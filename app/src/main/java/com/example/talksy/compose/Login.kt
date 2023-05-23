@@ -1,10 +1,8 @@
 package com.example.talksy.compose
 
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -12,10 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -35,7 +30,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,7 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.talksy.R
-import com.example.talksy.compose.destinations.LoginDestination
+import com.example.talksy.compose.destinations.RegisterDestination
 import com.example.talksy.compose.reusableComposables.AutoScalingText
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -54,12 +48,11 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Register(
+fun Login(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator?
 ) {
 
-    var nameInput by remember { mutableStateOf("") }
     var phoneInput by remember { mutableStateOf("") }
     var passwordInput by remember { mutableStateOf("") }
 
@@ -76,10 +69,10 @@ fun Register(
         topBar = {
             LargeTopAppBar(title = {
                 Column {
-                    Text(text = "Register")
+                    Text(text = "Login")
                     Spacer(modifier = modifier.height(4.dp))
                     Text(
-                        text = "Fill up your details to register.",
+                        text = "Enter your phone and password to continue.",
                         style = MaterialTheme.typography.titleSmall.copy(fontSize = 16.sp)
                     )
                 }
@@ -107,12 +100,6 @@ fun Register(
                     modifier = modifier.weight(1.5f),
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    OutlinedTextField(
-                        modifier = modifier.fillMaxWidth(),
-                        value = nameInput,
-                        label = { Text("Enter your name") },
-                        placeholder = { Text("Name") },
-                        onValueChange = { nameInput = it })
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
                         value = phoneInput,
@@ -150,7 +137,7 @@ fun Register(
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.titleMedium,
                             fontSize = 18.sp,
-                            text = "Register"
+                            text = "Login"
                         )
                     }
                     Spacer(modifier = modifier.fillMaxHeight(0.05f))
@@ -159,11 +146,11 @@ fun Register(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
                     ) {
-                        Text(text = "Already have an account?")
+                        Text(text = "Don't have an account?")
                         TextButton(
-                            onClick = { navigator?.navigate(LoginDestination) }) {
+                            onClick = { navigator?.navigate(RegisterDestination) }) {
                             Text(
-                                text = "Login"
+                                text = "Register"
                             )
                         }
                     }
@@ -173,8 +160,8 @@ fun Register(
     }
 }
 
-@Preview(showBackground = true)
+@Preview
 @Composable
-fun RegisterPrev() {
-    Register(navigator = null)
+fun LoginPrev() {
+    Login(navigator = null)
 }

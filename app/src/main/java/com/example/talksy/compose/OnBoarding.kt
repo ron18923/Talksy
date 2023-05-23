@@ -43,7 +43,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@Destination(start=true)
+@Destination(start = true)
 @Composable
 fun OnBoarding(
     modifier: Modifier = Modifier,
@@ -101,7 +101,7 @@ fun OnBoarding(
 
         Column(modifier = modifier.fillMaxSize()) {
             Button(
-                modifier = modifier.fillMaxHeight(0.50f),
+                modifier = modifier.height(screenHeight.times(0.06.toFloat())),
                 onClick = { /*TODO*/ }) {
                 AutoScalingText(
                     modifier = modifier.fillMaxWidth(),
