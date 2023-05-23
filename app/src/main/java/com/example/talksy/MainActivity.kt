@@ -13,8 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
+import com.example.talksy.compose.NavGraphs
 import com.example.talksy.compose.OnBoarding
 import com.example.talksy.ui.theme.TalksyTheme
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +31,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     //forcing the layout direction of the app to always be ltr
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr){
-//                        DestinationsNavHost(navGraph = )
+                        DestinationsNavHost(navGraph = NavGraphs.root)
                     }
                 }
             }

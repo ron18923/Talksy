@@ -37,13 +37,18 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.talksy.R
+import com.example.talksy.compose.destinations.RegisterDestination
 import com.example.talksy.compose.reusableComposables.AutoScalingText
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@Destination(start=true)
 @Composable
 fun OnBoarding(
     modifier: Modifier = Modifier,
+    navigator: DestinationsNavigator?
 ) {
-
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
@@ -64,7 +69,9 @@ fun OnBoarding(
                 //adding padding to the top of 5% of screen's height
                 modifier = modifier
                     .align(Alignment.End),
-                onClick = { /*TODO*/ }) {
+                onClick = {
+                    navigator?.navigate(RegisterDestination())
+                }) {
                 Text(text = "Skip", fontSize = 14.sp)
             }
 
@@ -111,5 +118,5 @@ fun OnBoarding(
 @Preview(showBackground = true)
 @Composable
 fun OnBoardingPrev() {
-//    OnBoarding()
+    OnBoarding(navigator = null)
 }
