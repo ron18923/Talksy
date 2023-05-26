@@ -72,7 +72,7 @@ fun Login(
                     Text(text = "Login")
                     Spacer(modifier = modifier.height(4.dp))
                     Text(
-                        text = "Enter your phone and password to continue.",
+                        text = "Enter your email and password to continue.",
                         style = MaterialTheme.typography.titleSmall.copy(fontSize = 16.sp)
                     )
                 }
@@ -103,8 +103,8 @@ fun Login(
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
                         value = phoneInput,
-                        label = { Text("Enter phone number") },
-                        placeholder = { Text("Phone") },
+                        label = { Text("Enter email") },
+                        placeholder = { Text("Email") },
                         onValueChange = { phoneInput = it })
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
