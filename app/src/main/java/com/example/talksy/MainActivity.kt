@@ -6,24 +6,26 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import com.example.talksy.compose.NavGraphs
 import com.example.talksy.compose.OnBoarding
+import com.example.talksy.compose.destinations.OnBoardingDestination
 import com.example.talksy.ui.theme.TalksyTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.manualcomposablecalls.composable
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        lateinit var viewModel: UserViewModel
+
         super.onCreate(savedInstanceState)
         setContent {
             TalksyTheme {
@@ -32,12 +34,15 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    //forcing the layout direction of the app to always be ltr
-                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr){
-                        DestinationsNavHost(navGraph = NavGraphs.root)
+                    viewModel = hiltViewModel<UserViewModel>()
 
-                        //TODO temporary code - delete later!
-//                        val viewModel = hilt
+                    //forcing the layout direction of the app to always be ltr
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        DestinationsNavHost(navGraph = NavGraphs.root){
+                            composable(OnBoardingDestination){
+                                OnBoarding(navigator = destinationsNavigator, userViewModel = viewModel)
+                            }
+                        }
                     }
                 }
             }
