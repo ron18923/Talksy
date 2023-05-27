@@ -12,7 +12,7 @@ import kotlinx.coroutines.tasks.await
 
 class UserRepository(private val auth: FirebaseAuth, private val appContext: Application) {
 
-    suspend fun addNewUser(name: String, email: String, password: String){
+    fun addNewUser(name: String, email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -20,15 +20,26 @@ class UserRepository(private val auth: FirebaseAuth, private val appContext: App
                 } else {
                     Toast.makeText(
                         appContext,
-                        "Authentication failed.",
+                        "Registering failed.",
                         Toast.LENGTH_SHORT,
                     ).show()
                 }
-            }.await()
+            }
     }
 
-    suspend fun loginUser(email: String, password: String) {
-        //login an existing user
+    fun loginUser(email: String, password: String) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                } else {
+                    Toast.makeText(
+                        appContext,
+                        "Login failed.",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
     }
 
 }

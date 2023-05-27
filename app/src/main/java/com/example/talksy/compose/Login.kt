@@ -1,5 +1,7 @@
 package com.example.talksy.compose
 
+import android.app.Application
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -40,8 +43,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.talksy.R
+import com.example.talksy.RegisterLoginViewModel
 import com.example.talksy.compose.destinations.RegisterDestination
 import com.example.talksy.compose.reusableComposables.AutoScalingText
+import com.example.talksy.data.user.UserRepository
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -50,12 +57,9 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun Login(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator?
+    navigator: DestinationsNavigator?,
+    registerLoginViewModel: RegisterLoginViewModel
 ) {
-
-    var phoneInput by remember { mutableStateOf("") }
-    var passwordInput by remember { mutableStateOf("") }
-
     var isPasswordVisible by remember { mutableStateOf(false) }
     val passwordFieldIcon =
         if (isPasswordVisible) R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24
@@ -64,6 +68,8 @@ fun Login(
 
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
+
+    val localContext = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -102,16 +108,16 @@ fun Login(
                 ) {
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
-                        value = phoneInput,
+                        value = registerLoginViewModel.emailInput.value,
                         label = { Text("Enter email") },
                         placeholder = { Text("Email") },
-                        onValueChange = { phoneInput = it })
+                        onValueChange = { registerLoginViewModel.emailInput.value = it })
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
-                        value = passwordInput,
+                        value = registerLoginViewModel.passwordInput.value,
                         label = { Text("Enter your password") },
                         placeholder = { Text("Password") },
-                        onValueChange = { passwordInput = it },
+                        onValueChange = { registerLoginViewModel.passwordInput.value = it },
                         trailingIcon = {
                             IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                                 Icon(
@@ -131,7 +137,16 @@ fun Login(
 
                     Button(
                         modifier = modifier.height(screenHeight.times(0.06.toFloat())),
-                        onClick = { /*TODO*/ }) {
+                        onClick = {
+                            val isValid = registerLoginViewModel.checkIfFieldsValid(
+                                email = registerLoginViewModel.emailInput.value,
+                                password = registerLoginViewModel.passwordInput.value
+                            ) { errorMessage ->
+                                Toast.makeText(localContext, errorMessage, Toast.LENGTH_LONG).show()
+                            }
+                            if (isValid) registerLoginViewModel.loginUser()
+                        }
+                    ) {
                         AutoScalingText(
                             modifier = modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
@@ -163,5 +178,13 @@ fun Login(
 @Preview
 @Composable
 fun LoginPrev() {
-    Login(navigator = null)
+    Login(
+        navigator = null,
+        registerLoginViewModel = RegisterLoginViewModel(
+            UserRepository(
+                Firebase.auth,
+                Application()
+            )
+        )
+    )
 }

@@ -11,20 +11,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
+import com.example.talksy.compose.Login
 import com.example.talksy.compose.NavGraphs
 import com.example.talksy.compose.OnBoarding
+import com.example.talksy.compose.Register
+import com.example.talksy.compose.destinations.LoginDestination
 import com.example.talksy.compose.destinations.OnBoardingDestination
+import com.example.talksy.compose.destinations.RegisterDestination
 import com.example.talksy.ui.theme.TalksyTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.manualcomposablecalls.composable
 import dagger.hilt.android.AndroidEntryPoint
 
+//TODO at the end of the project, make all of the compose functions parameters, non-nullable again.
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        lateinit var viewModel: UserViewModel
+        lateinit var viewModel: RegisterLoginViewModel
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -34,13 +39,25 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    viewModel = hiltViewModel<UserViewModel>()
+                    viewModel = hiltViewModel<RegisterLoginViewModel>()
 
                     //forcing the layout direction of the app to always be ltr
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                        DestinationsNavHost(navGraph = NavGraphs.root){
-                            composable(OnBoardingDestination){
-                                OnBoarding(navigator = destinationsNavigator, userViewModel = viewModel)
+                        DestinationsNavHost(navGraph = NavGraphs.root) {
+                            composable(OnBoardingDestination) {
+                                OnBoarding(navigator = destinationsNavigator)
+                            }
+                            composable(RegisterDestination) {
+                                Register(
+                                    navigator = destinationsNavigator,
+                                    registerLoginViewModel = viewModel
+                                )
+                            }
+                            composable(LoginDestination) {
+                                Login(
+                                    navigator = destinationsNavigator,
+                                    registerLoginViewModel = viewModel
+                                )
                             }
                         }
                     }

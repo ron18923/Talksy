@@ -14,6 +14,10 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -22,22 +26,35 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.talksy.UserViewModel
 import com.example.talksy.R
 import com.example.talksy.compose.destinations.RegisterDestination
 import com.example.talksy.compose.reusableComposables.AutoScalingText
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import java.util.LinkedList
+import java.util.Queue
 
 @Destination(start = true)
 @Composable
 fun OnBoarding(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator?,
-    userViewModel: UserViewModel?
+    navigator: DestinationsNavigator?
 ) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+
+    val texts: Queue<String> = remember {
+        LinkedList(
+            listOf(
+                "Welcome to Talksy, a great friend to chat with you",
+                "If you are confused about what to do just open Talksy app",
+                "Talksy will be ready to chat & make you happy"
+            )
+        )
+    }
+    var currentText by remember {
+        mutableStateOf(texts.remove())
+    }
 
     Column(
         modifier = modifier
@@ -76,7 +93,7 @@ fun OnBoarding(
             Spacer(modifier = modifier.height(screenHeight.times(0.05.toFloat())))
 
             Text(
-                text = "Welcome to Talksy, a great friend to chat with you",
+                text = currentText,
                 modifier = modifier
                     .align(Alignment.CenterHorizontally)
                     .fillMaxWidth(0.6f),
@@ -89,7 +106,10 @@ fun OnBoarding(
         Column(modifier = modifier.fillMaxSize()) {
             Button(
                 modifier = modifier.height(screenHeight.times(0.06.toFloat())),
-                onClick = { /*TODO*/ }) {
+                onClick = {
+                    if (!texts.isEmpty()) currentText = texts.remove()
+                    else navigator?.navigate(RegisterDestination())
+                }) {
                 AutoScalingText(
                     modifier = modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
@@ -105,5 +125,7 @@ fun OnBoarding(
 @Preview(showBackground = true)
 @Composable
 fun OnBoardingPrev() {
-//    OnBoarding(navigator = null, userViewModel = null)
+    OnBoarding(
+        navigator = null
+    )
 }
