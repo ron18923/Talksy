@@ -3,15 +3,14 @@ package com.example.talksy
 import android.util.Patterns
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.liveData
 import com.example.talksy.data.user.UserRepository
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterLoginViewModel @Inject constructor(
+class UserViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
@@ -20,12 +19,18 @@ class RegisterLoginViewModel @Inject constructor(
     var emailInput = mutableStateOf("")
     var passwordInput = mutableStateOf("")
 
-    fun addNewUser() {
-        userRepository.addNewUser(nameInput.value, emailInput.value, passwordInput.value)
+    fun addNewUser() = liveData {
+        val isSuccess = userRepository.addNewUser(
+            nameInput.value,
+            emailInput.value,
+            passwordInput.value
+        )
+        emit(isSuccess)
     }
 
-    fun loginUser() {
-        userRepository.loginUser(emailInput.value, passwordInput.value)
+    fun signInUser() = liveData {
+        val isSuccess = userRepository.signInUser(emailInput.value, passwordInput.value)
+        emit(isSuccess)
     }
 
     fun checkIfFieldsValid(
@@ -45,5 +50,13 @@ class RegisterLoginViewModel @Inject constructor(
             return false
         }
         return true
+    }
+
+    fun getUser(): FirebaseUser? {
+        return userRepository.getUser()
+    }
+
+    fun isSignedIn(): Boolean {
+        return getUser() == null
     }
 }

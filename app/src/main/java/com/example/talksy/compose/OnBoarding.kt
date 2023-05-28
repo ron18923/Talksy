@@ -34,7 +34,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.util.LinkedList
 import java.util.Queue
 
-@Destination(start = true)
+@Destination()
 @Composable
 fun OnBoarding(
     modifier: Modifier = Modifier,

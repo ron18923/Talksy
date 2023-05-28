@@ -11,10 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.talksy.compose.ChatPage
 import com.example.talksy.compose.Login
 import com.example.talksy.compose.NavGraphs
 import com.example.talksy.compose.OnBoarding
 import com.example.talksy.compose.Register
+import com.example.talksy.compose.destinations.ChatPageDestination
 import com.example.talksy.compose.destinations.LoginDestination
 import com.example.talksy.compose.destinations.OnBoardingDestination
 import com.example.talksy.compose.destinations.RegisterDestination
@@ -29,7 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        lateinit var viewModel: RegisterLoginViewModel
+        lateinit var viewModel: UserViewModel
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -39,7 +41,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    viewModel = hiltViewModel<RegisterLoginViewModel>()
+                    viewModel = hiltViewModel<UserViewModel>()
 
                     //forcing the layout direction of the app to always be ltr
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -50,13 +52,19 @@ class MainActivity : ComponentActivity() {
                             composable(RegisterDestination) {
                                 Register(
                                     navigator = destinationsNavigator,
-                                    registerLoginViewModel = viewModel
+                                    userViewModel = viewModel
                                 )
                             }
                             composable(LoginDestination) {
                                 Login(
                                     navigator = destinationsNavigator,
-                                    registerLoginViewModel = viewModel
+                                    userViewModel = viewModel
+                                )
+                            }
+                            composable(ChatPageDestination) {
+                                ChatPage(
+                                    navigator = destinationsNavigator,
+                                    userViewModel = viewModel
                                 )
                             }
                         }

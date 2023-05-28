@@ -1,45 +1,47 @@
 package com.example.talksy.data.user
 
 import android.app.Application
-import android.content.Context
 import android.widget.Toast
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
+import kotlin.coroutines.cancellation.CancellationException
 
 class UserRepository(private val auth: FirebaseAuth, private val appContext: Application) {
 
-    fun addNewUser(name: String, email: String, password: String) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                } else {
-                    Toast.makeText(
-                        appContext,
-                        "Registering failed.",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }
-            }
+    suspend fun addNewUser(name: String, email: String, password: String): Boolean {
+        return try {
+            val user = auth.createUserWithEmailAndPassword(email, password).await().user
+            user != null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            if (e is CancellationException) throw e
+            Toast.makeText(
+                appContext,
+                e.message,
+                Toast.LENGTH_SHORT,
+            ).show()
+            return false
+        }
     }
 
-    fun loginUser(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                } else {
-                    Toast.makeText(
-                        appContext,
-                        "Login failed.",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }
-            }
+    suspend fun signInUser(email: String, password: String): Boolean {
+        return try {
+            val user = auth.signInWithEmailAndPassword(email, password).await().user
+            user != null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            if (e is CancellationException) throw e
+            Toast.makeText(
+                appContext,
+                e.message,
+                Toast.LENGTH_SHORT,
+            ).show()
+            return false
+        }
     }
 
+    fun getUser(): FirebaseUser? {
+        return auth.currentUser
+    }
 }
