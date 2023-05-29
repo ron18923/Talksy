@@ -14,7 +14,6 @@ class UserViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    //TODO check about the 'remember' thing
     var nameInput = mutableStateOf("")
     var emailInput = mutableStateOf("")
     var passwordInput = mutableStateOf("")
@@ -57,6 +56,6 @@ class UserViewModel @Inject constructor(
     }
 
     fun isSignedIn(): Boolean {
-        return getUser() == null
+        return getUser() != null
     }
 }

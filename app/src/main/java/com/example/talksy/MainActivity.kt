@@ -31,7 +31,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        lateinit var viewModel: UserViewModel
+        lateinit var userViewModel: UserViewModel
+        lateinit var chatViewModel: ChatViewModel
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -41,7 +42,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    viewModel = hiltViewModel<UserViewModel>()
+                    userViewModel = hiltViewModel()
+                    chatViewModel = hiltViewModel()
 
                     //forcing the layout direction of the app to always be ltr
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -52,19 +54,20 @@ class MainActivity : ComponentActivity() {
                             composable(RegisterDestination) {
                                 Register(
                                     navigator = destinationsNavigator,
-                                    userViewModel = viewModel
+                                    userViewModel = userViewModel
                                 )
                             }
                             composable(LoginDestination) {
                                 Login(
                                     navigator = destinationsNavigator,
-                                    userViewModel = viewModel
+                                    userViewModel = userViewModel
                                 )
                             }
                             composable(ChatPageDestination) {
                                 ChatPage(
                                     navigator = destinationsNavigator,
-                                    userViewModel = viewModel
+                                    userViewModel = userViewModel,
+                                    chatViewModel = chatViewModel
                                 )
                             }
                         }
