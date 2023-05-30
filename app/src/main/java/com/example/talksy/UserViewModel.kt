@@ -23,7 +23,9 @@ class UserViewModel @Inject constructor(
             nameInput.value,
             emailInput.value,
             passwordInput.value
-        )
+        ){
+
+        }
         emit(isSuccess)
     }
 

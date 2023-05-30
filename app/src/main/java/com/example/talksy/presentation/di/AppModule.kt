@@ -1,4 +1,4 @@
-package com.example.talksy.di
+package com.example.talksy.presentation.di
 
 import android.app.Application
 import com.example.talksy.data.user.UserRepository

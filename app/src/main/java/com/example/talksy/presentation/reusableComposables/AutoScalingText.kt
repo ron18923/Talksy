@@ -1,6 +1,5 @@
-package com.example.talksy.compose.reusableComposables
+package com.example.talksy.presentation.reusableComposables
 
-import android.util.Log
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

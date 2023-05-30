@@ -10,21 +10,23 @@ import kotlin.coroutines.cancellation.CancellationException
 
 class UserRepository(private val auth: FirebaseAuth, private val appContext: Application) {
 
-    suspend fun addNewUser(name: String, email: String, password: String): Boolean {
-        return try {
+    suspend fun addNewUser(
+        name: String,
+        email: String,
+        password: String,
+        errorMessage: (String) -> Unit
+    ) {
+        try {
             val user = auth.createUserWithEmailAndPassword(email, password).await().user
             val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(name).build()
             user?.updateProfile(profileUpdates)?.await()
-            user != null
+            if(user != null){
+                errorMessage("failed to create new user.")
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             if (e is CancellationException) throw e
-            Toast.makeText(
-                appContext,
-                e.message,
-                Toast.LENGTH_SHORT,
-            ).show()
-            return false
+            errorMessage(e.message!!)
         }
     }
 

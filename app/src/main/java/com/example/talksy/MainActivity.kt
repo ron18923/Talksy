@@ -11,15 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.talksy.compose.ChatPage
-import com.example.talksy.compose.Login
-import com.example.talksy.compose.NavGraphs
-import com.example.talksy.compose.OnBoarding
-import com.example.talksy.compose.Register
-import com.example.talksy.compose.destinations.ChatPageDestination
-import com.example.talksy.compose.destinations.LoginDestination
-import com.example.talksy.compose.destinations.OnBoardingDestination
-import com.example.talksy.compose.destinations.RegisterDestination
+import com.example.talksy.presentation.ChatPage
+import com.example.talksy.presentation.Login
+import com.example.talksy.presentation.NavGraphs
+import com.example.talksy.presentation.OnBoarding
+import com.example.talksy.presentation.register.Register
+import com.example.talksy.presentation.destinations.ChatPageDestination
+import com.example.talksy.presentation.destinations.LoginDestination
+import com.example.talksy.presentation.destinations.OnBoardingDestination
+import com.example.talksy.presentation.destinations.RegisterDestination
+import com.example.talksy.presentation.register.RegisterViewModel
 import com.example.talksy.ui.theme.TalksyTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.manualcomposablecalls.composable
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
 
         lateinit var userViewModel: UserViewModel
         lateinit var chatViewModel: ChatViewModel
+        lateinit var registerViewModel: RegisterViewModel
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -44,6 +46,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     userViewModel = hiltViewModel()
                     chatViewModel = hiltViewModel()
+                    registerViewModel = hiltViewModel()
 
                     //forcing the layout direction of the app to always be ltr
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -54,7 +57,7 @@ class MainActivity : ComponentActivity() {
                             composable(RegisterDestination) {
                                 Register(
                                     navigator = destinationsNavigator,
-                                    userViewModel = userViewModel
+                                    registerViewModel = registerViewModel
                                 )
                             }
                             composable(LoginDestination) {

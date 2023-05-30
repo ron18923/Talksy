@@ -1,7 +1,6 @@
-package com.example.talksy.compose
+package com.example.talksy.presentation.register
 
 import android.app.Application
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,12 +22,16 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,14 +48,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.talksy.R
 import com.example.talksy.UserViewModel
-import com.example.talksy.compose.destinations.ChatPageDestination
-import com.example.talksy.compose.destinations.LoginDestination
-import com.example.talksy.compose.reusableComposables.AutoScalingText
+import com.example.talksy.presentation.destinations.LoginDestination
+import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import com.example.talksy.data.user.UserRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Destination
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,22 +64,39 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun Register(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator?,
-    userViewModel: UserViewModel
+    registerViewModel: RegisterViewModel
 ) {
-    var isPasswordVisible by remember { mutableStateOf(false) }
+    val state = registerViewModel.state.value
+
     val passwordFieldIcon =
-        if (isPasswordVisible) R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24
+        if (state.isPasswordVisible) R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24
     val passwordFieldVisualTransformation =
-        if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
+        if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
 
     val configuration = LocalConfiguration.current
     val screenHeight =
         configuration.screenHeightDp.dp //to calculate elements height with reference to screen height
 
-    val localContext = LocalContext.current
-    val lifeCycleOwner = LocalLifecycleOwner.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    //Handling events
+    LaunchedEffect(key1 = true) {
+        registerViewModel.events.collectLatest { event ->
+            when (event) {
+                is RegisterEvent.GoToLoginClicked -> {
+                    navigator?.navigate(LoginDestination)
+                }
+                is RegisterEvent.ShowMessage -> {
+                    scope.launch { snackbarHostState.showSnackbar(event.message) }
+                }
+                else -> {}
+            }
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             LargeTopAppBar(title = {
                 Column {
@@ -112,24 +133,24 @@ fun Register(
                 ) {
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
-                        value = userViewModel.nameInput.value,
+                        value = state.nameInput,
                         label = { Text("Enter your name") },
                         placeholder = { Text("Name") },
-                        onValueChange = { userViewModel.nameInput.value = it })
+                        onValueChange = { registerViewModel.onEvent(RegisterEvent.NameEntered(it)) })
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
-                        value = userViewModel.emailInput.value,
+                        value = state.emailInput,
                         label = { Text("Enter email") },
                         placeholder = { Text("Email") },
-                        onValueChange = { userViewModel.emailInput.value = it })
+                        onValueChange = { registerViewModel.onEvent(RegisterEvent.EmailEntered(it)) })
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
-                        value = userViewModel.passwordInput.value,
+                        value = state.passwordInput,
                         label = { Text("Enter your password") },
                         placeholder = { Text("Password") },
-                        onValueChange = { userViewModel.passwordInput.value = it },
+                        onValueChange = { registerViewModel.onEvent(RegisterEvent.PasswordEntered(it)) },
                         trailingIcon = {
-                            IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                            IconButton(onClick = { registerViewModel.onEvent(RegisterEvent.PasswordVisibilityClicked) }) {
                                 Icon(
                                     painter = painterResource(id = passwordFieldIcon),
                                     contentDescription = "visibility toggle"
@@ -148,19 +169,7 @@ fun Register(
                     Button(
                         modifier = modifier.height(screenHeight.times(0.06.toFloat())),
                         onClick = {
-                            val isValid = userViewModel.checkIfFieldsValid(
-                                userViewModel.nameInput.value,
-                                userViewModel.emailInput.value,
-                                userViewModel.passwordInput.value
-                            ) { errorMessage ->
-                                Toast.makeText(localContext, errorMessage, Toast.LENGTH_LONG).show()
-                            }
-                            if (isValid) {
-                                val isSuccess = userViewModel.addNewUser()
-                                isSuccess.observe(lifeCycleOwner) {
-                                    if(it) navigator?.navigate(ChatPageDestination)
-                                }
-                            }
+                            registerViewModel.onEvent(RegisterEvent.RegisterClicked)
                         }) {
                         AutoScalingText(
                             modifier = modifier.fillMaxWidth(),
@@ -178,7 +187,7 @@ fun Register(
                     ) {
                         Text(text = "Already have an account?")
                         TextButton(
-                            onClick = { navigator?.navigate(LoginDestination) }) {
+                            onClick = { registerViewModel.onEvent(RegisterEvent.GoToLoginClicked) }) {
                             Text(
                                 text = "Login"
                             )
@@ -195,7 +204,7 @@ fun Register(
 fun RegisterPrev() {
     Register(
         navigator = null,
-        userViewModel = UserViewModel(
+        registerViewModel = RegisterViewModel(
             UserRepository(
                 Firebase.auth,
                 Application()

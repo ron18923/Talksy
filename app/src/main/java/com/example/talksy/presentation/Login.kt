@@ -1,4 +1,4 @@
-package com.example.talksy.compose
+package com.example.talksy.presentation
 
 import android.app.Application
 import android.widget.Toast
@@ -43,12 +43,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LifecycleOwner
 import com.example.talksy.R
 import com.example.talksy.UserViewModel
-import com.example.talksy.compose.destinations.ChatPageDestination
-import com.example.talksy.compose.destinations.RegisterDestination
-import com.example.talksy.compose.reusableComposables.AutoScalingText
+import com.example.talksy.presentation.destinations.ChatPageDestination
+import com.example.talksy.presentation.destinations.RegisterDestination
+import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import com.example.talksy.data.user.UserRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase

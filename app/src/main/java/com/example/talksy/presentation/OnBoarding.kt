@@ -1,4 +1,4 @@
-package com.example.talksy.compose
+package com.example.talksy.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -27,8 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.talksy.R
-import com.example.talksy.compose.destinations.RegisterDestination
-import com.example.talksy.compose.reusableComposables.AutoScalingText
+import com.example.talksy.presentation.destinations.RegisterDestination
+import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import java.util.LinkedList
