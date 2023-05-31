@@ -30,7 +30,7 @@ class UserViewModel @Inject constructor(
     }
 
     fun signInUser() = liveData {
-        val isSuccess = userRepository.signInUser(emailInput.value, passwordInput.value)
+        val isSuccess = userRepository.signInUser(emailInput.value, passwordInput.value){}
         emit(isSuccess)
     }
 

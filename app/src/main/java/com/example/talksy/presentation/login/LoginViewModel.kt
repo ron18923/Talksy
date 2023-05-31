@@ -1,6 +1,5 @@
-package com.example.talksy.presentation.register
+package com.example.talksy.presentation.login
 
-import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -14,96 +13,88 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterViewModel @Inject constructor(
+class LoginViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _state = mutableStateOf(RegisterStates())
-    val state: State<RegisterStates> = _state
+    private val _state = mutableStateOf(LoginStates())
+    val state: State<LoginStates> = _state
 
-    private val _events = MutableSharedFlow<RegisterEvent>()
+    private val _events = MutableSharedFlow<LoginEvent>()
     val events = _events.asSharedFlow()
 
-    private fun registerUser() {
+    private fun loginUser() {
         checkIfFieldsValid(
-            _state.value.nameInput,
             _state.value.emailInput,
             _state.value.passwordInput
         ) { errorMessage ->
-            onEvent(RegisterEvent.ShowMessage(errorMessage))
+            onEvent(LoginEvent.ShowMessage(errorMessage))
             return@checkIfFieldsValid
         }
 
         viewModelScope.launch{
-            userRepository.addNewUser(
-                _state.value.nameInput,
+            userRepository.signInUser(
                 _state.value.emailInput,
                 _state.value.passwordInput
             ) { errorMessage ->
-                onEvent(RegisterEvent.ShowMessage(errorMessage))
-                return@addNewUser
+                onEvent(LoginEvent.ShowMessage(errorMessage))
+                return@signInUser
             }
-            if(userRepository.getUser() != null) onEvent(RegisterEvent.GoToApp)
+            if(userRepository.getUser() != null) onEvent(LoginEvent.GoToApp)
         }
     }
 
     private fun checkIfFieldsValid(
-        name: String = "  ", //spaces in the string are to pass name length checking.
         email: String,
         password: String,
         errorMessage: (String) -> Unit
     ) {
-        if (name.length < 2) {
-            errorMessage("Name must be at-least 2 characters.")
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             errorMessage("Valid Email must be entered.")
         } else if (password.length < 8) {
             errorMessage("Password Length must be at-least 8 characters.")
         }
     }
 
-    fun onEvent(event: RegisterEvent){
+    fun onEvent(event: LoginEvent){
         when(event){
-            is RegisterEvent.NameEntered -> {
-                _state.value = _state.value.copy(nameInput = event.value)
-            }
-            is RegisterEvent.EmailEntered -> {
+            is LoginEvent.EmailEntered -> {
                 _state.value = _state.value.copy(emailInput = event.value)
             }
-            is RegisterEvent.PasswordEntered -> {
+            is LoginEvent.PasswordEntered -> {
                 _state.value = _state.value.copy(passwordInput = event.value)
             }
-            is RegisterEvent.GoToLoginClicked -> {
+            is LoginEvent.GoToRegisterClicked -> {
                 viewModelScope.launch {
                     _events.emit(
-                        RegisterEvent.GoToLoginClicked
+                        LoginEvent.GoToRegisterClicked
                     )
                 }
             }
-            is RegisterEvent.GoBackClicked -> {
+            is LoginEvent.GoBackClicked -> {
                 viewModelScope.launch {
                     _events.emit(
-                        RegisterEvent.GoBackClicked
+                        LoginEvent.GoBackClicked
                     )
                 }
             }
-            is RegisterEvent.PasswordVisibilityClicked -> {
+            is LoginEvent.PasswordVisibilityClicked -> {
                 _state.value = _state.value.copy(isPasswordVisible = !_state.value.isPasswordVisible)
             }
-            is RegisterEvent.RegisterClicked -> {
-                registerUser()
+            is LoginEvent.LoginClicked -> {
+                loginUser()
             }
-            is RegisterEvent.ShowMessage -> {
+            is LoginEvent.ShowMessage -> {
                 viewModelScope.launch {
                     _events.emit(
-                        RegisterEvent.ShowMessage(event.message)
+                        LoginEvent.ShowMessage(event.message)
                     )
                 }
             }
-            is RegisterEvent.GoToApp -> {
+            is LoginEvent.GoToApp -> {
                 viewModelScope.launch {
                     _events.emit(
-                        RegisterEvent.GoToApp
+                        LoginEvent.GoToApp
                     )
                 }
             }

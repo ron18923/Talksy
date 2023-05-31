@@ -1,14 +1,13 @@
 package com.example.talksy.data.user
 
 import android.app.Application
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.cancellation.CancellationException
 
-class UserRepository(private val auth: FirebaseAuth, private val appContext: Application) {
+class UserRepository(private val auth: FirebaseAuth) {
 
     suspend fun addNewUser(
         name: String,
@@ -20,9 +19,7 @@ class UserRepository(private val auth: FirebaseAuth, private val appContext: App
             val user = auth.createUserWithEmailAndPassword(email, password).await().user
             val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(name).build()
             user?.updateProfile(profileUpdates)?.await()
-            if(user != null){
-                errorMessage("failed to create new user.")
-            }
+            if (user == null) errorMessage("failed to create new user.")
         } catch (e: Exception) {
             e.printStackTrace()
             if (e is CancellationException) throw e
@@ -30,19 +27,14 @@ class UserRepository(private val auth: FirebaseAuth, private val appContext: App
         }
     }
 
-    suspend fun signInUser(email: String, password: String): Boolean {
-        return try {
+    suspend fun signInUser(email: String, password: String, errorMessage: (String) -> Unit) {
+        try {
             val user = auth.signInWithEmailAndPassword(email, password).await().user
-            user != null
+            if (user == null) errorMessage("failed to Login.")
         } catch (e: Exception) {
             e.printStackTrace()
             if (e is CancellationException) throw e
-            Toast.makeText(
-                appContext,
-                e.message,
-                Toast.LENGTH_SHORT,
-            ).show()
-            return false
+            errorMessage(e.message!!)
         }
     }
 

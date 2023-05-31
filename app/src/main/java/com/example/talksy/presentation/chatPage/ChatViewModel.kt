@@ -1,4 +1,4 @@
-package com.example.talksy
+package com.example.talksy.presentation.chatPage
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel

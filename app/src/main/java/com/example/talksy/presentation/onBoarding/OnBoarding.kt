@@ -1,4 +1,4 @@
-package com.example.talksy.presentation
+package com.example.talksy.presentation.onBoarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -14,6 +14,7 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,9 +29,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.talksy.R
 import com.example.talksy.presentation.destinations.RegisterDestination
+import com.example.talksy.presentation.register.RegisterEvent
+import com.example.talksy.presentation.register.RegisterStates
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import java.util.LinkedList
 import java.util.Queue
 
@@ -38,22 +45,22 @@ import java.util.Queue
 @Composable
 fun OnBoarding(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator?
+    navigator: DestinationsNavigator?,
+    state: OnBoardingStates,
+    onEvent: (OnBoardingEvent) -> Unit,
+    events: SharedFlow<OnBoardingEvent>
 ) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
-    val texts: Queue<String> = remember {
-        LinkedList(
-            listOf(
-                "Welcome to Talksy, a great friend to chat with you",
-                "If you are confused about what to do just open Talksy app",
-                "Talksy will be ready to chat & make you happy"
-            )
-        )
-    }
-    var currentText by remember {
-        mutableStateOf(texts.remove())
+    LaunchedEffect(key1 = true) {
+        events.collectLatest { event ->
+            when (event) {
+                OnBoardingEvent.SkipClicked -> navigator?.navigate(RegisterDestination())
+                OnBoardingEvent.Finished -> navigator?.navigate(RegisterDestination)
+                else -> {}
+            }
+        }
     }
 
     Column(
@@ -74,7 +81,7 @@ fun OnBoarding(
                 modifier = modifier
                     .align(Alignment.End),
                 onClick = {
-                    navigator?.navigate(RegisterDestination())
+                    onEvent(OnBoardingEvent.SkipClicked)
                 }) {
                 Text(text = "Skip", fontSize = 14.sp)
             }
@@ -93,7 +100,7 @@ fun OnBoarding(
             Spacer(modifier = modifier.height(screenHeight.times(0.05.toFloat())))
 
             Text(
-                text = currentText,
+                text = state.textState,
                 modifier = modifier
                     .align(Alignment.CenterHorizontally)
                     .fillMaxWidth(0.6f),
@@ -107,8 +114,7 @@ fun OnBoarding(
             Button(
                 modifier = modifier.height(screenHeight.times(0.06.toFloat())),
                 onClick = {
-                    if (!texts.isEmpty()) currentText = texts.remove()
-                    else navigator?.navigate(RegisterDestination())
+                    onEvent(OnBoardingEvent.NextClicked)
                 }) {
                 AutoScalingText(
                     modifier = modifier.fillMaxWidth(),
@@ -126,6 +132,9 @@ fun OnBoarding(
 @Composable
 fun OnBoardingPrev() {
     OnBoarding(
-        navigator = null
+        navigator = null,
+        state = OnBoardingStates("Welcome to Talksy, a great friend to chat with you"),
+        onEvent = {},
+        events = MutableSharedFlow<OnBoardingEvent>().asSharedFlow()
     )
 }

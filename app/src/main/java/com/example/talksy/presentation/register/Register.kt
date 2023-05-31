@@ -1,6 +1,5 @@
 package com.example.talksy.presentation.register
 
-import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,17 +27,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -48,12 +41,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.talksy.R
-import com.example.talksy.UserViewModel
 import com.example.talksy.presentation.destinations.LoginDestination
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
-import com.example.talksy.data.user.UserRepository
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.example.talksy.presentation.destinations.ChatPageDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -73,7 +63,7 @@ fun Register(
     events: SharedFlow<RegisterEvent>
 ) {
     val passwordFieldIcon =
-        if (state.isPasswordVisible) R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24
+        if (state.isPasswordVisible) R.drawable.baseline_visibility_24 else R.drawable.baseline_visibility_off_24
     val passwordFieldVisualTransformation =
         if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
 
@@ -86,17 +76,14 @@ fun Register(
 
     //Handling events
     LaunchedEffect(key1 = true) {
-        onEvent(RegisterEvent.GoToLoginClicked)
-
         events.collectLatest { event ->
             when (event) {
-                is RegisterEvent.GoToLoginClicked -> {
-                    navigator?.navigate(LoginDestination)
-                }
-                is RegisterEvent.ShowMessage -> {
-                    scope.launch { snackbarHostState.showSnackbar(event.message) }
-                }
-                else -> {}
+                is RegisterEvent.GoToLoginClicked -> navigator?.navigate(LoginDestination)
+                is RegisterEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(event.message) }
+                is RegisterEvent.GoBackClicked -> navigator?.popBackStack()
+                is RegisterEvent.GoToApp -> navigator?.navigate(ChatPageDestination)
+
+                else -> {} //not all events require implementation here.
             }
         }
     }
@@ -116,7 +103,7 @@ fun Register(
             },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navigator?.popBackStack()
+                        onEvent(RegisterEvent.GoBackClicked)
                     }) {
                         Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go Back")
                     }
@@ -139,18 +126,21 @@ fun Register(
                 ) {
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
+                        singleLine = true,
                         value = state.nameInput,
                         label = { Text("Enter your name") },
                         placeholder = { Text("Name") },
                         onValueChange = { onEvent(RegisterEvent.NameEntered(it)) })
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
+                        singleLine = true,
                         value = state.emailInput,
                         label = { Text("Enter email") },
                         placeholder = { Text("Email") },
                         onValueChange = { onEvent(RegisterEvent.EmailEntered(it)) })
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
+                        singleLine = true,
                         value = state.passwordInput,
                         label = { Text("Enter your password") },
                         placeholder = { Text("Password") },
@@ -210,7 +200,7 @@ fun Register(
 fun RegisterPrev() {
     Register(
         navigator = null,
-        state = RegisterStates("", "", "", false, false),
+        state = RegisterStates("", "", "", false),
         onEvent = {},
         events = MutableSharedFlow<RegisterEvent>().asSharedFlow()
     )

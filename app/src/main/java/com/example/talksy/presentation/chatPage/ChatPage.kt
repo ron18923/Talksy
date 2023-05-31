@@ -1,4 +1,4 @@
-package com.example.talksy.presentation
+package com.example.talksy.presentation.chatPage
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.talksy.ChatViewModel
 import com.example.talksy.R
 import com.example.talksy.UserViewModel
 import com.example.talksy.presentation.destinations.OnBoardingDestination

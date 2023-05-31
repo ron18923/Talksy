@@ -16,8 +16,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(app: Application): UserRepository {
-        return UserRepository(auth = Firebase.auth, appContext = app)
+    fun provideUserRepository(): UserRepository {
+        return UserRepository(auth = Firebase.auth)
     }
 
 }

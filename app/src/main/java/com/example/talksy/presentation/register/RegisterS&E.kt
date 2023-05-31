@@ -8,14 +8,15 @@ sealed class RegisterEvent {
     object PasswordVisibilityClicked : RegisterEvent()
     object RegisterClicked : RegisterEvent()
     object GoToLoginClicked : RegisterEvent()
+    object GoBackClicked : RegisterEvent()
 
     data class ShowMessage(val message: String) : RegisterEvent()
+    object GoToApp : RegisterEvent()
 }
 
 data class RegisterStates(
     var nameInput: String = "",
     var emailInput: String = "",
     var passwordInput: String = "",
-    var isPasswordVisible: Boolean = false,
-    var isUserLogged: Boolean = false
+    var isPasswordVisible: Boolean = false
 )
