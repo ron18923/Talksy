@@ -25,6 +25,7 @@ import com.example.talksy.ui.theme.TalksyTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.manualcomposablecalls.composable
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 
 //TODO at the end of the project, make all of the compose functions parameters, non-nullable again.
 
@@ -57,7 +58,9 @@ class MainActivity : ComponentActivity() {
                             composable(RegisterDestination) {
                                 Register(
                                     navigator = destinationsNavigator,
-                                    registerViewModel = registerViewModel
+                                    state = registerViewModel.state.value,
+                                    onEvent = registerViewModel::onEvent,
+                                    events = registerViewModel.events
                                 )
                             }
                             composable(LoginDestination) {

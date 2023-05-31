@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +56,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -64,10 +68,10 @@ import kotlinx.coroutines.launch
 fun Register(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator?,
-    registerViewModel: RegisterViewModel
+    state: RegisterStates,
+    onEvent: (RegisterEvent) -> Unit,
+    events: SharedFlow<RegisterEvent>
 ) {
-    val state = registerViewModel.state.value
-
     val passwordFieldIcon =
         if (state.isPasswordVisible) R.drawable.baseline_visibility_off_24 else R.drawable.baseline_visibility_24
     val passwordFieldVisualTransformation =
@@ -82,7 +86,9 @@ fun Register(
 
     //Handling events
     LaunchedEffect(key1 = true) {
-        registerViewModel.events.collectLatest { event ->
+        onEvent(RegisterEvent.GoToLoginClicked)
+
+        events.collectLatest { event ->
             when (event) {
                 is RegisterEvent.GoToLoginClicked -> {
                     navigator?.navigate(LoginDestination)
@@ -136,21 +142,21 @@ fun Register(
                         value = state.nameInput,
                         label = { Text("Enter your name") },
                         placeholder = { Text("Name") },
-                        onValueChange = { registerViewModel.onEvent(RegisterEvent.NameEntered(it)) })
+                        onValueChange = { onEvent(RegisterEvent.NameEntered(it)) })
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
                         value = state.emailInput,
                         label = { Text("Enter email") },
                         placeholder = { Text("Email") },
-                        onValueChange = { registerViewModel.onEvent(RegisterEvent.EmailEntered(it)) })
+                        onValueChange = { onEvent(RegisterEvent.EmailEntered(it)) })
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
                         value = state.passwordInput,
                         label = { Text("Enter your password") },
                         placeholder = { Text("Password") },
-                        onValueChange = { registerViewModel.onEvent(RegisterEvent.PasswordEntered(it)) },
+                        onValueChange = { onEvent(RegisterEvent.PasswordEntered(it)) },
                         trailingIcon = {
-                            IconButton(onClick = { registerViewModel.onEvent(RegisterEvent.PasswordVisibilityClicked) }) {
+                            IconButton(onClick = { onEvent(RegisterEvent.PasswordVisibilityClicked) }) {
                                 Icon(
                                     painter = painterResource(id = passwordFieldIcon),
                                     contentDescription = "visibility toggle"
@@ -169,7 +175,7 @@ fun Register(
                     Button(
                         modifier = modifier.height(screenHeight.times(0.06.toFloat())),
                         onClick = {
-                            registerViewModel.onEvent(RegisterEvent.RegisterClicked)
+                            onEvent(RegisterEvent.RegisterClicked)
                         }) {
                         AutoScalingText(
                             modifier = modifier.fillMaxWidth(),
@@ -187,7 +193,7 @@ fun Register(
                     ) {
                         Text(text = "Already have an account?")
                         TextButton(
-                            onClick = { registerViewModel.onEvent(RegisterEvent.GoToLoginClicked) }) {
+                            onClick = { onEvent(RegisterEvent.GoToLoginClicked) }) {
                             Text(
                                 text = "Login"
                             )
@@ -204,11 +210,8 @@ fun Register(
 fun RegisterPrev() {
     Register(
         navigator = null,
-        registerViewModel = RegisterViewModel(
-            UserRepository(
-                Firebase.auth,
-                Application()
-            )
-        )
+        state = RegisterStates("", "", "", false, false),
+        onEvent = {},
+        events = MutableSharedFlow<RegisterEvent>().asSharedFlow()
     )
 }
