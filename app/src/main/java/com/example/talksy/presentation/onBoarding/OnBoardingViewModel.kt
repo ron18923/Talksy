@@ -1,5 +1,7 @@
 package com.example.talksy.presentation.onBoarding
 
+import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +40,7 @@ class OnBoardingViewModel @Inject constructor(
         if (!texts.isEmpty()){
             _state.value = _state.value.copy(textState = texts.remove())
         }
+        Log.d("MYTAG", state.value.textState)
     }
 
     fun onEvent(event: OnBoardingEvent) {

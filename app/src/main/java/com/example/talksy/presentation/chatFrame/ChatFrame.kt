@@ -1,5 +1,6 @@
-package com.example.talksy.presentation.chatPage
+package com.example.talksy.presentation.chatFrame
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,44 +18,51 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.talksy.R
-import com.example.talksy.UserViewModel
 import com.example.talksy.presentation.destinations.OnBoardingDestination
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination(start = true)
+@Destination
 @Composable
-fun ChatPage(
+fun ChatFrame(
     modifier: Modifier = Modifier,
     navigator: DestinationsNavigator?,
-    userViewModel: UserViewModel,
-    chatViewModel: ChatViewModel
+    state: ChatFrameStates,
+    onEvent: (ChatFrameEvent) -> Unit,
+    events: SharedFlow<ChatFrameEvent>
 ) {
-    if (!userViewModel.isSignedIn()) {
-        navigator?.navigate(OnBoardingDestination)
-        return
-    }
-
-    val user = userViewModel.getUser()!!
 
     val navItems = listOf(
         BottomNavItem("Chats", painterResource(R.drawable.baseline_chat_24)),
         BottomNavItem("Contacts", painterResource(R.drawable.baseline_people_24)),
         BottomNavItem("Settings", painterResource(R.drawable.baseline_settings_24)),
     )
-    var selectedNavItem by remember { mutableStateOf(0) }
+
+    //Handling events
+    LaunchedEffect(key1 = true) {
+        events.collectLatest { event ->
+            when (event) {
+                ChatFrameEvent.NoUserFound -> {
+                    navigator?.navigate(OnBoardingDestination)
+                }
+
+                else -> {}
+            }
+        }
+    }
 
     Scaffold(bottomBar = {
         NavigationBar() {
@@ -63,14 +71,16 @@ fun ChatPage(
                 NavigationBarItem(
                     icon = { Icon(item.icon, "nav icon") },
                     label = { Text(item.title) },
-                    selected = selectedNavItem == index,
-                    onClick = { selectedNavItem = index }
+                    selected = state.selectedNavItem == index,
+                    onClick = {
+                        onEvent(ChatFrameEvent.NavItemSelected(index))
+                    }
                 )
             }
         }
     },
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = navItems[selectedNavItem].title) })
+            CenterAlignedTopAppBar(title = { Text(text = navItems[state.selectedNavItem].title) })
         }
     ) {
         Box(
@@ -79,10 +89,10 @@ fun ChatPage(
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            when (selectedNavItem) {
+            when (state.selectedNavItem) {
                 0 -> Chats(modifier)
                 1 -> Contacts(modifier)
-                2 -> Settings(modifier, user)
+                2 -> Settings(modifier)
             }
         }
     }
@@ -104,14 +114,16 @@ fun Contacts(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Settings(modifier: Modifier = Modifier, user: FirebaseUser) {
+fun Settings(modifier: Modifier = Modifier, user: FirebaseUser = Firebase.auth.currentUser!!) {
     Column(
         modifier = modifier.fillMaxWidth(0.9f),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.1f)) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.1f)
+        ) {
             Image(
                 modifier = modifier
                     .fillMaxHeight()
@@ -129,5 +141,5 @@ fun Settings(modifier: Modifier = Modifier, user: FirebaseUser) {
 
 @Preview(showBackground = true)
 @Composable
-fun ChatPagePrev() {
+fun ChatFramePrev() {
 }

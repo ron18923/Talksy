@@ -41,9 +41,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.talksy.R
+import com.example.talksy.presentation.destinations.ChatFrameDestination
 import com.example.talksy.presentation.destinations.LoginDestination
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
-import com.example.talksy.presentation.destinations.ChatPageDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -81,8 +81,7 @@ fun Register(
                 is RegisterEvent.GoToLoginClicked -> navigator?.navigate(LoginDestination)
                 is RegisterEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(event.message) }
                 is RegisterEvent.GoBackClicked -> navigator?.popBackStack()
-                is RegisterEvent.GoToApp -> navigator?.navigate(ChatPageDestination)
-
+                is RegisterEvent.GoToApp -> navigator?.navigate(ChatFrameDestination)
                 else -> {} //not all events require implementation here.
             }
         }

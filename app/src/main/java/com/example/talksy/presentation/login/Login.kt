@@ -41,7 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.talksy.R
-import com.example.talksy.presentation.destinations.ChatPageDestination
+import com.example.talksy.presentation.destinations.ChatFrameDestination
 import com.example.talksy.presentation.destinations.RegisterDestination
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import com.ramcosta.composedestinations.annotation.Destination
@@ -80,7 +80,7 @@ fun Login(
                 is LoginEvent.GoToRegisterClicked -> navigator?.navigate(RegisterDestination)
                 is LoginEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(event.message) }
                 is LoginEvent.GoBackClicked -> navigator?.popBackStack()
-                is LoginEvent.GoToApp -> navigator?.navigate(ChatPageDestination)
+                is LoginEvent.GoToApp -> navigator?.navigate(ChatFrameDestination)
                 else -> {} //not all events require implementation here.
             }
         }
