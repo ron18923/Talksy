@@ -36,6 +36,8 @@ import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
 import com.example.talksy.presentation.chatFrame.contacts.ContactsStates
 import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import com.example.talksy.presentation.chatFrame.settings.SettingsStates
+import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
+import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
 import com.example.talksy.presentation.destinations.OnBoardingDestination
 import com.example.talksy.presentation.login.Login
 import com.example.talksy.presentation.login.LoginEvent
@@ -63,7 +65,7 @@ fun ChatFrame(
     events: SharedFlow<ChatFrameEvent>,
     chatsViewModelMap: Map<String, Any>,
     contactsViewModelMap: Map<String, Any>,
-    settingsViewModelMap: Map<String, Any>
+    settingsViewModelContainer: SettingsViewModelContainer
 ) {
 
     val navItems = listOf(
@@ -113,7 +115,7 @@ fun ChatFrame(
             when (state.selectedNavItem) {
                 0 -> Chats(modifier)
                 1 -> Contacts(modifier)
-                2 -> Settings(modifier, settingsViewModelMap)
+                2 -> Settings(modifier, settingsViewModelContainer)
             }
         }
     }
@@ -137,11 +139,11 @@ fun Contacts(modifier: Modifier = Modifier) {
 @Composable
 fun Settings(
     modifier: Modifier = Modifier,
-    viewModelMap: Map<String, Any>
+    settingsViewModelContainer: SettingsViewModelContainer
 ) {
-    val state = viewModelMap[STATE] as SettingsStates
-    val onEvent = viewModelMap[ONEVENT] as (SettingsEvent) -> Unit
-    val events = viewModelMap[EVENTS] as SharedFlow<*>
+    val state = settingsViewModelContainer.state
+    val onEvent = settingsViewModelContainer.onEvent
+    val events = settingsViewModelContainer.events
 
     Column(
         modifier = modifier.fillMaxWidth(0.9f),
@@ -170,6 +172,7 @@ fun Settings(
 @Preview(showBackground = true)
 @Composable
 fun ChatFramePrev() {
+
     ChatFrame(
         navigator = null,
         state = ChatFrameStates(2),
@@ -186,11 +189,11 @@ fun ChatFramePrev() {
             ONEVENT to {},
             EVENTS to MutableSharedFlow<ContactsEvent>().asSharedFlow()
         ),
-        settingsViewModelMap = mapOf(
-            STATE to SettingsStates("Ron", "ronron18923@gmail.com"),
-            ONEVENT to {},
-            ONEVENT to {},
-            EVENTS to MutableSharedFlow<SettingsEvent>().asSharedFlow()
+        settingsViewModelContainer = SettingsViewModelContainer(
+            state = SettingsStates("Ron", "ronronr18923@gmail.com"),
+            onEvent = {},
+            events = MutableSharedFlow<SettingsEvent>().asSharedFlow()
+
         )
     )
 }

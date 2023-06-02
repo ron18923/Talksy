@@ -27,6 +27,7 @@ import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModel
 import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
+import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
 import com.example.talksy.presentation.destinations.ChatFrameDestination
 import com.example.talksy.presentation.onBoarding.OnBoarding
 import com.example.talksy.presentation.register.Register
@@ -90,10 +91,10 @@ class MainActivity : ComponentActivity() {
                         ONEVENT to contactsViewModel::onEvent,
                         EVENTS to contactsViewModel.events
                     )
-                    val settingsViewModelMap = mapOf(
-                        STATE to settingsViewModel.state.value,
-                        ONEVENT to settingsViewModel::onEvent,
-                        EVENTS to settingsViewModel.events
+                    val settingsViewModelContainer = SettingsViewModelContainer(
+                        settingsViewModel.state.value,
+                        settingsViewModel::onEvent,
+                        settingsViewModel.events
                     )
 
                     //forcing the layout direction of the app to always be ltr
@@ -137,7 +138,7 @@ class MainActivity : ComponentActivity() {
                                     events = chatFrameViewModel.events,
                                     chatsViewModelMap = chatsViewModelMap,
                                     contactsViewModelMap = contactsViewModelMap,
-                                    settingsViewModelMap = settingsViewModelMap
+                                    settingsViewModelContainer = settingsViewModelContainer
                                 )
                             }
                         }
