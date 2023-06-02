@@ -1,6 +1,7 @@
 package com.example.talksy
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,11 +13,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.talksy.TalksyApp.Companion.EVENTS
+import com.example.talksy.TalksyApp.Companion.ONEVENT
+import com.example.talksy.TalksyApp.Companion.STATE
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.user.UserRepository
 import com.example.talksy.presentation.chatFrame.ChatFrame
 import com.example.talksy.presentation.login.Login
 import com.example.talksy.presentation.NavGraphs
 import com.example.talksy.presentation.chatFrame.ChatFrameViewModel
+import com.example.talksy.presentation.chatFrame.chats.ChatsViewModel
+import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
+import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModel
+import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
+import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
 import com.example.talksy.presentation.destinations.ChatFrameDestination
 import com.example.talksy.presentation.onBoarding.OnBoarding
 import com.example.talksy.presentation.register.Register
@@ -26,6 +36,7 @@ import com.example.talksy.presentation.destinations.RegisterDestination
 import com.example.talksy.presentation.destinations.StartComposeDestination
 import com.example.talksy.presentation.login.LoginViewModel
 import com.example.talksy.presentation.onBoarding.OnBoardingViewModel
+import com.example.talksy.presentation.register.RegisterEvent
 import com.example.talksy.presentation.register.RegisterViewModel
 import com.example.talksy.presentation.startCompose.StartCompose
 import com.example.talksy.presentation.startCompose.StartComposeViewModel
@@ -40,13 +51,17 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         lateinit var startComposeViewModel: StartComposeViewModel
         lateinit var onBoardingViewModel: OnBoardingViewModel
-        lateinit var chatFrameViewModel: ChatFrameViewModel
         lateinit var registerViewModel: RegisterViewModel
         lateinit var loginViewModel: LoginViewModel
+        lateinit var chatFrameViewModel: ChatFrameViewModel
+        lateinit var settingsViewModel: SettingsViewModel
+        lateinit var chatsViewModel: ChatsViewModel
+        lateinit var contactsViewModel: ContactsViewModel
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -58,9 +73,28 @@ class MainActivity : ComponentActivity() {
                 ) {
                     startComposeViewModel = hiltViewModel()
                     onBoardingViewModel = hiltViewModel()
-                    chatFrameViewModel = hiltViewModel()
                     registerViewModel = hiltViewModel()
                     loginViewModel = hiltViewModel()
+                    chatFrameViewModel = hiltViewModel()
+                    settingsViewModel = hiltViewModel()
+                    chatsViewModel = hiltViewModel()
+                    contactsViewModel = hiltViewModel()
+
+                    val chatsViewModelMap = mapOf(
+                        STATE to chatsViewModel.state.value,
+                        ONEVENT to chatsViewModel::onEvent,
+                        EVENTS to chatsViewModel.events
+                    )
+                    val contactsViewModelMap = mapOf(
+                        STATE to contactsViewModel.state.value,
+                        ONEVENT to contactsViewModel::onEvent,
+                        EVENTS to contactsViewModel.events
+                    )
+                    val settingsViewModelMap = mapOf(
+                        STATE to settingsViewModel.state.value,
+                        ONEVENT to settingsViewModel::onEvent,
+                        EVENTS to settingsViewModel.events
+                    )
 
                     //forcing the layout direction of the app to always be ltr
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -100,7 +134,10 @@ class MainActivity : ComponentActivity() {
                                     navigator = destinationsNavigator,
                                     state = chatFrameViewModel.state.value,
                                     onEvent = chatFrameViewModel::onEvent,
-                                    events = chatFrameViewModel.events
+                                    events = chatFrameViewModel.events,
+                                    chatsViewModelMap = chatsViewModelMap,
+                                    contactsViewModelMap = contactsViewModelMap,
+                                    settingsViewModelMap = settingsViewModelMap
                                 )
                             }
                         }

@@ -1,5 +1,8 @@
 package com.example.talksy.presentation.chatFrame
 
+import com.example.talksy.TalksyApp.Companion.EVENTS
+import com.example.talksy.TalksyApp.Companion.ONEVENT
+import com.example.talksy.TalksyApp.Companion.STATE
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -25,14 +28,29 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.talksy.R
+import com.example.talksy.TalksyApp
+import com.example.talksy.data.user.UserRepository
+import com.example.talksy.presentation.chatFrame.chats.ChatsEvent
+import com.example.talksy.presentation.chatFrame.chats.ChatsState
+import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
+import com.example.talksy.presentation.chatFrame.contacts.ContactsStates
+import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
+import com.example.talksy.presentation.chatFrame.settings.SettingsStates
 import com.example.talksy.presentation.destinations.OnBoardingDestination
+import com.example.talksy.presentation.login.Login
+import com.example.talksy.presentation.login.LoginEvent
+import com.example.talksy.presentation.login.LoginStates
+import com.example.talksy.presentation.register.RegisterEvent
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination
@@ -42,7 +60,10 @@ fun ChatFrame(
     navigator: DestinationsNavigator?,
     state: ChatFrameStates,
     onEvent: (ChatFrameEvent) -> Unit,
-    events: SharedFlow<ChatFrameEvent>
+    events: SharedFlow<ChatFrameEvent>,
+    chatsViewModelMap: Map<String, Any>,
+    contactsViewModelMap: Map<String, Any>,
+    settingsViewModelMap: Map<String, Any>
 ) {
 
     val navItems = listOf(
@@ -92,7 +113,7 @@ fun ChatFrame(
             when (state.selectedNavItem) {
                 0 -> Chats(modifier)
                 1 -> Contacts(modifier)
-                2 -> Settings(modifier)
+                2 -> Settings(modifier, settingsViewModelMap)
             }
         }
     }
@@ -114,7 +135,14 @@ fun Contacts(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun Settings(modifier: Modifier = Modifier, user: FirebaseUser = Firebase.auth.currentUser!!) {
+fun Settings(
+    modifier: Modifier = Modifier,
+    viewModelMap: Map<String, Any>
+) {
+    val state = viewModelMap[STATE] as SettingsStates
+    val onEvent = viewModelMap[ONEVENT] as (SettingsEvent) -> Unit
+    val events = viewModelMap[EVENTS] as SharedFlow<*>
+
     Column(
         modifier = modifier.fillMaxWidth(0.9f),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -132,8 +160,8 @@ fun Settings(modifier: Modifier = Modifier, user: FirebaseUser = Firebase.auth.c
                 contentDescription = "profile picture"
             )
             Column(verticalArrangement = Arrangement.Center) {
-                Text(text = user.displayName!!)
-                Text(text = user.email!!)
+                Text(text = state.displayName)
+                Text(text = state.email)
             }
         }
     }
@@ -142,4 +170,27 @@ fun Settings(modifier: Modifier = Modifier, user: FirebaseUser = Firebase.auth.c
 @Preview(showBackground = true)
 @Composable
 fun ChatFramePrev() {
+    ChatFrame(
+        navigator = null,
+        state = ChatFrameStates(2),
+        onEvent = {},
+        events = MutableSharedFlow<ChatFrameEvent>().asSharedFlow(),
+        chatsViewModelMap = mapOf(
+            STATE to ChatsState(""),
+            ONEVENT to {},
+            EVENTS to MutableSharedFlow<ChatsEvent>().asSharedFlow()
+        ),
+        contactsViewModelMap = mapOf(
+            STATE to ContactsStates(""),
+            ONEVENT to {},
+            ONEVENT to {},
+            EVENTS to MutableSharedFlow<ContactsEvent>().asSharedFlow()
+        ),
+        settingsViewModelMap = mapOf(
+            STATE to SettingsStates("Ron", "ronron18923@gmail.com"),
+            ONEVENT to {},
+            ONEVENT to {},
+            EVENTS to MutableSharedFlow<SettingsEvent>().asSharedFlow()
+        )
+    )
 }
