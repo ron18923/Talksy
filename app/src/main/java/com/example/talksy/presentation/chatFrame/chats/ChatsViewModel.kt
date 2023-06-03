@@ -8,6 +8,7 @@ import com.example.talksy.presentation.login.LoginEvent
 import com.example.talksy.presentation.login.LoginStates
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 
@@ -28,3 +29,9 @@ class ChatsViewModel @Inject constructor(
         }
     }
 }
+
+data class ChatsViewModelContainer(
+    var state: ChatsState,
+    var onEvent: (ChatsEvent) -> Unit,
+    var events: SharedFlow<ChatsEvent>,
+)

@@ -32,8 +32,10 @@ import com.example.talksy.TalksyApp
 import com.example.talksy.data.user.UserRepository
 import com.example.talksy.presentation.chatFrame.chats.ChatsEvent
 import com.example.talksy.presentation.chatFrame.chats.ChatsState
+import com.example.talksy.presentation.chatFrame.chats.ChatsViewModelContainer
 import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
 import com.example.talksy.presentation.chatFrame.contacts.ContactsStates
+import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
 import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import com.example.talksy.presentation.chatFrame.settings.SettingsStates
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
@@ -63,8 +65,8 @@ fun ChatFrame(
     state: ChatFrameStates,
     onEvent: (ChatFrameEvent) -> Unit,
     events: SharedFlow<ChatFrameEvent>,
-    chatsViewModelMap: Map<String, Any>,
-    contactsViewModelMap: Map<String, Any>,
+    chatsViewModelContainer: ChatsViewModelContainer,
+    contactsViewModelContainer: ContactsViewModelContainer,
     settingsViewModelContainer: SettingsViewModelContainer
 ) {
 
@@ -113,8 +115,8 @@ fun ChatFrame(
             contentAlignment = Alignment.Center
         ) {
             when (state.selectedNavItem) {
-                0 -> Chats(modifier)
-                1 -> Contacts(modifier)
+                0 -> Chats(modifier, chatsViewModelContainer)
+                1 -> Contacts(modifier, contactsViewModelContainer)
                 2 -> Settings(modifier, settingsViewModelContainer)
             }
         }
@@ -127,12 +129,18 @@ data class BottomNavItem(
 )
 
 @Composable
-fun Chats(modifier: Modifier = Modifier) {
+fun Chats(
+    modifier: Modifier = Modifier,
+    chatsViewModelContainer: ChatsViewModelContainer
+) {
     Text(text = "chats")
 }
 
 @Composable
-fun Contacts(modifier: Modifier = Modifier) {
+fun Contacts(
+    modifier: Modifier = Modifier,
+    contactsViewModelContainer: ContactsViewModelContainer
+) {
     Text(text = "contacts")
 }
 
@@ -178,16 +186,15 @@ fun ChatFramePrev() {
         state = ChatFrameStates(2),
         onEvent = {},
         events = MutableSharedFlow<ChatFrameEvent>().asSharedFlow(),
-        chatsViewModelMap = mapOf(
-            STATE to ChatsState(""),
-            ONEVENT to {},
-            EVENTS to MutableSharedFlow<ChatsEvent>().asSharedFlow()
+        chatsViewModelContainer = ChatsViewModelContainer(
+            state = ChatsState(""),
+            onEvent = {},
+            events = MutableSharedFlow<ChatsEvent>().asSharedFlow()
         ),
-        contactsViewModelMap = mapOf(
-            STATE to ContactsStates(""),
-            ONEVENT to {},
-            ONEVENT to {},
-            EVENTS to MutableSharedFlow<ContactsEvent>().asSharedFlow()
+        contactsViewModelContainer = ContactsViewModelContainer(
+            state = ContactsStates(""),
+            onEvent = {},
+            events = MutableSharedFlow<ContactsEvent>().asSharedFlow()
         ),
         settingsViewModelContainer = SettingsViewModelContainer(
             state = SettingsStates("Ron", "ronronr18923@gmail.com"),

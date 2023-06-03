@@ -23,8 +23,10 @@ import com.example.talksy.presentation.login.Login
 import com.example.talksy.presentation.NavGraphs
 import com.example.talksy.presentation.chatFrame.ChatFrameViewModel
 import com.example.talksy.presentation.chatFrame.chats.ChatsViewModel
+import com.example.talksy.presentation.chatFrame.chats.ChatsViewModelContainer
 import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModel
+import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
 import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
@@ -81,16 +83,18 @@ class MainActivity : ComponentActivity() {
                     chatsViewModel = hiltViewModel()
                     contactsViewModel = hiltViewModel()
 
-                    val chatsViewModelMap = mapOf(
-                        STATE to chatsViewModel.state.value,
-                        ONEVENT to chatsViewModel::onEvent,
-                        EVENTS to chatsViewModel.events
+                    val chatsViewModelContainer = ChatsViewModelContainer(
+                        chatsViewModel.state.value,
+                        chatsViewModel::onEvent,
+                        chatsViewModel.events
                     )
-                    val contactsViewModelMap = mapOf(
-                        STATE to contactsViewModel.state.value,
-                        ONEVENT to contactsViewModel::onEvent,
-                        EVENTS to contactsViewModel.events
+
+                    val contactsViewModelContainer = ContactsViewModelContainer(
+                        contactsViewModel.state.value,
+                        contactsViewModel::onEvent,
+                        contactsViewModel.events
                     )
+
                     val settingsViewModelContainer = SettingsViewModelContainer(
                         settingsViewModel.state.value,
                         settingsViewModel::onEvent,
@@ -136,8 +140,8 @@ class MainActivity : ComponentActivity() {
                                     state = chatFrameViewModel.state.value,
                                     onEvent = chatFrameViewModel::onEvent,
                                     events = chatFrameViewModel.events,
-                                    chatsViewModelMap = chatsViewModelMap,
-                                    contactsViewModelMap = contactsViewModelMap,
+                                    chatsViewModelContainer = chatsViewModelContainer,
+                                    contactsViewModelContainer = contactsViewModelContainer,
                                     settingsViewModelContainer = settingsViewModelContainer
                                 )
                             }
