@@ -3,6 +3,7 @@ package com.example.talksy.presentation.chatFrame.settings
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.talksy.data.user.UserRepository
 import com.example.talksy.presentation.chatFrame.ChatFrameEvent
 import com.example.talksy.presentation.chatFrame.ChatFrameStates
@@ -12,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,7 +38,14 @@ class SettingsViewModel @Inject constructor(
 
     fun onEvent(event: SettingsEvent) {
         when (event) {
-            SettingsEvent.SignOut -> userRepository.signOut()
+            SettingsEvent.SignOut -> {
+                userRepository.signOut()
+                viewModelScope.launch {
+                    _events.emit(
+                        SettingsEvent.SignOut
+                    )
+                }
+            }
         }
     }
 }

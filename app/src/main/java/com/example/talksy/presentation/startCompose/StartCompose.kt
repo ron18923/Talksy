@@ -16,6 +16,7 @@ fun StartCompose(
 ) {
     // TODO: temporary solution.
     Log.d(TAG, "StartCompose: ${viewModel.state.value.isSignedIn}")
+    viewModel.onEvent(NavigationEvent.CheckSignedIn)
     if (viewModel.state.value.isSignedIn){
         navigator?.navigate(ChatFrameDestination)
     }

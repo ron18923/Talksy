@@ -108,7 +108,7 @@ fun ChatFrame(
             when (state.selectedNavItem) {
                 0 -> Chats(modifier, chatsViewModelContainer)
                 1 -> Contacts(modifier, contactsViewModelContainer)
-                2 -> Settings(modifier, settingsViewModelContainer)
+                2 -> Settings(modifier, navigator, settingsViewModelContainer)
             }
         }
     }
