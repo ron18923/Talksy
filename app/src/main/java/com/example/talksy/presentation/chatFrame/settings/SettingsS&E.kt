@@ -1,7 +1,7 @@
 package com.example.talksy.presentation.chatFrame.settings
 
 sealed class SettingsEvent {
-    object TempEvent: SettingsEvent()
+    object SignOut : SettingsEvent()
 }
 
 data class SettingsStates(

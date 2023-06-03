@@ -13,9 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ChatFrameViewModel @Inject constructor(
-    private val userRepository: UserRepository
-) : ViewModel() {
+class ChatFrameViewModel @Inject constructor(): ViewModel() {
 
     private val _state = mutableStateOf(ChatFrameStates())
     val state: State<ChatFrameStates> = _state
@@ -37,9 +35,5 @@ class ChatFrameViewModel @Inject constructor(
                 _state.value = _state.value.copy(selectedNavItem = event.value)
             }
         }
-    }
-
-    private fun isUserFound(): Boolean {
-        return userRepository.getUser() != null
     }
 }

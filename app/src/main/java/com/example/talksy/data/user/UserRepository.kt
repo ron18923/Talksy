@@ -1,6 +1,8 @@
 package com.example.talksy.data.user
 
 import android.app.Application
+import android.util.Log
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -40,5 +42,9 @@ class UserRepository(private val auth: FirebaseAuth) {
 
     fun getUser(): FirebaseUser? {
         return auth.currentUser
+    }
+
+    fun signOut(){
+        auth.signOut()
     }
 }

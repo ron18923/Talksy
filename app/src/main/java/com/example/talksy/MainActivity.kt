@@ -1,33 +1,24 @@
 package com.example.talksy
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.talksy.TalksyApp.Companion.EVENTS
-import com.example.talksy.TalksyApp.Companion.ONEVENT
-import com.example.talksy.TalksyApp.Companion.STATE
-import com.example.talksy.TalksyApp.Companion.TAG
-import com.example.talksy.data.user.UserRepository
 import com.example.talksy.presentation.chatFrame.ChatFrame
 import com.example.talksy.presentation.login.Login
 import com.example.talksy.presentation.NavGraphs
 import com.example.talksy.presentation.chatFrame.ChatFrameViewModel
 import com.example.talksy.presentation.chatFrame.chats.ChatsViewModel
 import com.example.talksy.presentation.chatFrame.chats.ChatsViewModelContainer
-import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModel
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
-import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
 import com.example.talksy.presentation.destinations.ChatFrameDestination
@@ -39,15 +30,12 @@ import com.example.talksy.presentation.destinations.RegisterDestination
 import com.example.talksy.presentation.destinations.StartComposeDestination
 import com.example.talksy.presentation.login.LoginViewModel
 import com.example.talksy.presentation.onBoarding.OnBoardingViewModel
-import com.example.talksy.presentation.register.RegisterEvent
 import com.example.talksy.presentation.register.RegisterViewModel
 import com.example.talksy.presentation.startCompose.StartCompose
-import com.example.talksy.presentation.startCompose.StartComposeViewModel
+import com.example.talksy.presentation.startCompose.NavigationViewModel
 import com.example.talksy.ui.theme.TalksyTheme
 import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.manualcomposablecalls.composable
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import dagger.hilt.android.AndroidEntryPoint
 
 //TODO at the end of the project, make all of the compose functions parameters, non-nullable again.
@@ -57,7 +45,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        lateinit var startComposeViewModel: StartComposeViewModel
+        lateinit var navigationViewModel: NavigationViewModel
         lateinit var onBoardingViewModel: OnBoardingViewModel
         lateinit var registerViewModel: RegisterViewModel
         lateinit var loginViewModel: LoginViewModel
@@ -74,7 +62,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    startComposeViewModel = hiltViewModel()
+                    navigationViewModel = hiltViewModel()
                     onBoardingViewModel = hiltViewModel()
                     registerViewModel = hiltViewModel()
                     loginViewModel = hiltViewModel()
@@ -107,7 +95,7 @@ class MainActivity : ComponentActivity() {
                             composable(StartComposeDestination) {
                                 StartCompose(
                                     navigator = destinationsNavigator,
-                                    viewModel = startComposeViewModel
+                                    viewModel = navigationViewModel
                                 )
                             }
                             composable(OnBoardingDestination) {

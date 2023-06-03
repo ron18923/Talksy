@@ -25,10 +25,10 @@ class SettingsViewModel @Inject constructor(
     private val _events = MutableSharedFlow<SettingsEvent>()
     val events = _events.asSharedFlow()
 
-    val user = userRepository.getUser()!!
+    val user = userRepository.getUser()
 
     init {
-        _state.value = _state.value.copy(
+        if (user != null) _state.value = _state.value.copy(
             displayName = user.displayName!!,
             email = user.email!!
         )
@@ -36,7 +36,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onEvent(event: SettingsEvent) {
         when (event) {
-            SettingsEvent.TempEvent -> {}
+            SettingsEvent.SignOut -> userRepository.signOut()
         }
     }
 }
