@@ -1,5 +1,7 @@
 package com.example.talksy.presentation.chatFrame
 
+import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +29,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.content.ContextCompat.startActivity
 import com.example.talksy.R
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.chatFrame.chats.ChatsEvent
 import com.example.talksy.presentation.chatFrame.chats.ChatsState
 import com.example.talksy.presentation.chatFrame.chats.ChatsViewModelContainer
@@ -40,6 +44,7 @@ import com.example.talksy.presentation.chatFrame.settings.SettingsStates
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
 import com.example.talksy.presentation.destinations.OnBoardingDestination
 import com.example.talksy.ui.theme.TalksyTheme
+import com.google.firebase.auth.FirebaseAuth
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -60,7 +65,6 @@ fun ChatFrame(
     contactsViewModelContainer: ContactsViewModelContainer,
     settingsViewModelContainer: SettingsViewModelContainer
 ) {
-
     val navItems = listOf(
         BottomNavItem("Chats", painterResource(R.drawable.baseline_chat_24)),
         BottomNavItem("Contacts", painterResource(R.drawable.baseline_people_24)),

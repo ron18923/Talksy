@@ -1,15 +1,29 @@
 package com.example.talksy.data.user
 
-import android.app.Application
-import android.util.Log
-import com.example.talksy.TalksyApp.Companion.TAG
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.viewModelScope
+import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.cancellation.CancellationException
 
 class UserRepository(private val auth: FirebaseAuth) {
+
+    private var listener: UserStateListener? = null
+
+    init {
+        auth.addAuthStateListener{
+            listener?.onUserStateChanged()
+        }
+    }
+
+    fun setListener(listener: UserStateListener) {
+        this.listener = listener
+    }
 
     suspend fun addNewUser(
         name: String,
@@ -47,4 +61,9 @@ class UserRepository(private val auth: FirebaseAuth) {
     fun signOut(){
         auth.signOut()
     }
+
+}
+
+interface UserStateListener {
+    fun onUserStateChanged()
 }
