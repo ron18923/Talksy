@@ -1,7 +1,7 @@
 package com.example.talksy.presentation.register
 
 sealed class RegisterEvent {
-    data class NameEntered(val value: String) : RegisterEvent()
+    data class UsernameEntered(val value: String) : RegisterEvent()
     data class EmailEntered(val value: String) : RegisterEvent()
     data class PasswordEntered(val value: String) : RegisterEvent()
 
@@ -15,7 +15,7 @@ sealed class RegisterEvent {
 }
 
 data class RegisterStates(
-    var nameInput: String = "",
+    var usernameInput: String = "",
     var emailInput: String = "",
     var passwordInput: String = "",
     var isPasswordVisible: Boolean = false

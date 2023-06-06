@@ -35,16 +35,13 @@ import com.example.talksy.presentation.chatFrame.chats.ChatsViewModelContainer
 import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
 import com.example.talksy.presentation.chatFrame.contacts.ContactsStates
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
-import com.example.talksy.presentation.destinations.ChatFrameDestination
-import com.example.talksy.presentation.destinations.RegisterDestination
+import com.example.talksy.presentation.destinations.EditProfileDestination
 import com.example.talksy.presentation.destinations.StartComposeDestination
-import com.example.talksy.presentation.login.LoginEvent
 import com.example.talksy.ui.theme.TalksyTheme
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 @Composable
 fun Settings(
@@ -62,6 +59,7 @@ fun Settings(
             when (event) {
                 // TODO: temporary solution
                 SettingsEvent.SignOut -> navigator?.navigate(StartComposeDestination)
+                SettingsEvent.GoToEditProfile -> navigator?.navigate(EditProfileDestination)
             }
         }
     }
@@ -89,7 +87,7 @@ fun Settings(
                     modifier = modifier.fillMaxHeight(),
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = state.displayName, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = state.username, color = MaterialTheme.colorScheme.onSurface)
                     Text(text = state.email, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
@@ -99,7 +97,8 @@ fun Settings(
 
         CustomTextButton(
             leadingIcon = R.drawable.outline_edit_attributes_24,
-            text = "Edit Profile"
+            text = "Edit Profile",
+            onClick = { onEvent(SettingsEvent.GoToEditProfile) }
         )
         CustomTextButton(
             leadingIcon = R.drawable.baseline_block_24,
@@ -120,7 +119,7 @@ fun Settings(
         CustomTextButton(
             leadingIcon = R.drawable.outline_exit_to_app_24,
             text = "Logout",
-            onClick = {onEvent(SettingsEvent.SignOut)}
+            onClick = { onEvent(SettingsEvent.SignOut) }
         )
     }
 }

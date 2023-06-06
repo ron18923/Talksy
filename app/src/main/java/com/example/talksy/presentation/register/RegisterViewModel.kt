@@ -1,6 +1,5 @@
 package com.example.talksy.presentation.register
 
-import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +25,7 @@ class RegisterViewModel @Inject constructor(
 
     private fun registerUser() {
         checkIfFieldsValid(
-            _state.value.nameInput,
+            _state.value.usernameInput,
             _state.value.emailInput,
             _state.value.passwordInput
         ) { errorMessage ->
@@ -36,7 +35,7 @@ class RegisterViewModel @Inject constructor(
 
         viewModelScope.launch{
             userRepository.addNewUser(
-                _state.value.nameInput,
+                _state.value.usernameInput,
                 _state.value.emailInput,
                 _state.value.passwordInput
             ) { errorMessage ->
@@ -64,8 +63,8 @@ class RegisterViewModel @Inject constructor(
 
     fun onEvent(event: RegisterEvent){
         when(event){
-            is RegisterEvent.NameEntered -> {
-                _state.value = _state.value.copy(nameInput = event.value)
+            is RegisterEvent.UsernameEntered -> {
+                _state.value = _state.value.copy(usernameInput = event.value)
             }
             is RegisterEvent.EmailEntered -> {
                 _state.value = _state.value.copy(emailInput = event.value)

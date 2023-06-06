@@ -126,10 +126,10 @@ fun Register(
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
                         singleLine = true,
-                        value = state.nameInput,
-                        label = { Text("Enter your name") },
-                        placeholder = { Text("Name") },
-                        onValueChange = { onEvent(RegisterEvent.NameEntered(it)) })
+                        value = state.usernameInput,
+                        label = { Text("Enter Username") },
+                        placeholder = { Text("Username") },
+                        onValueChange = { onEvent(RegisterEvent.UsernameEntered(it)) })
                     OutlinedTextField(
                         modifier = modifier.fillMaxWidth(),
                         singleLine = true,

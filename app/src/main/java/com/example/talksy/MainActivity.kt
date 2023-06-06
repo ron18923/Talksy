@@ -22,12 +22,15 @@ import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelConta
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
 import com.example.talksy.presentation.destinations.ChatFrameDestination
+import com.example.talksy.presentation.destinations.EditProfileDestination
 import com.example.talksy.presentation.onBoarding.OnBoarding
 import com.example.talksy.presentation.register.Register
 import com.example.talksy.presentation.destinations.LoginDestination
 import com.example.talksy.presentation.destinations.OnBoardingDestination
 import com.example.talksy.presentation.destinations.RegisterDestination
 import com.example.talksy.presentation.destinations.StartComposeDestination
+import com.example.talksy.presentation.editProfile.EditProfile
+import com.example.talksy.presentation.editProfile.EditProfileViewModel
 import com.example.talksy.presentation.login.LoginViewModel
 import com.example.talksy.presentation.onBoarding.OnBoardingViewModel
 import com.example.talksy.presentation.register.RegisterViewModel
@@ -53,6 +56,7 @@ class MainActivity : ComponentActivity() {
         lateinit var settingsViewModel: SettingsViewModel
         lateinit var chatsViewModel: ChatsViewModel
         lateinit var contactsViewModel: ContactsViewModel
+        lateinit var editProfileViewModel: EditProfileViewModel
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -70,6 +74,7 @@ class MainActivity : ComponentActivity() {
                     settingsViewModel = hiltViewModel()
                     chatsViewModel = hiltViewModel()
                     contactsViewModel = hiltViewModel()
+                    editProfileViewModel = hiltViewModel()
 
                     val chatsViewModelContainer = ChatsViewModelContainer(
                         chatsViewModel.state.value,
@@ -131,6 +136,14 @@ class MainActivity : ComponentActivity() {
                                     chatsViewModelContainer = chatsViewModelContainer,
                                     contactsViewModelContainer = contactsViewModelContainer,
                                     settingsViewModelContainer = settingsViewModelContainer
+                                )
+                            }
+                            composable(EditProfileDestination){
+                                EditProfile(
+                                    navigator = destinationsNavigator,
+                                    state = editProfileViewModel.state.value,
+                                    onEvent = editProfileViewModel::onEvent,
+                                    events = editProfileViewModel.events,
                                 )
                             }
                         }

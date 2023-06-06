@@ -14,13 +14,13 @@ class UserViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-    var nameInput = mutableStateOf("")
+    var usernameInput = mutableStateOf("")
     var emailInput = mutableStateOf("")
     var passwordInput = mutableStateOf("")
 
     fun addNewUser() = liveData {
         val isSuccess = userRepository.addNewUser(
-            nameInput.value,
+            usernameInput.value,
             emailInput.value,
             passwordInput.value
         ){

@@ -40,7 +40,6 @@ class OnBoardingViewModel @Inject constructor(
         if (!texts.isEmpty()){
             _state.value = _state.value.copy(textState = texts.remove())
         }
-        Log.d("MYTAG", state.value.textState)
     }
 
     fun onEvent(event: OnBoardingEvent) {
