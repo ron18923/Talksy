@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.editProfile
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -30,7 +31,7 @@ class EditProfileViewModel @Inject constructor(private val userRepository: UserR
         updateScreenValues()
     }
 
-    fun updateScreenValues() {
+    private fun updateScreenValues() {
         if (_user != null) _state.value = _state.value.copy(
             email = _user.email ?: "",
             username = _user.displayName ?: ""
@@ -46,14 +47,31 @@ class EditProfileViewModel @Inject constructor(private val userRepository: UserR
                     )
                 }
             }
-
             is EditProfileEvent.EmailChanged -> _state.value =
                 _state.value.copy(email = event.value)
-
             is EditProfileEvent.UsernameChanged -> _state.value =
                 _state.value.copy(username = event.value)
-
-            is EditProfileEvent.UpdateProfileClicked -> {
+            is EditProfileEvent.ChangePasswordClicked -> {
+                viewModelScope.launch {
+                    _events.emit(
+                        EditProfileEvent.ChangePasswordClicked
+                    )
+                }
+            }
+            is EditProfileEvent.ChangePasswordConfirmed -> {
+                userRepository.resetPassword()
+                viewModelScope.launch {
+                    _events.emit(
+                        EditProfileEvent.ChangePasswordConfirmed
+                    )
+                }
+            }
+            EditProfileEvent.ChangeProfileClicked -> {
+                viewModelScope.launch {
+                    _events.emit(
+                        EditProfileEvent.ChangeProfileClicked
+                    )
+                }
             }
         }
     }

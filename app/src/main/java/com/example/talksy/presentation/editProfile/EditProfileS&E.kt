@@ -5,7 +5,9 @@ sealed class EditProfileEvent {
     data class UsernameChanged(val value: String) : EditProfileEvent()
 
     object GoBackClicked : EditProfileEvent()
-    object UpdateProfileClicked: EditProfileEvent()
+    object ChangePasswordClicked: EditProfileEvent()
+    object ChangePasswordConfirmed: EditProfileEvent()
+    object ChangeProfileClicked: EditProfileEvent()
 }
 
 data class EditProfileStates(

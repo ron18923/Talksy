@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -63,7 +65,7 @@ fun Register(
     events: SharedFlow<RegisterEvent>
 ) {
     val passwordFieldIcon =
-        if (state.isPasswordVisible) R.drawable.baseline_visibility_24 else R.drawable.baseline_visibility_off_24
+        if (state.isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
     val passwordFieldVisualTransformation =
         if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
 
@@ -147,7 +149,7 @@ fun Register(
                         trailingIcon = {
                             IconButton(onClick = { onEvent(RegisterEvent.PasswordVisibilityClicked) }) {
                                 Icon(
-                                    painter = painterResource(id = passwordFieldIcon),
+                                    imageVector = passwordFieldIcon,
                                     contentDescription = "visibility toggle"
                                 )
                             }

@@ -69,6 +69,12 @@ class UserRepository(private val auth: FirebaseAuth) {
         user.updateProfile(userProfileChangeRequest).await()
     }
 
+    fun resetPassword(){
+        val user = auth.currentUser
+        if(user != null){
+            auth.sendPasswordResetEmail(user.email?: "")
+        }
+    }
 }
 
 interface UserStateListener {

@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Contacts
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -66,9 +71,9 @@ fun ChatFrame(
     settingsViewModelContainer: SettingsViewModelContainer
 ) {
     val navItems = listOf(
-        BottomNavItem("Chats", painterResource(R.drawable.baseline_chat_24)),
-        BottomNavItem("Contacts", painterResource(R.drawable.baseline_people_24)),
-        BottomNavItem("Settings", painterResource(R.drawable.baseline_settings_24)),
+        BottomNavItem("Chats", Icons.Default.Chat),
+        BottomNavItem("Contacts", Icons.Default.Contacts),
+        BottomNavItem("Settings", Icons.Default.Settings),
     )
 
     //Handling events
@@ -120,7 +125,7 @@ fun ChatFrame(
 
 data class BottomNavItem(
     val title: String,
-    val icon: Painter
+    val icon: ImageVector
 )
 
 @Composable

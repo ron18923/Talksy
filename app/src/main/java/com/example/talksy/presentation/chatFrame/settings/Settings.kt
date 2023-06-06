@@ -12,6 +12,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.EditAttributes
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.ModeEdit
+import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.filled.ReadMore
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.EditAttributes
+import androidx.compose.material.icons.outlined.Logout
+import androidx.compose.material.icons.outlined.PrivacyTip
+import androidx.compose.material.icons.outlined.ReadMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -79,7 +98,7 @@ fun Settings(
                     modifier = modifier
                         .fillMaxHeight()
                         .aspectRatio(1f),
-                    painter = painterResource(id = R.drawable.baseline_account_circle_24),
+                    imageVector = Icons.Default.AccountCircle,
                     colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurface),
                     contentDescription = "profile picture"
                 )
@@ -96,28 +115,28 @@ fun Settings(
         Spacer(modifier = modifier.height(25.dp))
 
         CustomTextButton(
-            leadingIcon = R.drawable.outline_edit_attributes_24,
+            leadingIcon = Icons.Outlined.EditAttributes,
             text = "Edit Profile",
             onClick = { onEvent(SettingsEvent.GoToEditProfile) }
         )
         CustomTextButton(
-            leadingIcon = R.drawable.baseline_block_24,
+            leadingIcon = Icons.Outlined.Block,
             text = "Blocked Users"
         )
         CustomTextButton(
-            leadingIcon = R.drawable.outline_delete_24,
+            leadingIcon = Icons.Outlined.Delete,
             text = "Delete Account"
         )
         CustomTextButton(
-            leadingIcon = R.drawable.outline_privacy_tip_24,
+            leadingIcon = Icons.Outlined.PrivacyTip,
             text = "Privacy Policy"
         )
         CustomTextButton(
-            leadingIcon = R.drawable.outline_read_more_24,
+            leadingIcon = Icons.Outlined.ReadMore,
             text = "Terms & Conditions"
         )
         CustomTextButton(
-            leadingIcon = R.drawable.outline_exit_to_app_24,
+            leadingIcon = Icons.Outlined.Logout,
             text = "Logout",
             onClick = { onEvent(SettingsEvent.SignOut) }
         )
@@ -127,7 +146,7 @@ fun Settings(
 @Composable
 fun CustomTextButton(
     modifier: Modifier = Modifier,
-    leadingIcon: Int,
+    leadingIcon: ImageVector,
     text: String,
     onClick: () -> Unit = {}
 ) {
@@ -143,7 +162,7 @@ fun CustomTextButton(
                     centerVerticallyTo(parent)
                     start.linkTo(parent.start)
                 },
-                painter = painterResource(id = leadingIcon),
+                imageVector = leadingIcon,
                 contentDescription = "leading icon",
             )
             Text(
@@ -160,7 +179,7 @@ fun CustomTextButton(
                     centerVerticallyTo(parent)
                     end.linkTo(parent.end)
                 },
-                painter = painterResource(id = R.drawable.baseline_arrow_forward_ios_24),
+                imageVector = Icons.Default.ArrowForward,
                 contentDescription = "forward arrow"
             )
         }
