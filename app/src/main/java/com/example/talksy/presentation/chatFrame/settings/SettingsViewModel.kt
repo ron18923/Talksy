@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.chatFrame.settings
 
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -30,8 +31,9 @@ class SettingsViewModel @Inject constructor(
 
     init {
         if (_user != null) _state.value = _state.value.copy(
-            username = _user.displayName!!,
-            email = _user.email!!
+            username = _user.displayName ?: "",
+            email = _user.email ?: "",
+            profilePicture = _user.photoUrl ?: Uri.EMPTY
         )
         userRepository.setListener(_userStateListener)
     }

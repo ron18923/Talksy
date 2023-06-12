@@ -89,6 +89,7 @@ dependencies {
     //firebase
     implementation platform('com.google.firebase:firebase-bom:32.0.0')
     implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
 
     //dagger-hilt
     implementation "com.google.dagger:hilt-android:2.45"

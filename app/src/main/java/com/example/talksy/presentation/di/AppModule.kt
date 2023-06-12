@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.di
 
+import com.example.talksy.data.FireStoreRepository
 import com.example.talksy.data.StorageRepository
 import com.example.talksy.data.UserRepository
 import com.google.firebase.auth.ktx.auth
@@ -24,6 +25,12 @@ object AppModule {
     @Singleton
     fun providesStorageRepository(): StorageRepository {
         return StorageRepository()
+    }
+
+    @Provides
+    @Singleton
+    fun providesFireStoreRepository(): FireStoreRepository {
+        return FireStoreRepository()
     }
 
 }

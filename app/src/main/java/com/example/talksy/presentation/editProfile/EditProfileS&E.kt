@@ -1,9 +1,6 @@
 package com.example.talksy.presentation.editProfile
 
 import android.net.Uri
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class EditProfileEvent {
     data class EmailChanged(val value: String) : EditProfileEvent()
@@ -13,7 +10,8 @@ sealed class EditProfileEvent {
     object GoBackClicked : EditProfileEvent()
     object ChangePasswordClicked: EditProfileEvent()
     object ChangePasswordConfirmed: EditProfileEvent()
-    object ChangeProfileClicked: EditProfileEvent()
+    object ProfileImageClicked: EditProfileEvent()
+    object DeleteImageClicked: EditProfileEvent()
 }
 
 data class EditProfileStates(

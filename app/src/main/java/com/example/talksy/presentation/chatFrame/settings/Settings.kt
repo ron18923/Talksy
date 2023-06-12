@@ -1,7 +1,9 @@
 package com.example.talksy.presentation.chatFrame.settings
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,18 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.EditAttributes
-import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.ModeEdit
-import androidx.compose.material.icons.filled.PrivacyTip
-import androidx.compose.material.icons.filled.ReadMore
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.EditAttributes
@@ -38,13 +32,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.talksy.R
+import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.presentation.chatFrame.ChatFrame
 import com.example.talksy.presentation.chatFrame.ChatFrameEvent
 import com.example.talksy.presentation.chatFrame.ChatFrameStates
@@ -94,14 +88,27 @@ fun Settings(
                 .fillMaxHeight(0.1f)
         ) {
             Row(modifier = modifier.fillMaxSize()) {
-                Image(
-                    modifier = modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1f),
-                    imageVector = Icons.Default.AccountCircle,
-                    colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurface),
-                    contentDescription = "profile picture"
-                )
+                Box(modifier = modifier
+                    .fillMaxHeight()
+                    .aspectRatio(1f)) {
+                    Image(
+                        modifier = modifier
+                            .fillMaxSize(),
+                        imageVector = Icons.Default.AccountCircle,
+                        colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurface),
+                        contentDescription = "profile picture empty"
+                    )
+                    Image(
+                        modifier = modifier
+                            .fillMaxSize()
+                            .padding(6.dp)
+                            .clip(CircleShape)
+                            .border(2.dp, MaterialTheme.colorScheme.onBackground, CircleShape),
+                        painter = rememberAsyncImagePainter(model = state.profilePicture),
+                        contentDescription = "profile picture"
+                    )
+
+                }
                 Column(
                     modifier = modifier.fillMaxHeight(),
                     verticalArrangement = Arrangement.Center

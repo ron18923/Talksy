@@ -11,14 +11,11 @@ import com.example.talksy.data.StorageRepository
 import com.example.talksy.data.UserRepository
 import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import com.example.talksy.presentation.chatFrame.settings.SettingsStates
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
@@ -83,10 +80,10 @@ class EditProfileViewModel @Inject constructor(
                 }
             }
 
-            EditProfileEvent.ChangeProfileClicked -> {
+            EditProfileEvent.ProfileImageClicked -> {
                 viewModelScope.launch {
                     _events.emit(
-                        EditProfileEvent.ChangeProfileClicked
+                        EditProfileEvent.ProfileImageClicked
                     )
                 }
             }
@@ -99,7 +96,19 @@ class EditProfileViewModel @Inject constructor(
                             userRepository.updateProfilePicture(it)
                             _state.value =
                                 _state.value.copy(profileImage = it)
-                            Log.d(TAG, "onEvent: $it")
+                        }
+                    }
+                }
+            }
+
+            EditProfileEvent.DeleteImageClicked -> {
+                viewModelScope.launch {
+                    val userUid = userRepository.getUserUid() ?: return@launch
+                    storageRepository.deleteProfilePicture(userUid) {
+                        viewModelScope.launch {
+                            userRepository.updateProfilePicture(Uri.EMPTY)
+                            _state.value =
+                                _state.value.copy(profileImage = Uri.EMPTY)
                         }
                     }
                 }

@@ -1,20 +1,12 @@
 package com.example.talksy.presentation.editProfile
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
-import android.view.ViewGroup
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.UseCase
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
@@ -45,7 +38,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,35 +45,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.camera.core.Preview as Prev
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.TalksyApp.Companion.TAG
-import com.example.talksy.presentation.destinations.CameraCaptureDestination
 import com.example.talksy.ui.theme.TalksyTheme
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.util.concurrent.Executor
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination
@@ -131,7 +110,7 @@ fun EditProfile(
                     )
                 }
 
-                is EditProfileEvent.ChangeProfileClicked -> isChangeProfile = true
+                is EditProfileEvent.ProfileImageClicked -> isChangeProfile = true
 
                 else -> {} //not all events require implementation here.
             }
@@ -174,8 +153,20 @@ fun EditProfile(
                             .aspectRatio(1f)
                     ) {
                         Image(
+                            imageVector = Icons.Default.AccountCircle,
+                            modifier = modifier
+                                .fillMaxSize()
+                                .border(4.dp, MaterialTheme.colorScheme.onBackground, CircleShape),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
+                            contentDescription = "profile picture empty",
+                        )
+                        Image(
                             painter = rememberAsyncImagePainter(model = state.profileImage),
-                            modifier = modifier.fillMaxSize(),
+                            modifier = modifier
+                                .fillMaxSize()
+                                .clip(CircleShape)
+                                .border(4.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
+                                .clickable { onEvent(EditProfileEvent.ProfileImageClicked) },
                             contentDescription = "profile picture",
                         )
                     }
@@ -187,11 +178,9 @@ fun EditProfile(
                             onClick = { /*TODO*/ },
                         ) {
                             TextButton(
-                                onClick = {
-                                    onEvent(EditProfileEvent.ChangeProfileClicked)
-                                }) {
+                                onClick = { onEvent(EditProfileEvent.DeleteImageClicked) }) {
                                 Text(
-                                    text = "Change profile",
+                                    text = "Delete profile",
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }
