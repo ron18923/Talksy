@@ -4,8 +4,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talksy.data.user.UserRepository
-import com.example.talksy.data.user.UserStateListener
+import com.example.talksy.data.UserRepository
+import com.example.talksy.data.UserStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

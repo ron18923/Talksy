@@ -21,6 +21,7 @@ import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModel
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
+import com.example.talksy.presentation.destinations.CameraCaptureDestination
 import com.example.talksy.presentation.destinations.ChatFrameDestination
 import com.example.talksy.presentation.destinations.EditProfileDestination
 import com.example.talksy.presentation.onBoarding.OnBoarding
@@ -34,6 +35,7 @@ import com.example.talksy.presentation.editProfile.EditProfileViewModel
 import com.example.talksy.presentation.login.LoginViewModel
 import com.example.talksy.presentation.onBoarding.OnBoardingViewModel
 import com.example.talksy.presentation.register.RegisterViewModel
+import com.example.talksy.presentation.reusableComposables.CameraCapture
 import com.example.talksy.presentation.startCompose.StartCompose
 import com.example.talksy.presentation.startCompose.NavigationViewModel
 import com.example.talksy.ui.theme.TalksyTheme
@@ -138,13 +140,16 @@ class MainActivity : ComponentActivity() {
                                     settingsViewModelContainer = settingsViewModelContainer
                                 )
                             }
-                            composable(EditProfileDestination){
+                            composable(EditProfileDestination) {
                                 EditProfile(
                                     navigator = destinationsNavigator,
                                     state = editProfileViewModel.state.value,
                                     onEvent = editProfileViewModel::onEvent,
                                     events = editProfileViewModel.events,
                                 )
+                            }
+                            composable(CameraCaptureDestination) {
+                                CameraCapture(navigator = destinationsNavigator)
                             }
                         }
                     }

@@ -1,22 +1,31 @@
 package com.example.talksy.presentation.editProfile
 
-import androidx.activity.compose.rememberLauncherForActivityResult
+import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talksy.data.user.UserRepository
+import com.example.talksy.TalksyApp.Companion.TAG
+import com.example.talksy.data.StorageRepository
+import com.example.talksy.data.UserRepository
 import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import com.example.talksy.presentation.chatFrame.settings.SettingsStates
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
-class EditProfileViewModel @Inject constructor(private val userRepository: UserRepository) :
+class EditProfileViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val storageRepository: StorageRepository
+) :
     ViewModel() {
 
     private val _state = mutableStateOf(EditProfileStates())
@@ -32,10 +41,13 @@ class EditProfileViewModel @Inject constructor(private val userRepository: UserR
     }
 
     private fun updateScreenValues() {
-        if (_user != null) _state.value = _state.value.copy(
-            email = _user.email ?: "",
-            username = _user.displayName ?: ""
-        )
+        _user?.let {
+            _state.value = _state.value.copy(
+                email = _user.email ?: "",
+                username = _user.displayName ?: "",
+                profileImage = _user.photoUrl ?: Uri.EMPTY
+            )
+        }
     }
 
     fun onEvent(event: EditProfileEvent) {
@@ -47,18 +59,22 @@ class EditProfileViewModel @Inject constructor(private val userRepository: UserR
                     )
                 }
             }
+
             is EditProfileEvent.EmailChanged -> _state.value =
                 _state.value.copy(email = event.value)
+
             is EditProfileEvent.UsernameChanged -> _state.value =
                 _state.value.copy(username = event.value)
-            is EditProfileEvent.ChangePasswordClicked -> {
+
+            EditProfileEvent.ChangePasswordClicked -> {
                 viewModelScope.launch {
                     _events.emit(
                         EditProfileEvent.ChangePasswordClicked
                     )
                 }
             }
-            is EditProfileEvent.ChangePasswordConfirmed -> {
+
+            EditProfileEvent.ChangePasswordConfirmed -> {
                 userRepository.resetPassword()
                 viewModelScope.launch {
                     _events.emit(
@@ -66,11 +82,26 @@ class EditProfileViewModel @Inject constructor(private val userRepository: UserR
                     )
                 }
             }
+
             EditProfileEvent.ChangeProfileClicked -> {
                 viewModelScope.launch {
                     _events.emit(
                         EditProfileEvent.ChangeProfileClicked
                     )
+                }
+            }
+
+            is EditProfileEvent.ImagePicked -> {
+                viewModelScope.launch {
+                    val userUid = userRepository.getUserUid() ?: return@launch
+                    storageRepository.putProfilePicture(userUid, event.value) {
+                        viewModelScope.launch {
+                            userRepository.updateProfilePicture(it)
+                            _state.value =
+                                _state.value.copy(profileImage = it)
+                            Log.d(TAG, "onEvent: $it")
+                        }
+                    }
                 }
             }
         }

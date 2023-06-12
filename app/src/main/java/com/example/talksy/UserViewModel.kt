@@ -4,7 +4,7 @@ import android.util.Patterns
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
-import com.example.talksy.data.user.UserRepository
+import com.example.talksy.data.UserRepository
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

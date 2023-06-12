@@ -63,6 +63,7 @@ kapt {
 }
 
 dependencies {
+    implementation 'com.google.firebase:firebase-storage:20.1.0'
     def lifecycle_version = "2.3.1"
 
     implementation 'androidx.core:core-ktx:1.10.1'
@@ -110,8 +111,13 @@ dependencies {
     //icons
     implementation "androidx.compose.material:material-icons-extended"
 
-    //camera
-    implementation "androidx.camera:camera-camera2:1.0.1"
-    implementation "androidx.camera:camera-lifecycle:1.0.1"
-    implementation "androidx.camera:camera-view:1.0.0-alpha27"
+    // CameraX
+    def cameraxVersion = '1.2.0-beta01'
+    implementation "androidx.camera:camera-lifecycle:$cameraxVersion"
+    implementation "androidx.camera:camera-view:$cameraxVersion"
+    implementation "androidx.camera:camera-extensions:$cameraxVersion"
+    implementation "androidx.camera:camera-camera2:$cameraxVersion"
+
+    // to load images from URI
+    implementation("io.coil-kt:coil-compose:2.0.0-rc01")
 }

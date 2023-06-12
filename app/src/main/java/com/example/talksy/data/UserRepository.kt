@@ -1,4 +1,4 @@
-package com.example.talksy.data.user
+package com.example.talksy.data
 
 import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
@@ -9,6 +9,8 @@ import kotlin.coroutines.cancellation.CancellationException
 
 class UserRepository(private val auth: FirebaseAuth) {
     private var listener: UserStateListener? = null
+
+    private val user = auth.currentUser
 
     init {
         auth.addAuthStateListener{
@@ -49,8 +51,9 @@ class UserRepository(private val auth: FirebaseAuth) {
         }
     }
 
+    // TODO: remove this function as it's not good practice
     fun getUser(): FirebaseUser? {
-        return auth.currentUser
+        return user
     }
 
     fun signOut(){
@@ -58,22 +61,26 @@ class UserRepository(private val auth: FirebaseAuth) {
     }
 
     suspend fun updateUsername(username: String){
-        val user = auth.currentUser ?: return
+        val user = user ?: return
         val userProfileChangeRequest = UserProfileChangeRequest.Builder().setDisplayName(username).build()
         user.updateProfile(userProfileChangeRequest).await()
     }
 
     suspend fun updateProfilePicture(profilePicture: Uri){
-        val user = auth.currentUser ?: return
+        val user = user ?: return
         val userProfileChangeRequest = UserProfileChangeRequest.Builder().setPhotoUri(profilePicture).build()
         user.updateProfile(userProfileChangeRequest).await()
     }
 
     fun resetPassword(){
-        val user = auth.currentUser
+        val user = user
         if(user != null){
             auth.sendPasswordResetEmail(user.email?: "")
         }
+    }
+
+    fun getUserUid(): String?{
+        return user?.uid
     }
 }
 
