@@ -103,6 +103,7 @@ fun EditProfile(
 
     val cameraPickerLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+            Log.d(TAG, "EditProfile: asd")
             if (uri != null) onEvent(EditProfileEvent.ImagePicked(uri))
         }
 
@@ -115,27 +116,7 @@ fun EditProfile(
 
     if (isChangeProfile) {
         isChangeProfile = false
-
-        val context = LocalContext.current
-        val permission = Manifest.permission.CAMERA
-        val launcher = rememberLauncherForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-            if (isGranted) {
-                // implement here camera.
-                cameraPickerLauncher.launch("image/*")
-            } else {
-                // TODO: Show dialog
-            }
-        }
-        val permissionCheckResult = ContextCompat.checkSelfPermission(context, permission)
-        if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-            // implement here camera.
-            cameraPickerLauncher.launch("image/*")
-        } else {
-            // Request a permission
-            SideEffect { launcher.launch(permission) }
-        }
+        cameraPickerLauncher.launch("image/*")
     }
 
     //Handling events
@@ -187,9 +168,11 @@ fun EditProfile(
                     modifier = modifier.wrapContentHeight(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Box(modifier = modifier
-                        .fillMaxWidth(0.5f)
-                        .aspectRatio(1f)) {
+                    Box(
+                        modifier = modifier
+                            .fillMaxWidth(0.5f)
+                            .aspectRatio(1f)
+                    ) {
                         Image(
                             painter = rememberAsyncImagePainter(model = state.profileImage),
                             modifier = modifier.fillMaxSize(),
