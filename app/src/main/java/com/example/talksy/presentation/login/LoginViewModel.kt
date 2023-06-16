@@ -1,11 +1,18 @@
 package com.example.talksy.presentation.login
 
+import android.util.Log
 import android.util.Patterns
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talksy.data.UserRepository
+import com.example.talksy.TalksyApp
+import com.example.talksy.TalksyApp.Companion.TAG
+import com.example.talksy.data.MainRepository
+import com.example.talksy.data.helperRepositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -14,11 +21,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val mainRepository: MainRepository
 ) : ViewModel() {
 
     private val _state = mutableStateOf(LoginStates())
-    val state: State<LoginStates> = _state
+    val state: MutableState<LoginStates> = _state
 
     private val _events = MutableSharedFlow<LoginEvent>()
     val events = _events.asSharedFlow()
@@ -32,15 +39,17 @@ class LoginViewModel @Inject constructor(
             return@checkIfFieldsValid
         }
 
-        viewModelScope.launch{
-            userRepository.signInUser(
+        viewModelScope.launch {
+            Log.d(TAG, "Login: 1")
+            mainRepository.signInUser(
                 _state.value.emailInput,
                 _state.value.passwordInput
             ) { errorMessage ->
                 onEvent(LoginEvent.ShowMessage(errorMessage))
                 return@signInUser
             }
-            if(userRepository.getUser() != null) onEvent(LoginEvent.GoToApp)
+            Log.d(TAG, "Login: 2 ${mainRepository.getUser() != null}")
+            if (mainRepository.getUser() != null) onEvent(LoginEvent.GoToApp)
         }
     }
 
@@ -56,14 +65,16 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: LoginEvent){
-        when(event){
+    fun onEvent(event: LoginEvent) {
+        when (event) {
             is LoginEvent.EmailEntered -> {
                 _state.value = _state.value.copy(emailInput = event.value)
             }
+
             is LoginEvent.PasswordEntered -> {
                 _state.value = _state.value.copy(passwordInput = event.value)
             }
+
             is LoginEvent.GoToRegisterClicked -> {
                 viewModelScope.launch {
                     _events.emit(
@@ -71,6 +82,7 @@ class LoginViewModel @Inject constructor(
                     )
                 }
             }
+
             is LoginEvent.GoBackClicked -> {
                 viewModelScope.launch {
                     _events.emit(
@@ -78,12 +90,15 @@ class LoginViewModel @Inject constructor(
                     )
                 }
             }
+
             is LoginEvent.PasswordVisibilityClicked -> {
                 _state.value = _state.value.copy(isPasswordVisible = !_state.value.isPasswordVisible)
             }
+
             is LoginEvent.LoginClicked -> {
                 loginUser()
             }
+
             is LoginEvent.ShowMessage -> {
                 viewModelScope.launch {
                     _events.emit(
@@ -91,7 +106,9 @@ class LoginViewModel @Inject constructor(
                     )
                 }
             }
+
             is LoginEvent.GoToApp -> {
+                Log.d(TAG, "Login: GoToAppViewModel")
                 viewModelScope.launch {
                     _events.emit(
                         LoginEvent.GoToApp

@@ -1,8 +1,9 @@
 package com.example.talksy.presentation.di
 
-import com.example.talksy.data.FireStoreRepository
-import com.example.talksy.data.StorageRepository
-import com.example.talksy.data.UserRepository
+import com.example.talksy.data.MainRepository
+import com.example.talksy.data.helperRepositories.FireStoreRepository
+import com.example.talksy.data.helperRepositories.StorageRepository
+import com.example.talksy.data.helperRepositories.UserRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.Module
@@ -17,7 +18,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(): UserRepository {
+    fun providesUserRepository(): UserRepository {
         return UserRepository(auth = Firebase.auth)
     }
 
@@ -31,6 +32,12 @@ object AppModule {
     @Singleton
     fun providesFireStoreRepository(): FireStoreRepository {
         return FireStoreRepository()
+    }
+
+    @Provides
+    @Singleton
+    fun providesMainRepository(): MainRepository {
+        return MainRepository(userRepository = providesUserRepository(), storageRepository = providesStorageRepository())
     }
 
 }

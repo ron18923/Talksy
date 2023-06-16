@@ -1,10 +1,7 @@
-package com.example.talksy.data
+package com.example.talksy.data.helperRepositories
 
 import android.net.Uri
-import android.util.Log
-import com.google.firebase.FirebaseError
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 

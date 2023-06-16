@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.login
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.talksy.R
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.destinations.ChatFrameDestination
 import com.example.talksy.presentation.destinations.RegisterDestination
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
@@ -82,7 +84,10 @@ fun Login(
                 is LoginEvent.GoToRegisterClicked -> navigator?.navigate(RegisterDestination)
                 is LoginEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(event.message) }
                 is LoginEvent.GoBackClicked -> navigator?.popBackStack()
-                is LoginEvent.GoToApp -> navigator?.navigate(ChatFrameDestination)
+                is LoginEvent.GoToApp -> {
+                    Log.d(TAG, "Login: GoToApp")
+                    navigator?.navigate(ChatFrameDestination)
+                }
                 else -> {} //not all events require implementation here.
             }
         }

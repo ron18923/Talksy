@@ -1,12 +1,14 @@
 package com.example.talksy.presentation.chatFrame.settings
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talksy.data.UserRepository
-import com.example.talksy.data.UserStateListener
+import com.example.talksy.TalksyApp.Companion.TAG
+import com.example.talksy.data.helperRepositories.UserRepository
+import com.example.talksy.data.helperRepositories.UserStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -40,7 +42,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onEvent(event: SettingsEvent) {
         when (event) {
-            SettingsEvent.SignOut -> userRepository.signOut()
+            SettingsEvent.SignOut -> {
+                Log.d(TAG, "onEvent: event")
+                userRepository.signOut()
+            }
             SettingsEvent.GoToEditProfile -> {
                 viewModelScope.launch {
                     _events.emit(
@@ -51,7 +56,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    inner class UserStateListenerImpl: UserStateListener{
+    inner class UserStateListenerImpl: UserStateListener {
         override fun onUserStateChanged() {
             val updatedUser = userRepository.getUser()
             if (updatedUser != null) _state.value = _state.value.copy(

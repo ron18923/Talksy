@@ -1,14 +1,16 @@
 package com.example.talksy.presentation.editProfile
 
 import android.net.Uri
-import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talksy.TalksyApp.Companion.TAG
-import com.example.talksy.data.StorageRepository
-import com.example.talksy.data.UserRepository
+import com.example.talksy.data.MainRepository
+import com.example.talksy.data.helperRepositories.StorageRepository
+import com.example.talksy.data.helperRepositories.UserRepository
 import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import com.example.talksy.presentation.chatFrame.settings.SettingsStates
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,18 +22,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    private val storageRepository: StorageRepository
+    private val mainRepository: MainRepository
 ) :
     ViewModel() {
 
-    private val _state = mutableStateOf(EditProfileStates())
-    val state: State<EditProfileStates> = _state
+    private var _state = mutableStateOf(EditProfileStates())
+    val state: MutableState<EditProfileStates> = _state
 
     private val _events = MutableSharedFlow<EditProfileEvent>()
     val events = _events.asSharedFlow()
 
-    private val _user = userRepository.getUser()
+    private val _user = mainRepository.getUser()
 
     init {
         updateScreenValues()
@@ -72,7 +73,7 @@ class EditProfileViewModel @Inject constructor(
             }
 
             EditProfileEvent.ChangePasswordConfirmed -> {
-                userRepository.resetPassword()
+                mainRepository.resetPassword()
                 viewModelScope.launch {
                     _events.emit(
                         EditProfileEvent.ChangePasswordConfirmed
@@ -90,10 +91,10 @@ class EditProfileViewModel @Inject constructor(
 
             is EditProfileEvent.ImagePicked -> {
                 viewModelScope.launch {
-                    val userUid = userRepository.getUserUid() ?: return@launch
-                    storageRepository.putProfilePicture(userUid, event.value) {
+                    val userUid = mainRepository.getUserUid() ?: return@launch
+                    mainRepository.putProfilePicture(userUid, event.value) {
                         viewModelScope.launch {
-                            userRepository.updateProfilePicture(it)
+                            mainRepository.updateProfilePicture(it)
                             _state.value =
                                 _state.value.copy(profileImage = it)
                         }
@@ -103,10 +104,10 @@ class EditProfileViewModel @Inject constructor(
 
             EditProfileEvent.DeleteImageClicked -> {
                 viewModelScope.launch {
-                    val userUid = userRepository.getUserUid() ?: return@launch
-                    storageRepository.deleteProfilePicture(userUid) {
+                    val userUid = mainRepository.getUserUid() ?: return@launch
+                    mainRepository.deleteProfilePicture(userUid) {
                         viewModelScope.launch {
-                            userRepository.updateProfilePicture(Uri.EMPTY)
+                            mainRepository.updateProfilePicture(Uri.EMPTY)
                             _state.value =
                                 _state.value.copy(profileImage = Uri.EMPTY)
                         }

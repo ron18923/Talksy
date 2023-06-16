@@ -1,11 +1,15 @@
 package com.example.talksy.presentation.register
 
 import android.util.Patterns
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talksy.data.UserRepository
+import com.example.talksy.data.MainRepository
+import com.example.talksy.data.dataModels.User
+import com.example.talksy.data.helperRepositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -14,11 +18,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val mainRepository: MainRepository
 ) : ViewModel() {
 
     private val _state = mutableStateOf(RegisterStates())
-    val state: State<RegisterStates> = _state
+    val state: MutableState<RegisterStates> = _state
 
     private val _events = MutableSharedFlow<RegisterEvent>()
     val events = _events.asSharedFlow()
@@ -34,15 +38,14 @@ class RegisterViewModel @Inject constructor(
         }
 
         viewModelScope.launch{
-            userRepository.addNewUser(
-                _state.value.usernameInput,
-                _state.value.emailInput,
-                _state.value.passwordInput
+            mainRepository.addNewUser(
+                User(username = _state.value.usernameInput, email = _state.value.emailInput),
+                _state.value.passwordInput,
             ) { errorMessage ->
                 onEvent(RegisterEvent.ShowMessage(errorMessage))
                 return@addNewUser
             }
-            if(userRepository.getUser() != null) onEvent(RegisterEvent.GoToApp)
+            if(mainRepository.getUser() != null) onEvent(RegisterEvent.GoToApp)
         }
     }
 
