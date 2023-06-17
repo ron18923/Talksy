@@ -37,7 +37,11 @@ object AppModule {
     @Provides
     @Singleton
     fun providesMainRepository(): MainRepository {
-        return MainRepository(userRepository = providesUserRepository(), storageRepository = providesStorageRepository())
+        return MainRepository(
+            userRepository = providesUserRepository(),
+            storageRepository = providesStorageRepository(),
+            fireStoreRepository = providesFireStoreRepository()
+        )
     }
 
 }

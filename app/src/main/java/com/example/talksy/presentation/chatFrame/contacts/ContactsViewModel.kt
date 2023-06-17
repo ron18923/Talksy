@@ -2,10 +2,12 @@ package com.example.talksy.presentation.chatFrame.contacts
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talksy.data.helperRepositories.FireStoreRepository
 import com.example.talksy.data.helperRepositories.UserRepository
+import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -27,7 +29,19 @@ class ContactsViewModel @Inject constructor(
 
     fun onEvent(event: ContactsEvent) {
         when (event) {
-            else -> {}
+            ContactsEvent.SearchClose -> {
+                _state.value =
+                    _state.value.copy(searchInput = TextFieldValue(""))
+                viewModelScope.launch {
+                    _events.emit(
+                        ContactsEvent.SearchClose
+                    )
+                }
+            }
+
+
+            is ContactsEvent.SearchEntered -> _state.value =
+                _state.value.copy(searchInput = event.value)
         }
     }
 }

@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.content.ContextCompat.startActivity
@@ -40,6 +41,7 @@ import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.chatFrame.chats.ChatsEvent
 import com.example.talksy.presentation.chatFrame.chats.ChatsState
 import com.example.talksy.presentation.chatFrame.chats.ChatsViewModelContainer
+import com.example.talksy.presentation.chatFrame.contacts.Contacts
 import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
 import com.example.talksy.presentation.chatFrame.contacts.ContactsStates
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
@@ -136,14 +138,6 @@ fun Chats(
     Text(text = "chats")
 }
 
-@Composable
-fun Contacts(
-    modifier: Modifier = Modifier,
-    contactsViewModelContainer: ContactsViewModelContainer
-) {
-    Text(text = "contacts")
-}
-
 @Preview(showBackground = true)
 @Composable
 fun ChatFramePrev() {
@@ -159,7 +153,7 @@ fun ChatFramePrev() {
                 events = MutableSharedFlow<ChatsEvent>().asSharedFlow()
             ),
             contactsViewModelContainer = ContactsViewModelContainer(
-                state = ContactsStates(""),
+                state = ContactsStates(TextFieldValue("")),
                 onEvent = {},
                 events = MutableSharedFlow<ContactsEvent>().asSharedFlow()
             ),

@@ -1,9 +1,12 @@
 package com.example.talksy.presentation.chatFrame.contacts
 
-sealed class ContactsEvent {
+import androidx.compose.ui.text.input.TextFieldValue
 
+sealed class ContactsEvent {
+    data class SearchEntered(val value: TextFieldValue): ContactsEvent()
+    object SearchClose: ContactsEvent()
 }
 
 data class ContactsStates(
-    var temp: String = ""
+    var searchInput: TextFieldValue = TextFieldValue("")
 )

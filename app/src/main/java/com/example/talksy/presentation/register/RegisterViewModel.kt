@@ -38,8 +38,7 @@ class RegisterViewModel @Inject constructor(
         }
 
         viewModelScope.launch{
-            mainRepository.addNewUser(
-                User(username = _state.value.usernameInput, email = _state.value.emailInput),
+            mainRepository.addNewUser(username = _state.value.usernameInput, email = _state.value.emailInput,
                 _state.value.passwordInput,
             ) { errorMessage ->
                 onEvent(RegisterEvent.ShowMessage(errorMessage))

@@ -2,18 +2,28 @@ package com.example.talksy.data
 
 import android.net.Uri
 import com.example.talksy.data.dataModels.User
+import com.example.talksy.data.helperRepositories.FireStoreRepository
 import com.example.talksy.data.helperRepositories.StorageRepository
 import com.example.talksy.data.helperRepositories.UserRepository
 import com.google.firebase.auth.FirebaseUser
 
-class MainRepository(val userRepository: UserRepository, val storageRepository: StorageRepository) {
+class MainRepository(
+    val userRepository: UserRepository,
+    val storageRepository: StorageRepository,
+    val fireStoreRepository: FireStoreRepository
+) {
 
     suspend fun addNewUser(
-        user: User,
+        username: String,
+        email: String,
         password: String,
         errorMessage: (String) -> Unit
     ) {
-        userRepository.addNewUser(user, password, errorMessage)
+        val userUid = userRepository.addNewUser(username = username, email = email, password, errorMessage)
+        userUid?.let {
+            val user = User(uid = userUid, username = username, email = email)
+            fireStoreRepository.addNewUser(user)
+    }
     }
 
     suspend fun signInUser(email: String, password: String, errorMessage: (String) -> Unit) {

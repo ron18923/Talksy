@@ -3,6 +3,7 @@ package com.example.talksy.data.dataModels
 import android.net.Uri
 
 data class User(
+    val uid: String,
     val username: String,
     val email: String,
     var profilePicture: Uri = Uri.EMPTY,

@@ -24,19 +24,25 @@ class UserRepository(private val auth: FirebaseAuth) {
     }
 
     suspend fun addNewUser(
-        userObject: User,
+        username: String,
+        email: String,
         password: String,
         errorMessage: (String) -> Unit
-    ) {
+    ): String? {
         try {
-            val firebaseUser = auth.createUserWithEmailAndPassword(userObject.email, password).await().user
-            val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(userObject.username).build()
+            val firebaseUser = auth.createUserWithEmailAndPassword(email, password).await().user
+            val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(username).build()
             firebaseUser?.updateProfile(profileUpdates)?.await()
-            if (firebaseUser == null) errorMessage("failed to create new user.")
+            if (firebaseUser == null){
+                errorMessage("failed to create new user.")
+                return null
+            }
+            return firebaseUser.uid
         } catch (e: Exception) {
             e.printStackTrace()
             if (e is CancellationException) throw e
             errorMessage(e.message!!)
+            return null
         }
     }
 
