@@ -13,17 +13,8 @@ class MainRepository(
     val fireStoreRepository: FireStoreRepository
 ) {
 
-    suspend fun addNewUser(
-        username: String,
-        email: String,
-        password: String,
-        errorMessage: (String) -> Unit
-    ) {
-        val userUid = userRepository.addNewUser(username = username, email = email, password, errorMessage)
-        userUid?.let {
-            val user = User(uid = userUid, username = username, email = email)
-            fireStoreRepository.addNewUser(user)
-    }
+    suspend fun updateProfilePicture(profilePicture: Uri) {
+        userRepository.updateProfilePicture(profilePicture)
     }
 
     suspend fun signInUser(email: String, password: String, errorMessage: (String) -> Unit) {
@@ -42,6 +33,20 @@ class MainRepository(
         return userRepository.getUserUid()
     }
 
+    suspend fun addNewUser(
+        username: String,
+        email: String,
+        password: String,
+        errorMessage: (String) -> Unit
+    ) {
+        val userUid =
+            userRepository.addNewUser(username = username, email = email, password, errorMessage)
+        userUid?.let {
+            val user = User(username = username, email = email)
+            fireStoreRepository.addNewUser(user = user, uid = userUid)
+        }
+    }
+
     suspend fun putProfilePicture(
         uid: String,
         profilePicture: Uri,
@@ -55,14 +60,21 @@ class MainRepository(
         }
     }
 
-    suspend fun updateProfilePicture(profilePicture: Uri) {
-        userRepository.updateProfilePicture(profilePicture)
-    }
-
     suspend fun deleteProfilePicture(uid: String, profilePictureDeleted: () -> Unit) {
         storageRepository.deleteProfilePicture(
             uid = uid,
             profilePictureDeleted = profilePictureDeleted
         )
+    }
+
+    suspend fun searchUsers(searchUsers: String): ArrayList<String> {
+        return fireStoreRepository.searchUsers(searchUsers)
+    }
+
+    suspend fun addNewContact(username: String) {
+        val currentUser = userRepository.getUserUid()
+        currentUser?.let {
+            fireStoreRepository.addContactToUser(userUID = currentUser, contactUsername = username)
+        }
     }
 }

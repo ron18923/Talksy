@@ -23,7 +23,7 @@ class StorageRepository {
         try {
             storageRef.child(uid).delete().await()
             profilePictureDeleted()
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

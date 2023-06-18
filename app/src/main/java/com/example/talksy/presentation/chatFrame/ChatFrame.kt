@@ -153,7 +153,7 @@ fun ChatFramePrev() {
                 events = MutableSharedFlow<ChatsEvent>().asSharedFlow()
             ),
             contactsViewModelContainer = ContactsViewModelContainer(
-                state = ContactsStates(TextFieldValue("")),
+                state = ContactsStates(""),
                 onEvent = {},
                 events = MutableSharedFlow<ContactsEvent>().asSharedFlow()
             ),
