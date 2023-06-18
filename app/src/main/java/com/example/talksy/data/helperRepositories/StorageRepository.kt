@@ -27,4 +27,13 @@ class StorageRepository {
             e.printStackTrace()
         }
     }
+
+    suspend fun getProfilePicture(uid: String): Uri {
+        return try {
+            storageRef.child(uid).downloadUrl.await() ?: Uri.EMPTY
+        } catch (e: Exception){
+            e.printStackTrace()
+            Uri.EMPTY
+        }
+    }
 }

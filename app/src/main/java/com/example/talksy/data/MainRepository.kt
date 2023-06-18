@@ -1,6 +1,8 @@
 package com.example.talksy.data
 
 import android.net.Uri
+import android.util.Log
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.User
 import com.example.talksy.data.helperRepositories.FireStoreRepository
 import com.example.talksy.data.helperRepositories.StorageRepository
@@ -76,5 +78,27 @@ class MainRepository(
         currentUser?.let {
             fireStoreRepository.addContactToUser(userUID = currentUser, contactUsername = username)
         }
+    }
+
+    suspend fun getUserContacts(): ArrayList<HashMap<String, String>> {
+
+        val user = userRepository.getUser() ?: return arrayListOf()
+
+        val contacts: ArrayList<HashMap<String, String>> = arrayListOf()
+        val currentUserUid = user.uid
+        val userFireStore =
+            fireStoreRepository.getUser(userUid = currentUserUid) ?: return arrayListOf()
+        val currentUserContacts = userFireStore.contacts
+        currentUserContacts.forEach { uid ->
+            val profilePicture = storageRepository.getProfilePicture(uid)
+            val username = fireStoreRepository.getUsernameByUid(uid) ?: return@forEach
+            contacts.add(
+                hashMapOf(
+                    "username" to username,
+                    "profilePicture" to profilePicture.toString()
+                )
+            )
+        }
+        return contacts
     }
 }

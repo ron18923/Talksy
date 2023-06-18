@@ -23,6 +23,12 @@ class ContactsViewModel @Inject constructor(
     private val _events = MutableSharedFlow<ContactsEvent>()
     val events = _events.asSharedFlow()
 
+    init {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(contactsList = mainRepository.getUserContacts())
+        }
+    }
+
     fun onEvent(event: ContactsEvent) {
         when (event) {
             ContactsEvent.SearchClose -> {

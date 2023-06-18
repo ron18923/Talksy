@@ -59,8 +59,24 @@ class FireStoreRepository {
         return result.documents[0].id
     }
 
-    private suspend fun getUserUsernameByUid(uid: String): String?{
+    suspend fun getUsernameByUid(uid: String): String?{
         val user = usersCollection.document(uid).get().await().toObject(User::class.java)
         return user?.username
+    }
+
+    suspend fun getUser(userUid: String): User?{
+        val docRef = usersCollection.document(userUid)
+
+        val user = docRef.get().await().toObject(User::class.java)
+        return user
+    }
+
+    suspend fun getProfilePicture(uid: String): String {
+
+        val docRef = usersCollection.document(uid)
+
+        val user = docRef.get().await().toObject(User::class.java) ?: return ""
+
+        return user.profilePicture
     }
 }
