@@ -1,12 +1,12 @@
 package com.example.talksy.data
 
 import android.net.Uri
-import android.util.Log
-import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.User
 import com.example.talksy.data.helperRepositories.FireStoreRepository
 import com.example.talksy.data.helperRepositories.StorageRepository
 import com.example.talksy.data.helperRepositories.UserRepository
+import com.example.talksy.data.helperRepositories.UserStateListener
+import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
 import com.google.firebase.auth.FirebaseUser
 
 class MainRepository(
@@ -21,6 +21,10 @@ class MainRepository(
 
     suspend fun signInUser(email: String, password: String, errorMessage: (String) -> Unit) {
         userRepository.signInUser(email, password, errorMessage)
+    }
+
+    fun signOutUser(){
+        userRepository.signOutUser()
     }
 
     fun getUser(): FirebaseUser? {
@@ -41,6 +45,7 @@ class MainRepository(
         password: String,
         errorMessage: (String) -> Unit
     ) {
+        if(!fireStoreRepository.checkUsername(username, errorMessage)) return
         val userUid =
             userRepository.addNewUser(username = username, email = email, password, errorMessage)
         userUid?.let {
@@ -78,6 +83,7 @@ class MainRepository(
         currentUser?.let {
             fireStoreRepository.addContactToUser(userUID = currentUser, contactUsername = username)
         }
+
     }
 
     suspend fun getUserContacts(): ArrayList<HashMap<String, String>> {
@@ -100,5 +106,9 @@ class MainRepository(
             )
         }
         return contacts
+    }
+
+    fun setUserListener(listener: UserStateListener) {
+        userRepository.setListener(listener)
     }
 }

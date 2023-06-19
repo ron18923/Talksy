@@ -3,7 +3,6 @@ package com.example.talksy.data.helperRepositories
 import android.net.Uri
 import android.util.Log
 import com.example.talksy.TalksyApp.Companion.TAG
-import com.example.talksy.data.dataModels.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -63,7 +62,7 @@ class UserRepository(private val auth: FirebaseAuth) {
         return auth.currentUser
     }
 
-    fun signOut(){
+    fun signOutUser(){
         auth.signOut()
     }
 

@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talksy.TalksyApp.Companion.TAG
+import com.example.talksy.data.MainRepository
 import com.example.talksy.data.helperRepositories.UserRepository
 import com.example.talksy.data.helperRepositories.UserStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val mainRepository: MainRepository
 ) : ViewModel() {
 
     private val _state = mutableStateOf(SettingsStates())
@@ -27,25 +28,27 @@ class SettingsViewModel @Inject constructor(
     private val _events = MutableSharedFlow<SettingsEvent>()
     val events = _events.asSharedFlow()
 
-    private val _user = userRepository.getUser()
+    private val _user = mainRepository.getUser()
 
     private val _userStateListener = UserStateListenerImpl()
 
     init {
+        if (_user != null) Log.d(TAG, "user: ${_user.displayName}")
         if (_user != null) _state.value = _state.value.copy(
             username = _user.displayName ?: "",
             email = _user.email ?: "",
             profilePicture = _user.photoUrl ?: Uri.EMPTY
         )
-        userRepository.setListener(_userStateListener)
+        mainRepository.setUserListener(_userStateListener)
     }
 
     fun onEvent(event: SettingsEvent) {
         when (event) {
             SettingsEvent.SignOut -> {
                 Log.d(TAG, "onEvent: event")
-                userRepository.signOut()
+                mainRepository.signOutUser()
             }
+
             SettingsEvent.GoToEditProfile -> {
                 viewModelScope.launch {
                     _events.emit(
@@ -56,14 +59,14 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    inner class UserStateListenerImpl: UserStateListener {
+    inner class UserStateListenerImpl : UserStateListener {
         override fun onUserStateChanged() {
-            val updatedUser = userRepository.getUser()
+            val updatedUser = mainRepository.getUser()
             if (updatedUser != null) _state.value = _state.value.copy(
-                username = updatedUser.displayName?:"",
-                email = updatedUser.email?:""
+                username = updatedUser.displayName ?: "",
+                email = updatedUser.email ?: ""
             )
-            if(updatedUser == null){
+            if (updatedUser == null) {
                 viewModelScope.launch {
                     _events.emit(
                         SettingsEvent.SignOut

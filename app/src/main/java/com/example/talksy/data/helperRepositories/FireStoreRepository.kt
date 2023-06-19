@@ -11,6 +11,8 @@ class FireStoreRepository {
 
         const val FIELD_CONTACTS = "contacts"
         const val FIELD_USERNAME = "username"
+        const val FIELD_EMAIL = "email"
+        const val FIELD_PROFILE_PICTURE = "profilePicture"
         const val FIELD_UID = "uid"
     }
 
@@ -29,16 +31,23 @@ class FireStoreRepository {
 
             user?.let {
                 val contactsArray = user.contacts
-                if(contactsArray.contains(contactUid)) return@addOnSuccessListener
+                if (contactsArray.contains(contactUid)) return@addOnSuccessListener
                 contactsArray.add(contactUid)
-                docRef.set(hashMapOf(FIELD_CONTACTS to contactsArray) )
+                docRef.set(hashMapOf(FIELD_CONTACTS to contactsArray))
             }
         }
     }
 
     fun addNewUser(user: User, uid: String) {
-        // TODO: implement fully
         val docRef = usersCollection.document(uid)
+        docRef.set(
+            hashMapOf(
+                FIELD_CONTACTS to user.contacts,
+                FIELD_EMAIL to user.email,
+                FIELD_PROFILE_PICTURE to user.profilePicture,
+                FIELD_USERNAME to user.username
+            )
+        )
     }
 
     suspend fun searchUsers(searchValue: String): ArrayList<String> {
@@ -46,7 +55,7 @@ class FireStoreRepository {
         var usernameList: ArrayList<String> = arrayListOf()
         usersCollection.get().await().documents.forEach { userDocument ->
             val user = userDocument.toObject(User::class.java) ?: return@forEach
-            if(user.username.contains(searchValue)) usernameList.add(user.username)
+            if (user.username.contains(searchValue)) usernameList.add(user.username)
         }
         usernameList = ArrayList(usernameList.take(10))
         return usernameList
@@ -55,16 +64,16 @@ class FireStoreRepository {
     private suspend fun getUserUidByUsername(username: String): String? {
         // TODO: if there are two users with the same username(shouldn't happen) then the first one will be added.
         val result = usersCollection.whereEqualTo(FIELD_USERNAME, username).get().await()
-        if(result.isEmpty) return null
+        if (result.isEmpty) return null
         return result.documents[0].id
     }
 
-    suspend fun getUsernameByUid(uid: String): String?{
+    suspend fun getUsernameByUid(uid: String): String? {
         val user = usersCollection.document(uid).get().await().toObject(User::class.java)
         return user?.username
     }
 
-    suspend fun getUser(userUid: String): User?{
+    suspend fun getUser(userUid: String): User? {
         val docRef = usersCollection.document(userUid)
 
         val user = docRef.get().await().toObject(User::class.java)
@@ -78,5 +87,15 @@ class FireStoreRepository {
         val user = docRef.get().await().toObject(User::class.java) ?: return ""
 
         return user.profilePicture
+    }
+
+    suspend fun checkUsername(username: String, errorMessage: (String) -> Unit): Boolean{
+        val documents = usersCollection.whereEqualTo(FIELD_USERNAME, username).get().await()
+        return if(documents.isEmpty){
+            true
+        } else{
+            errorMessage("Username is already being used.")
+            false
+        }
     }
 }

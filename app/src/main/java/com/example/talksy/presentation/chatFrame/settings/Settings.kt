@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavOptionsBuilder
 import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.presentation.chatFrame.ChatFrame
 import com.example.talksy.presentation.chatFrame.ChatFrameEvent
@@ -49,6 +50,7 @@ import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
 import com.example.talksy.presentation.chatFrame.contacts.ContactsStates
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
 import com.example.talksy.presentation.destinations.EditProfileDestination
+import com.example.talksy.presentation.destinations.LoginDestination
 import com.example.talksy.presentation.destinations.StartComposeDestination
 import com.example.talksy.ui.theme.TalksyTheme
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -71,7 +73,9 @@ fun Settings(
         events.collectLatest { event ->
             when (event) {
                 // TODO: temporary solution
-                SettingsEvent.SignOut -> navigator?.navigate(StartComposeDestination)
+                SettingsEvent.SignOut -> {
+                    navigator?.navigate(LoginDestination)
+                }
                 SettingsEvent.GoToEditProfile -> navigator?.navigate(EditProfileDestination)
             }
         }
