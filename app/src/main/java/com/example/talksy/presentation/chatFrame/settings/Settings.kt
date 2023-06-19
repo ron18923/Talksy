@@ -76,11 +76,12 @@ fun Settings(
                 SettingsEvent.SignOut -> {
                     navigator?.navigate(LoginDestination)
                 }
+
                 SettingsEvent.GoToEditProfile -> navigator?.navigate(EditProfileDestination)
             }
         }
     }
-    
+
     Column(
         modifier = modifier.fillMaxWidth(0.9f),
     ) {
@@ -92,9 +93,11 @@ fun Settings(
                 .fillMaxHeight(0.1f)
         ) {
             Row(modifier = modifier.fillMaxSize()) {
-                Box(modifier = modifier
-                    .fillMaxHeight()
-                    .aspectRatio(1f)) {
+                Box(
+                    modifier = modifier
+                        .fillMaxHeight()
+                        .aspectRatio(1f)
+                ) {
                     Image(
                         modifier = modifier
                             .fillMaxSize(),

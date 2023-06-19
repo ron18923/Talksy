@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.talksy.presentation.chatFrame.chats.Chats
 import com.example.talksy.presentation.chatFrame.chats.ChatsEvent
 import com.example.talksy.presentation.chatFrame.chats.ChatsState
 import com.example.talksy.presentation.chatFrame.chats.ChatsViewModelContainer
@@ -98,7 +99,7 @@ fun ChatFrame(
             contentAlignment = Alignment.Center
         ) {
             when (state.selectedNavItem) {
-                0 -> Chats(modifier, chatsViewModelContainer)
+                0 -> Chats(modifier, navigator, chatsViewModelContainer)
                 1 -> Contacts(modifier, contactsViewModelContainer)
                 2 -> Settings(modifier, navigator, settingsViewModelContainer)
             }
@@ -110,14 +111,6 @@ data class BottomNavItem(
     val title: String,
     val icon: ImageVector
 )
-
-@Composable
-fun Chats(
-    modifier: Modifier = Modifier,
-    chatsViewModelContainer: ChatsViewModelContainer
-) {
-    Text(text = "chats")
-}
 
 @Preview(showBackground = true)
 @Composable

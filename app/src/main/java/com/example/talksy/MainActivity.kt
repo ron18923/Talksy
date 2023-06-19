@@ -21,8 +21,11 @@ import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModel
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
+import com.example.talksy.presentation.chatScreen.ChatScreen
+import com.example.talksy.presentation.chatScreen.ChatScreenViewModel
 import com.example.talksy.presentation.destinations.CameraCaptureDestination
 import com.example.talksy.presentation.destinations.ChatFrameDestination
+import com.example.talksy.presentation.destinations.ChatScreenDestination
 import com.example.talksy.presentation.destinations.EditProfileDestination
 import com.example.talksy.presentation.onBoarding.OnBoarding
 import com.example.talksy.presentation.register.Register
@@ -59,6 +62,7 @@ class MainActivity : ComponentActivity() {
         lateinit var chatsViewModel: ChatsViewModel
         lateinit var contactsViewModel: ContactsViewModel
         lateinit var editProfileViewModel: EditProfileViewModel
+        lateinit var chatScreenViewModel: ChatScreenViewModel
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -77,6 +81,7 @@ class MainActivity : ComponentActivity() {
                     chatsViewModel = hiltViewModel()
                     contactsViewModel = hiltViewModel()
                     editProfileViewModel = hiltViewModel()
+                    chatScreenViewModel = hiltViewModel()
 
                     val chatsViewModelContainer = ChatsViewModelContainer(
                         chatsViewModel.state.value,
@@ -148,6 +153,16 @@ class MainActivity : ComponentActivity() {
                                     events = editProfileViewModel.events,
                                 )
                             }
+
+                            composable(ChatScreenDestination) {
+                                ChatScreen(
+                                    navigator = destinationsNavigator,
+                                    state = chatScreenViewModel.state.value,
+                                    onEvent = chatScreenViewModel::onEvent,
+                                    events = chatScreenViewModel.events
+                                )
+                            }
+
                             composable(CameraCaptureDestination) {
                                 CameraCapture(navigator = destinationsNavigator)
                             }

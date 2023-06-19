@@ -63,7 +63,6 @@ kapt {
 }
 
 dependencies {
-    implementation 'com.google.firebase:firebase-storage:20.1.0'
     def lifecycle_version = "2.3.1"
 
     implementation 'androidx.core:core-ktx:1.10.1'
@@ -82,14 +81,15 @@ dependencies {
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
-    // compose-destinations
-    implementation 'io.github.raamcosta.compose-destinations:core:1.7.41-beta'
-    ksp 'io.github.raamcosta.compose-destinations:ksp:1.7.41-beta'
+//    // compose-destinations
+//    implementation 'io.github.raamcosta.compose-destinations:core:1.7.41-beta'
+//    ksp 'io.github.raamcosta.compose-destinations:ksp:1.7.41-beta'
 
     //firebase
     implementation platform('com.google.firebase:firebase-bom:32.0.0')
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation 'com.google.firebase:firebase-storage:20.1.0'
 
     //dagger-hilt
     implementation "com.google.dagger:hilt-android:2.45"
@@ -121,4 +121,7 @@ dependencies {
 
     // to load images from URI
     implementation("io.coil-kt:coil-compose:2.0.0-rc01")
+
+    //jetpack compose navigation
+    implementation "androidx.navigation:navigation-compose:2.6.0"
 }
