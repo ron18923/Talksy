@@ -35,7 +35,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -43,25 +42,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.talksy.R
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.talksy.TalksyApp.Companion.TAG
-import com.example.talksy.presentation.destinations.ChatFrameDestination
-import com.example.talksy.presentation.destinations.RegisterDestination
+import com.example.talksy.presentation.navigation.Screen
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@Destination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Login(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator?,
+    navController: NavController,
     state: LoginStates,
     onEvent: (LoginEvent) -> Unit,
     events: SharedFlow<LoginEvent>
@@ -81,12 +77,12 @@ fun Login(
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
             when (event) {
-                is LoginEvent.GoToRegisterClicked -> navigator?.navigate(RegisterDestination)
+                is LoginEvent.GoToRegisterClicked -> navController.navigate(Screen.Register.route)
                 is LoginEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(event.message) }
-                is LoginEvent.GoBackClicked -> navigator?.popBackStack()
+                is LoginEvent.GoBackClicked -> navController.popBackStack()
                 is LoginEvent.GoToApp -> {
                     Log.d(TAG, "Login: GoToApp")
-                    navigator?.navigate(ChatFrameDestination)
+                    navController.navigate(Screen.ChatFrame.route)
                 }
                 else -> {} //not all events require implementation here.
             }
@@ -180,7 +176,7 @@ fun Login(
                     ) {
                         Text(text = "Don't have an account?")
                         TextButton(
-                            onClick = { navigator?.navigate(RegisterDestination) }) {
+                            onClick = { navController.navigate(Screen.Register.route) }) {
                             Text(
                                 text = "Register"
                             )
@@ -196,7 +192,7 @@ fun Login(
 @Composable
 fun LoginPrev() {
     Login(
-        navigator = null,
+        navController = rememberNavController(),
         state = LoginStates("", "", false),
         onEvent = {},
         events = MutableSharedFlow<LoginEvent>().asSharedFlow()

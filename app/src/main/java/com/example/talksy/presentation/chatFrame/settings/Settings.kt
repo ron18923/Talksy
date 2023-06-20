@@ -38,7 +38,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.presentation.chatFrame.ChatFrame
 import com.example.talksy.presentation.chatFrame.ChatFrameEvent
@@ -49,11 +50,8 @@ import com.example.talksy.presentation.chatFrame.chats.ChatsViewModelContainer
 import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
 import com.example.talksy.presentation.chatFrame.contacts.ContactsStates
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
-import com.example.talksy.presentation.destinations.EditProfileDestination
-import com.example.talksy.presentation.destinations.LoginDestination
-import com.example.talksy.presentation.destinations.StartComposeDestination
+import com.example.talksy.presentation.navigation.Screen
 import com.example.talksy.ui.theme.TalksyTheme
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -61,7 +59,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun Settings(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator?,
+    navController: NavController,
     settingsViewModelContainer: SettingsViewModelContainer
 ) {
     val state = settingsViewModelContainer.state
@@ -74,10 +72,10 @@ fun Settings(
             when (event) {
                 // TODO: temporary solution
                 SettingsEvent.SignOut -> {
-                    navigator?.navigate(LoginDestination)
+                    navController.navigate(Screen.Login.route)
                 }
 
-                SettingsEvent.GoToEditProfile -> navigator?.navigate(EditProfileDestination)
+                SettingsEvent.GoToEditProfile -> navController.navigate(Screen.EditProfile.route)
             }
         }
     }
@@ -205,7 +203,7 @@ fun CustomTextButton(
 fun SettingsPrev() {
     TalksyTheme(darkTheme = true) {
         ChatFrame(
-            navigator = null,
+            navController = rememberNavController(),
             state = ChatFrameStates(2),
             onEvent = {},
             events = MutableSharedFlow<ChatFrameEvent>().asSharedFlow(),

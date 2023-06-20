@@ -1,26 +1,20 @@
 package com.example.talksy.presentation.startCompose
 
-import android.util.Log
 import androidx.compose.runtime.Composable
-import com.example.talksy.TalksyApp.Companion.TAG
-import com.example.talksy.presentation.destinations.OnBoardingDestination
-import com.example.talksy.presentation.destinations.ChatFrameDestination
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import androidx.navigation.NavController
+import com.example.talksy.presentation.navigation.Screen
 
-@Destination(start = true)
 @Composable
 fun StartCompose(
-    navigator: DestinationsNavigator?,
+    navController: NavController,
     viewModel: NavigationViewModel
 ) {
     // TODO: temporary solution.
     viewModel.onEvent(NavigationEvent.CheckSignedIn)
-    Log.d(TAG, "StartCompose: ${viewModel.state.value.isSignedIn}")
     if (viewModel.state.value.isSignedIn){
-        navigator?.navigate(ChatFrameDestination)
+        navController.navigate(Screen.ChatFrame.route)
     }
     else{
-        navigator?.navigate(OnBoardingDestination)
+        navController.navigate(Screen.OnBoarding.route)
    }
 }

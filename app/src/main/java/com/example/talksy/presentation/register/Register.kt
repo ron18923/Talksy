@@ -34,7 +34,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -42,24 +41,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.talksy.R
-import com.example.talksy.presentation.destinations.ChatFrameDestination
-import com.example.talksy.presentation.destinations.LoginDestination
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.talksy.presentation.navigation.Screen
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@Destination
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Register(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator?,
+    navController: NavController,
     state: RegisterStates,
     onEvent: (RegisterEvent) -> Unit,
     events: SharedFlow<RegisterEvent>
@@ -80,10 +76,10 @@ fun Register(
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
             when (event) {
-                is RegisterEvent.GoToLoginClicked -> navigator?.navigate(LoginDestination)
+                is RegisterEvent.GoToLoginClicked -> navController.navigate(Screen.Login.route)
                 is RegisterEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(event.message) }
-                is RegisterEvent.GoBackClicked -> navigator?.popBackStack()
-                is RegisterEvent.GoToApp -> navigator?.navigate(ChatFrameDestination)
+                is RegisterEvent.GoBackClicked -> navController.popBackStack()
+                is RegisterEvent.GoToApp -> navController.navigate(Screen.ChatFrame.route)
                 else -> {} //not all events require implementation here.
             }
         }
@@ -200,7 +196,7 @@ fun Register(
 @Composable
 fun RegisterPrev() {
     Register(
-        navigator = null,
+        navController = rememberNavController(),
         state = RegisterStates("", "", "", false),
         onEvent = {},
         events = MutableSharedFlow<RegisterEvent>().asSharedFlow()

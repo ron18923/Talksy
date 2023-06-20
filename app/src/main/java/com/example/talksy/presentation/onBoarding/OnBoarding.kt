@@ -15,10 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -27,25 +23,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.talksy.R
-import com.example.talksy.presentation.destinations.RegisterDestination
-import com.example.talksy.presentation.register.RegisterEvent
-import com.example.talksy.presentation.register.RegisterStates
+import com.example.talksy.presentation.navigation.Screen
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import java.util.LinkedList
-import java.util.Queue
 
-@Destination()
 @Composable
 fun OnBoarding(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator?,
+    navController: NavController,
     state: OnBoardingStates,
     onEvent: (OnBoardingEvent) -> Unit,
     events: SharedFlow<OnBoardingEvent>
@@ -56,8 +47,8 @@ fun OnBoarding(
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
             when (event) {
-                OnBoardingEvent.SkipClicked -> navigator?.navigate(RegisterDestination())
-                OnBoardingEvent.Finished -> navigator?.navigate(RegisterDestination)
+                OnBoardingEvent.SkipClicked -> navController.navigate(Screen.Register.route)
+                OnBoardingEvent.Finished -> navController.navigate(Screen.Register.route)
                 else -> {}
             }
         }
@@ -132,7 +123,7 @@ fun OnBoarding(
 @Composable
 fun OnBoardingPrev() {
     OnBoarding(
-        navigator = null,
+        navController = rememberNavController(),
         state = OnBoardingStates("Welcome to Talksy, a great friend to chat with you"),
         onEvent = {},
         events = MutableSharedFlow<OnBoardingEvent>().asSharedFlow()

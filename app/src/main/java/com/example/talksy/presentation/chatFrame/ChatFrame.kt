@@ -20,6 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.talksy.presentation.chatFrame.chats.Chats
 import com.example.talksy.presentation.chatFrame.chats.ChatsEvent
 import com.example.talksy.presentation.chatFrame.chats.ChatsState
@@ -32,21 +34,18 @@ import com.example.talksy.presentation.chatFrame.settings.Settings
 import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import com.example.talksy.presentation.chatFrame.settings.SettingsStates
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
-import com.example.talksy.presentation.destinations.OnBoardingDestination
+import com.example.talksy.presentation.navigation.Screen
 import com.example.talksy.ui.theme.TalksyTheme
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination
 @Composable
 fun ChatFrame(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator?,
+    navController: NavController,
     state: ChatFrameStates,
     onEvent: (ChatFrameEvent) -> Unit,
     events: SharedFlow<ChatFrameEvent>,
@@ -65,7 +64,7 @@ fun ChatFrame(
         events.collectLatest { event ->
             when (event) {
                 ChatFrameEvent.NoUserFound -> {
-                    navigator?.navigate(OnBoardingDestination)
+                    navController.navigate(Screen.OnBoarding.route)
                 }
 
                 else -> {}
@@ -99,9 +98,9 @@ fun ChatFrame(
             contentAlignment = Alignment.Center
         ) {
             when (state.selectedNavItem) {
-                0 -> Chats(modifier, navigator, chatsViewModelContainer)
+                0 -> Chats(modifier, navController, chatsViewModelContainer)
                 1 -> Contacts(modifier, contactsViewModelContainer)
-                2 -> Settings(modifier, navigator, settingsViewModelContainer)
+                2 -> Settings(modifier, navController, settingsViewModelContainer)
             }
         }
     }
@@ -117,7 +116,7 @@ data class BottomNavItem(
 fun ChatFramePrev() {
     TalksyTheme {
         ChatFrame(
-            navigator = null,
+            navController = rememberNavController(),
             state = ChatFrameStates(2),
             onEvent = {},
             events = MutableSharedFlow<ChatFrameEvent>().asSharedFlow(),

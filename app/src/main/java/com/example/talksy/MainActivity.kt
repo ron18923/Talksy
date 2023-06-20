@@ -10,40 +10,18 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.talksy.presentation.chatFrame.ChatFrame
-import com.example.talksy.presentation.login.Login
-import com.example.talksy.presentation.NavGraphs
 import com.example.talksy.presentation.chatFrame.ChatFrameViewModel
 import com.example.talksy.presentation.chatFrame.chats.ChatsViewModel
-import com.example.talksy.presentation.chatFrame.chats.ChatsViewModelContainer
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModel
-import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
-import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
-import com.example.talksy.presentation.chatScreen.ChatScreen
 import com.example.talksy.presentation.chatScreen.ChatScreenViewModel
-import com.example.talksy.presentation.destinations.CameraCaptureDestination
-import com.example.talksy.presentation.destinations.ChatFrameDestination
-import com.example.talksy.presentation.destinations.ChatScreenDestination
-import com.example.talksy.presentation.destinations.EditProfileDestination
-import com.example.talksy.presentation.onBoarding.OnBoarding
-import com.example.talksy.presentation.register.Register
-import com.example.talksy.presentation.destinations.LoginDestination
-import com.example.talksy.presentation.destinations.OnBoardingDestination
-import com.example.talksy.presentation.destinations.RegisterDestination
-import com.example.talksy.presentation.destinations.StartComposeDestination
-import com.example.talksy.presentation.editProfile.EditProfile
 import com.example.talksy.presentation.editProfile.EditProfileViewModel
 import com.example.talksy.presentation.login.LoginViewModel
+import com.example.talksy.presentation.navigation.Navigation
 import com.example.talksy.presentation.onBoarding.OnBoardingViewModel
 import com.example.talksy.presentation.register.RegisterViewModel
-import com.example.talksy.presentation.reusableComposables.CameraCapture
-import com.example.talksy.presentation.startCompose.StartCompose
 import com.example.talksy.presentation.startCompose.NavigationViewModel
 import com.example.talksy.ui.theme.TalksyTheme
-import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.manualcomposablecalls.composable
 import dagger.hilt.android.AndroidEntryPoint
 
 //TODO at the end of the project, make all of the compose functions parameters, non-nullable again.
@@ -72,101 +50,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    navigationViewModel = hiltViewModel()
-                    onBoardingViewModel = hiltViewModel()
-                    registerViewModel = hiltViewModel()
-                    loginViewModel = hiltViewModel()
-                    chatFrameViewModel = hiltViewModel()
-                    settingsViewModel = hiltViewModel()
-                    chatsViewModel = hiltViewModel()
-                    contactsViewModel = hiltViewModel()
-                    editProfileViewModel = hiltViewModel()
-                    chatScreenViewModel = hiltViewModel()
-
-                    val chatsViewModelContainer = ChatsViewModelContainer(
-                        chatsViewModel.state.value,
-                        chatsViewModel::onEvent,
-                        chatsViewModel.events
-                    )
-
-                    val contactsViewModelContainer = ContactsViewModelContainer(
-                        contactsViewModel.state.value,
-                        contactsViewModel::onEvent,
-                        contactsViewModel.events
-                    )
-
-                    val settingsViewModelContainer = SettingsViewModelContainer(
-                        settingsViewModel.state.value,
-                        settingsViewModel::onEvent,
-                        settingsViewModel.events
-                    )
-
                     //forcing the layout direction of the app to always be ltr
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                        DestinationsNavHost(navGraph = NavGraphs.root) {
-                            composable(StartComposeDestination) {
-                                StartCompose(
-                                    navigator = destinationsNavigator,
-                                    viewModel = navigationViewModel
-                                )
-                            }
-                            composable(OnBoardingDestination) {
-                                OnBoarding(
-                                    navigator = destinationsNavigator,
-                                    state = onBoardingViewModel.state.value,
-                                    onEvent = onBoardingViewModel::onEvent,
-                                    events = onBoardingViewModel.events
-                                )
-                            }
-                            composable(RegisterDestination) {
-                                Register(
-                                    navigator = destinationsNavigator,
-                                    state = registerViewModel.state.value,
-                                    onEvent = registerViewModel::onEvent,
-                                    events = registerViewModel.events
-                                )
-                            }
-                            composable(LoginDestination) {
-                                Login(
-                                    navigator = destinationsNavigator,
-                                    state = loginViewModel.state.value,
-                                    onEvent = loginViewModel::onEvent,
-                                    events = loginViewModel.events
-                                )
-                            }
-                            composable(ChatFrameDestination) {
-                                ChatFrame(
-                                    navigator = destinationsNavigator,
-                                    state = chatFrameViewModel.state.value,
-                                    onEvent = chatFrameViewModel::onEvent,
-                                    events = chatFrameViewModel.events,
-                                    chatsViewModelContainer = chatsViewModelContainer,
-                                    contactsViewModelContainer = contactsViewModelContainer,
-                                    settingsViewModelContainer = settingsViewModelContainer
-                                )
-                            }
-                            composable(EditProfileDestination) {
-                                EditProfile(
-                                    navigator = destinationsNavigator,
-                                    state = editProfileViewModel.state.value,
-                                    onEvent = editProfileViewModel::onEvent,
-                                    events = editProfileViewModel.events,
-                                )
-                            }
-
-                            composable(ChatScreenDestination) {
-                                ChatScreen(
-                                    navigator = destinationsNavigator,
-                                    state = chatScreenViewModel.state.value,
-                                    onEvent = chatScreenViewModel::onEvent,
-                                    events = chatScreenViewModel.events
-                                )
-                            }
-
-                            composable(CameraCaptureDestination) {
-                                CameraCapture(navigator = destinationsNavigator)
-                            }
-                        }
+                        Navigation()
                     }
                 }
             }

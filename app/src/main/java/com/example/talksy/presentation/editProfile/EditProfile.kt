@@ -51,11 +51,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.ui.theme.TalksyTheme
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -63,11 +63,10 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination
 @Composable
 fun EditProfile(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator?,
+    navController: NavController,
     state: EditProfileStates,
     onEvent: (EditProfileEvent) -> Unit,
     events: SharedFlow<EditProfileEvent>
@@ -102,7 +101,7 @@ fun EditProfile(
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
             when (event) {
-                is EditProfileEvent.GoBackClicked -> navigator?.popBackStack()
+                is EditProfileEvent.GoBackClicked -> navController?.popBackStack()
                 is EditProfileEvent.ChangePasswordClicked -> isShowDialog = true
                 is EditProfileEvent.ChangePasswordConfirmed -> scope.launch {
                     snackbarHostState.showSnackbar(
@@ -209,7 +208,7 @@ fun EditProfile(
 @Composable
 fun EditProfilePrev() {
     EditProfile(
-        navigator = null,
+        navController = rememberNavController(),
         state = EditProfileStates(),
         onEvent = {},
         events = MutableSharedFlow<EditProfileEvent>().asSharedFlow()
