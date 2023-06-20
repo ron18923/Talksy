@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.talksy.TalksyApp.Companion.TAG
-import com.example.talksy.presentation.navigation.Screen
+import com.example.talksy.presentation.graphs.navigation.Screen
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -77,13 +77,17 @@ fun Login(
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
             when (event) {
-                is LoginEvent.GoToRegisterClicked -> navController.navigate(Screen.Register.route)
+                is LoginEvent.GoToRegisterClicked -> navController.navigate(Screen.Register.route) {
+                    popUpTo(0)
+                }
+
                 is LoginEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(event.message) }
                 is LoginEvent.GoBackClicked -> navController.popBackStack()
                 is LoginEvent.GoToApp -> {
                     Log.d(TAG, "Login: GoToApp")
                     navController.navigate(Screen.ChatFrame.route)
                 }
+
                 else -> {} //not all events require implementation here.
             }
         }
@@ -92,23 +96,25 @@ fun Login(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            LargeTopAppBar(title = {
-                Column {
-                    Text(text = "Login")
-                    Spacer(modifier = modifier.height(4.dp))
-                    Text(
-                        text = "Enter your email and password to continue.",
-                        style = MaterialTheme.typography.titleSmall.copy(fontSize = 16.sp)
-                    )
-                }
-            },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        onEvent(LoginEvent.GoBackClicked)
-                    }) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go Back")
+            LargeTopAppBar(
+                title = {
+                    Column {
+                        Text(text = "Login")
+                        Spacer(modifier = modifier.height(4.dp))
+                        Text(
+                            text = "Enter your email and password to continue.",
+                            style = MaterialTheme.typography.titleSmall.copy(fontSize = 16.sp)
+                        )
                     }
-                })
+                },
+//                navigationIcon = {
+//                    IconButton(onClick = {
+//                        onEvent(LoginEvent.GoBackClicked)
+//                    }) {
+//                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go Back")
+//                    }
+//                }
+            )
         }) { innerPadding ->
         Box(
             modifier = modifier

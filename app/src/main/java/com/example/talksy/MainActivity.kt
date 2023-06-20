@@ -17,7 +17,7 @@ import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
 import com.example.talksy.presentation.chatScreen.ChatScreenViewModel
 import com.example.talksy.presentation.editProfile.EditProfileViewModel
 import com.example.talksy.presentation.login.LoginViewModel
-import com.example.talksy.presentation.navigation.Navigation
+import com.example.talksy.presentation.graphs.navigation.Navigation
 import com.example.talksy.presentation.onBoarding.OnBoardingViewModel
 import com.example.talksy.presentation.register.RegisterViewModel
 import com.example.talksy.presentation.startCompose.NavigationViewModel

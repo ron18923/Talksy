@@ -2,7 +2,7 @@ package com.example.talksy.presentation.startCompose
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.example.talksy.presentation.navigation.Screen
+import com.example.talksy.presentation.graphs.navigation.Screen
 
 @Composable
 fun StartCompose(

@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.talksy.R
-import com.example.talksy.presentation.navigation.Screen
+import com.example.talksy.presentation.graphs.navigation.Screen
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -47,8 +47,8 @@ fun OnBoarding(
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
             when (event) {
-                OnBoardingEvent.SkipClicked -> navController.navigate(Screen.Register.route)
-                OnBoardingEvent.Finished -> navController.navigate(Screen.Register.route)
+                OnBoardingEvent.SkipClicked -> navigateNext(navController)
+                OnBoardingEvent.Finished -> navigateNext(navController)
                 else -> {}
             }
         }
@@ -116,6 +116,12 @@ fun OnBoarding(
                 )
             }
         }
+    }
+}
+
+fun navigateNext(navController: NavController){
+    navController.navigate(Screen.Register.route){
+        popUpTo(0)
     }
 }
 

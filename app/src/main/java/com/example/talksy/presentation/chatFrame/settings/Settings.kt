@@ -50,7 +50,7 @@ import com.example.talksy.presentation.chatFrame.chats.ChatsViewModelContainer
 import com.example.talksy.presentation.chatFrame.contacts.ContactsEvent
 import com.example.talksy.presentation.chatFrame.contacts.ContactsStates
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
-import com.example.talksy.presentation.navigation.Screen
+import com.example.talksy.presentation.graphs.navigation.Screen
 import com.example.talksy.ui.theme.TalksyTheme
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

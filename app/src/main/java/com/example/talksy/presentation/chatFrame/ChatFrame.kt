@@ -16,11 +16,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.talksy.presentation.chatFrame.chats.Chats
 import com.example.talksy.presentation.chatFrame.chats.ChatsEvent
@@ -34,7 +38,8 @@ import com.example.talksy.presentation.chatFrame.settings.Settings
 import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
 import com.example.talksy.presentation.chatFrame.settings.SettingsStates
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
-import com.example.talksy.presentation.navigation.Screen
+import com.example.talksy.presentation.graphs.navigation.BottomNavScreen
+import com.example.talksy.presentation.graphs.navigation.Screen
 import com.example.talksy.ui.theme.TalksyTheme
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -54,9 +59,9 @@ fun ChatFrame(
     settingsViewModelContainer: SettingsViewModelContainer
 ) {
     val navItems = listOf(
-        BottomNavItem("Chats", Icons.Default.Chat),
-        BottomNavItem("Contacts", Icons.Default.Contacts),
-        BottomNavItem("Settings", Icons.Default.Settings),
+        BottomNavScreen.Chats,
+        BottomNavScreen.Contacts,
+        BottomNavScreen.Settings
     )
 
     //Handling events
@@ -75,20 +80,38 @@ fun ChatFrame(
     Scaffold(bottomBar = {
         NavigationBar() {
             //TODO implement it later correctly.
-            navItems.forEachIndexed { index, item ->
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+            navItems.forEach { screen ->
                 NavigationBarItem(
-                    icon = { Icon(item.icon, "nav icon") },
-                    label = { Text(item.title) },
-                    selected = state.selectedNavItem == index,
+                    icon = {
+                        Icon(
+                            imageVector = screen.icon,
+                            contentDescription = "navigation item icon"
+                        )
+                    },
+                    label = { Text(text = screen.label) },
+                    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                     onClick = {
-                        onEvent(ChatFrameEvent.NavItemSelected(index))
-                    }
-                )
+                        navController.navigate(screen.route) {
+                            // Pop up to the start destination of the graph to
+                            // avoid building up a large stack of destinations
+                            // on the back stack as users select items
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            launchSingleTop = true
+                            // Restore state when reselecting a previously selected item
+                            restoreState = true
+                        }
+                    })
             }
         }
     },
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = navItems[state.selectedNavItem].title) })
+            CenterAlignedTopAppBar(title = { Text(text = navItems[state.selectedNavItem].label) })
         }
     ) {
         Box(
@@ -99,17 +122,12 @@ fun ChatFrame(
         ) {
             when (state.selectedNavItem) {
                 0 -> Chats(modifier, navController, chatsViewModelContainer)
-                1 -> Contacts(modifier, contactsViewModelContainer)
+                1 -> Contacts(modifier, navController,  contactsViewModelContainer)
                 2 -> Settings(modifier, navController, settingsViewModelContainer)
             }
         }
     }
 }
-
-data class BottomNavItem(
-    val title: String,
-    val icon: ImageVector
-)
 
 @Preview(showBackground = true)
 @Composable

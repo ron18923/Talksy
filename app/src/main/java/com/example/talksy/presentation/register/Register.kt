@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.talksy.presentation.navigation.Screen
+import com.example.talksy.presentation.graphs.navigation.Screen
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -76,7 +76,9 @@ fun Register(
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
             when (event) {
-                is RegisterEvent.GoToLoginClicked -> navController.navigate(Screen.Login.route)
+                is RegisterEvent.GoToLoginClicked -> navController.navigate(Screen.Login.route){
+                    popUpTo(0)
+                }
                 is RegisterEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(event.message) }
                 is RegisterEvent.GoBackClicked -> navController.popBackStack()
                 is RegisterEvent.GoToApp -> navController.navigate(Screen.ChatFrame.route)
@@ -98,13 +100,14 @@ fun Register(
                     )
                 }
             },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        onEvent(RegisterEvent.GoBackClicked)
-                    }) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go Back")
-                    }
-                })
+//                navigationIcon = {
+//                    IconButton(onClick = {
+//                        onEvent(RegisterEvent.GoBackClicked)
+//                    }) {
+//                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go Back")
+//                    }
+//                }
+            )
         }) { innerPadding ->
         Box(
             modifier = modifier

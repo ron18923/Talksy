@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.presentation.chatFrame.ChatFrame
@@ -56,6 +57,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun Contacts(
     modifier: Modifier = Modifier,
+    navController: NavController,
     contactsViewModelContainer: ContactsViewModelContainer,
 ) {
     val state = contactsViewModelContainer.state

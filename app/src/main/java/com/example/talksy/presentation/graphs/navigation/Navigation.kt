@@ -1,4 +1,4 @@
-package com.example.talksy.presentation.navigation
+package com.example.talksy.presentation.graphs.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -7,10 +7,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.talksy.presentation.chatFrame.ChatFrame
 import com.example.talksy.presentation.chatFrame.ChatFrameViewModel
+import com.example.talksy.presentation.chatFrame.chats.Chats
 import com.example.talksy.presentation.chatFrame.chats.ChatsViewModel
 import com.example.talksy.presentation.chatFrame.chats.ChatsViewModelContainer
+import com.example.talksy.presentation.chatFrame.contacts.Contacts
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModel
 import com.example.talksy.presentation.chatFrame.contacts.ContactsViewModelContainer
+import com.example.talksy.presentation.chatFrame.settings.Settings
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
 import com.example.talksy.presentation.chatFrame.settings.SettingsViewModelContainer
 import com.example.talksy.presentation.chatScreen.ChatScreen
@@ -95,6 +98,24 @@ fun Navigation() {
                 events = chatFrameViewModel.events,
                 chatsViewModelContainer = chatsViewModelContainer,
                 contactsViewModelContainer = contactsViewModelContainer,
+                settingsViewModelContainer = settingsViewModelContainer
+            )
+        }
+        composable(route = BottomNavScreen.Chats.route) {
+            Chats(
+                navController = navController,
+                chatsViewModelContainer = chatsViewModelContainer
+            )
+        }
+        composable(route = BottomNavScreen.Contacts.route) {
+            Contacts(
+                navController = navController,
+                contactsViewModelContainer = contactsViewModelContainer
+            )
+        }
+        composable(route = BottomNavScreen.Settings.route) {
+            Settings(
+                navController = navController,
                 settingsViewModelContainer = settingsViewModelContainer
             )
         }
