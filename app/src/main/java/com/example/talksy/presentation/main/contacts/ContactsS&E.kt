@@ -1,4 +1,4 @@
-package com.example.talksy.presentation.chatFrame.contacts
+package com.example.talksy.presentation.main.contacts
 
 sealed class ContactsEvent {
     data class SearchEntered(val value: String): ContactsEvent()

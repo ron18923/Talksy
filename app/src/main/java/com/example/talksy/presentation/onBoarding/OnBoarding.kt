@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.talksy.R
-import com.example.talksy.presentation.graphs.navigation.Screen
+import com.example.talksy.presentation.graphs.navigation.AuthScreen
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -120,7 +120,7 @@ fun OnBoarding(
 }
 
 fun navigateNext(navController: NavController){
-    navController.navigate(Screen.Register.route){
+    navController.navigate(AuthScreen.Register.route){
         popUpTo(0)
     }
 }

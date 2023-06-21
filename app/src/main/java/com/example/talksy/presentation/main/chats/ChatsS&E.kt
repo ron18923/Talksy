@@ -1,4 +1,4 @@
-package com.example.talksy.presentation.chatFrame.chats
+package com.example.talksy.presentation.main.chats
 
 sealed class ChatsEvent {
 

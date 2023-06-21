@@ -4,8 +4,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.talksy.data.MainRepository
-import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
-import com.example.talksy.presentation.chatFrame.settings.SettingsStates
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

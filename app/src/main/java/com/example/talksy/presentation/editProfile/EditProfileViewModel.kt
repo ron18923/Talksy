@@ -2,17 +2,12 @@ package com.example.talksy.presentation.editProfile
 
 import android.net.Uri
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talksy.data.MainRepository
-import com.example.talksy.data.helperRepositories.StorageRepository
-import com.example.talksy.data.helperRepositories.UserRepository
-import com.example.talksy.presentation.chatFrame.settings.SettingsEvent
-import com.example.talksy.presentation.chatFrame.settings.SettingsStates
+import com.example.talksy.presentation.main.settings.SettingsEvent
+import com.example.talksy.presentation.main.settings.SettingsStates
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

@@ -1,9 +1,11 @@
-package com.example.talksy.presentation.chatFrame.contacts
+package com.example.talksy.presentation.main.contacts
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,6 +32,7 @@ class ContactsViewModel @Inject constructor(
     }
 
     fun onEvent(event: ContactsEvent) {
+        Log.d(TAG, "onEvent: ${event.toString()}")
         when (event) {
             ContactsEvent.SearchClose -> {
                 if (state.value.searchInput.isNotEmpty()) {

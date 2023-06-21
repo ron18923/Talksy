@@ -1,4 +1,4 @@
-package com.example.talksy.presentation.chatFrame.settings
+package com.example.talksy.presentation.main.settings
 
 import android.net.Uri
 import android.util.Log
@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.MainRepository
-import com.example.talksy.data.helperRepositories.UserRepository
 import com.example.talksy.data.helperRepositories.UserStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow

@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -45,7 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.talksy.TalksyApp.Companion.TAG
-import com.example.talksy.presentation.graphs.navigation.Screen
+import com.example.talksy.presentation.graphs.navigation.AuthScreen
+import com.example.talksy.presentation.graphs.navigation.Graph
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -77,15 +77,17 @@ fun Login(
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
             when (event) {
-                is LoginEvent.GoToRegisterClicked -> navController.navigate(Screen.Register.route) {
-                    popUpTo(0)
+                is LoginEvent.GoToRegisterClicked -> navController.navigate(AuthScreen.Register.route) {
+                    popUpTo(AuthScreen.Login.route){
+                        inclusive = true
+                    }
                 }
 
                 is LoginEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(event.message) }
                 is LoginEvent.GoBackClicked -> navController.popBackStack()
                 is LoginEvent.GoToApp -> {
                     Log.d(TAG, "Login: GoToApp")
-                    navController.navigate(Screen.ChatFrame.route)
+                    navController.navigate(Graph.Main.route)
                 }
 
                 else -> {} //not all events require implementation here.
@@ -182,7 +184,7 @@ fun Login(
                     ) {
                         Text(text = "Don't have an account?")
                         TextButton(
-                            onClick = { navController.navigate(Screen.Register.route) }) {
+                            onClick = { navController.navigate(AuthScreen.Register.route) }) {
                             Text(
                                 text = "Register"
                             )

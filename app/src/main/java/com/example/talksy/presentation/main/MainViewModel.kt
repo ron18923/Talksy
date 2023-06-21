@@ -1,4 +1,4 @@
-package com.example.talksy.presentation.chatFrame
+package com.example.talksy.presentation.main
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -11,25 +11,25 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ChatFrameViewModel @Inject constructor(): ViewModel() {
+class MainViewModel @Inject constructor(): ViewModel() {
 
-    private val _state = mutableStateOf(ChatFrameStates())
-    val state: State<ChatFrameStates> = _state
+    private val _state = mutableStateOf(MainStates())
+    val state: State<MainStates> = _state
 
-    private val _events = MutableSharedFlow<ChatFrameEvent>()
+    private val _events = MutableSharedFlow<MainEvent>()
     val events = _events.asSharedFlow()
 
-    fun onEvent(event: ChatFrameEvent) {
+    fun onEvent(event: MainEvent) {
         when (event) {
-            ChatFrameEvent.NoUserFound -> {
+            MainEvent.NoUserFound -> {
                 viewModelScope.launch {
                     _events.emit(
-                        ChatFrameEvent.NoUserFound
+                        MainEvent.NoUserFound
                     )
                 }
             }
 
-            is ChatFrameEvent.NavItemSelected -> {
+            is MainEvent.NavItemSelected -> {
                 _state.value = _state.value.copy(selectedNavItem = event.value)
             }
         }

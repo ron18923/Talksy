@@ -6,7 +6,6 @@ import com.example.talksy.data.helperRepositories.FireStoreRepository
 import com.example.talksy.data.helperRepositories.StorageRepository
 import com.example.talksy.data.helperRepositories.UserRepository
 import com.example.talksy.data.helperRepositories.UserStateListener
-import com.example.talksy.presentation.chatFrame.settings.SettingsViewModel
 import com.google.firebase.auth.FirebaseUser
 
 class MainRepository(

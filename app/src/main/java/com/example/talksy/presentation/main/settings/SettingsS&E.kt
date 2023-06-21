@@ -1,4 +1,4 @@
-package com.example.talksy.presentation.chatFrame.settings
+package com.example.talksy.presentation.main.settings
 
 import android.net.Uri
 
