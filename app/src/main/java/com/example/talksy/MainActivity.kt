@@ -12,14 +12,13 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.talksy.presentation.main.MainViewModel
 import com.example.talksy.presentation.main.chats.ChatsViewModel
 import com.example.talksy.presentation.main.contacts.ContactsViewModel
 import com.example.talksy.presentation.main.settings.SettingsViewModel
 import com.example.talksy.presentation.editProfile.EditProfileViewModel
 import com.example.talksy.presentation.login.LoginViewModel
-import com.example.talksy.presentation.graphs.navigation.RootNav
-import com.example.talksy.presentation.graphs.navigation.RootViewModel
+import com.example.talksy.presentation.navigation.RootNav
+import com.example.talksy.presentation.navigation.RootViewModel
 import com.example.talksy.presentation.onBoarding.OnBoardingViewModel
 import com.example.talksy.presentation.register.RegisterViewModel
 import com.example.talksy.ui.theme.TalksyTheme
@@ -36,7 +35,6 @@ class MainActivity : ComponentActivity() {
         lateinit var onBoardingViewModel: OnBoardingViewModel
         lateinit var registerViewModel: RegisterViewModel
         lateinit var loginViewModel: LoginViewModel
-        lateinit var mainViewModel: MainViewModel
         lateinit var chatsViewModel: ChatsViewModel
         lateinit var contactsViewModel: ContactsViewModel
         lateinit var settingsViewModel: SettingsViewModel
@@ -56,7 +54,6 @@ class MainActivity : ComponentActivity() {
                     onBoardingViewModel = hiltViewModel()
                     registerViewModel = hiltViewModel()
                     loginViewModel = hiltViewModel()
-                    mainViewModel = hiltViewModel()
 
                     chatsViewModel = hiltViewModel()
                     contactsViewModel = hiltViewModel()
@@ -71,7 +68,6 @@ class MainActivity : ComponentActivity() {
                             onBoardingViewModel = onBoardingViewModel,
                             registerViewModel = registerViewModel,
                             loginViewModel = loginViewModel,
-                            mainViewModel = mainViewModel,
 
                             chatsViewModel = chatsViewModel,
                             contactsViewModel = contactsViewModel,

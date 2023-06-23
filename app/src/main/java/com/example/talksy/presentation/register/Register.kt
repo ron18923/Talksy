@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.talksy.presentation.graphs.navigation.AuthScreen
+import com.example.talksy.presentation.navigation.AuthScreen
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

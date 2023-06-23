@@ -47,10 +47,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.TalksyApp.Companion.TAG
-import com.example.talksy.presentation.graphs.navigation.GraphIconLabel
-import com.example.talksy.presentation.main.Main
-import com.example.talksy.presentation.main.MainEvent
-import com.example.talksy.presentation.main.MainStates
+import com.example.talksy.presentation.navigation.GraphIconLabel
 import com.example.talksy.presentation.main.chats.ChatsEvent
 import com.example.talksy.presentation.main.chats.ChatsState
 import com.example.talksy.presentation.main.chats.ChatsViewModelContainer

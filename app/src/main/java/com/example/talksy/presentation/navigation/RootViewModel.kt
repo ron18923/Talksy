@@ -1,4 +1,4 @@
-package com.example.talksy.presentation.graphs.navigation
+package com.example.talksy.presentation.navigation
 
 import android.net.Uri
 import android.util.Log

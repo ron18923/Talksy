@@ -36,10 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,18 +48,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.talksy.presentation.graphs.navigation.AuthScreen
-import com.example.talksy.presentation.graphs.navigation.GraphIconLabel
-import com.example.talksy.presentation.graphs.navigation.SettingsNav
-import com.example.talksy.presentation.main.Main
-import com.example.talksy.presentation.main.MainEvent
-import com.example.talksy.presentation.main.MainStates
-import com.example.talksy.presentation.main.chats.ChatsEvent
-import com.example.talksy.presentation.main.chats.ChatsState
-import com.example.talksy.presentation.main.chats.ChatsViewModelContainer
-import com.example.talksy.presentation.main.contacts.ContactsEvent
-import com.example.talksy.presentation.main.contacts.ContactsStates
-import com.example.talksy.presentation.main.contacts.ContactsViewModelContainer
+import com.example.talksy.presentation.navigation.AuthScreen
+import com.example.talksy.presentation.navigation.GraphIconLabel
+import com.example.talksy.presentation.navigation.SettingsNav
 import com.example.talksy.ui.theme.TalksyTheme
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -276,11 +263,11 @@ fun CustomTextButton(
 @Composable
 fun SettingsPrev() {
     TalksyTheme(darkTheme = true) {
-        Main(
+        Settings(
             navController = rememberNavController(),
-            state = MainStates(2),
+            state = SettingsStates(username = "Ron189", "ronron18923@gmail.com"),
             onEvent = {},
-            events = MutableSharedFlow<MainEvent>().asSharedFlow(),
+            events = MutableSharedFlow<SettingsEvent>().asSharedFlow()
         )
     }
 }

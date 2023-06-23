@@ -1,4 +1,4 @@
-package com.example.talksy.presentation.graphs.navigation
+package com.example.talksy.presentation.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
@@ -14,7 +14,6 @@ import com.example.talksy.presentation.editProfile.EditProfile
 import com.example.talksy.presentation.editProfile.EditProfileViewModel
 import com.example.talksy.presentation.login.Login
 import com.example.talksy.presentation.login.LoginViewModel
-import com.example.talksy.presentation.main.MainViewModel
 import com.example.talksy.presentation.main.chats.Chats
 import com.example.talksy.presentation.main.chats.ChatsViewModel
 import com.example.talksy.presentation.main.contacts.Contacts
@@ -34,7 +33,6 @@ fun RootNav(
     registerViewModel: RegisterViewModel,
     loginViewModel: LoginViewModel,
     chatsViewModel: ChatsViewModel,
-    mainViewModel: MainViewModel,
     contactsViewModel: ContactsViewModel,
     settingsViewModel: SettingsViewModel,
     editProfileViewModel: EditProfileViewModel
@@ -135,8 +133,28 @@ sealed class Graph(val route: String) {
     object Main : Graph("main")
 }
 
+sealed class AuthScreen(val route: String) {
+    object OnBoarding : AuthScreen(route = "on_boarding")
+    object Login : AuthScreen(route = "login")
+    object Register : AuthScreen(route = "register")
+}
+
+// main objects -
+
+sealed class BottomNavScreen(val route: String, val label: String, val icon: ImageVector) {
+    object Chats : BottomNavScreen("chats", "Chats", Icons.Default.Chat)
+    object Contacts : BottomNavScreen("contacts", "Contacts", Icons.Default.Contacts)
+    object Settings : BottomNavScreen("settings", "Settings", Icons.Default.Settings)
+}
+
+// graphs of each bottom nav screen
 sealed class GraphIconLabel(val route: String, val label: String, val icon: ImageVector){
     object Settings : GraphIconLabel("settings_graph", "Settings", Icons.Default.Settings)
     object Contacts : GraphIconLabel("contacts_graph", "Contacts", Icons.Default.Contacts)
     object Chats : GraphIconLabel("chats_graph", "Chats", Icons.Default.Chat)
+}
+
+// objects of bottom nav screens graphs
+sealed class SettingsNav(val route: String) {
+    object EditProfile : SettingsNav("edit_profile")
 }
