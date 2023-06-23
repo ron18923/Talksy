@@ -32,7 +32,7 @@ class ContactsViewModel @Inject constructor(
     }
 
     fun onEvent(event: ContactsEvent) {
-        Log.d(TAG, "onEvent: ${event.toString()}")
+        Log.d(TAG, "onEvent: ${state.value.searchInput}")
         when (event) {
             ContactsEvent.SearchClose -> {
                 if (state.value.searchInput.isNotEmpty()) {

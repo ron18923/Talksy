@@ -6,75 +6,44 @@ import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
 import androidx.navigation.navigation
-import com.example.talksy.data.MainRepository
-import com.example.talksy.data.helperRepositories.UserRepository
 import com.example.talksy.presentation.editProfile.EditProfile
 import com.example.talksy.presentation.editProfile.EditProfileViewModel
 import com.example.talksy.presentation.login.Login
-import com.example.talksy.presentation.main.MainViewModel
-import com.example.talksy.presentation.main.Main
 import com.example.talksy.presentation.login.LoginViewModel
+import com.example.talksy.presentation.main.MainViewModel
 import com.example.talksy.presentation.main.chats.Chats
 import com.example.talksy.presentation.main.chats.ChatsViewModel
-import com.example.talksy.presentation.main.chats.ChatsViewModelContainer
 import com.example.talksy.presentation.main.contacts.Contacts
 import com.example.talksy.presentation.main.contacts.ContactsViewModel
-import com.example.talksy.presentation.main.contacts.ContactsViewModelContainer
 import com.example.talksy.presentation.main.settings.Settings
 import com.example.talksy.presentation.main.settings.SettingsViewModel
-import com.example.talksy.presentation.main.settings.SettingsViewModelContainer
 import com.example.talksy.presentation.onBoarding.OnBoarding
 import com.example.talksy.presentation.onBoarding.OnBoardingViewModel
 import com.example.talksy.presentation.register.Register
 import com.example.talksy.presentation.register.RegisterViewModel
 
 @Composable
-fun RootNav(navController: NavHostController) {
-
-    val rootViewModel = hiltViewModel<RootViewModel>()
-    val rootStates = rootViewModel.state.value
-
-    val onBoardingViewModel = hiltViewModel<OnBoardingViewModel>()
-    val registerViewModel = hiltViewModel<RegisterViewModel>()
-    val loginViewModel = hiltViewModel<LoginViewModel>()
-    val mainViewModel = hiltViewModel<MainViewModel>()
-
-    val chatsViewModel = hiltViewModel<ChatsViewModel>()
-    val contactsViewModel = hiltViewModel<ContactsViewModel>()
-    val settingsViewModel = hiltViewModel<SettingsViewModel>()
-    val editProfileViewModel = hiltViewModel<EditProfileViewModel>()
-
-    // TODO: implement it correctly later
-    val chatsViewModelContainer = ChatsViewModelContainer(
-        chatsViewModel.state.value,
-        chatsViewModel::onEvent,
-        chatsViewModel.events
-    )
-
-    val contactsViewModelContainer = ContactsViewModelContainer(
-        contactsViewModel.state.value,
-        contactsViewModel::onEvent,
-        contactsViewModel.events
-    )
-
-    val settingsViewModelContainer = SettingsViewModelContainer(
-        settingsViewModel.state.value,
-        settingsViewModel::onEvent,
-        settingsViewModel.events
-    )
-
-    // TODO: later implement correct start destination
+fun RootNav(
+    navController: NavHostController,
+    rootViewModel: RootViewModel,
+    onBoardingViewModel: OnBoardingViewModel,
+    registerViewModel: RegisterViewModel,
+    loginViewModel: LoginViewModel,
+    chatsViewModel: ChatsViewModel,
+    mainViewModel: MainViewModel,
+    contactsViewModel: ContactsViewModel,
+    settingsViewModel: SettingsViewModel,
+    editProfileViewModel: EditProfileViewModel
+) {
 
     NavHost(
         navController = navController,
         route = Graph.Root.route,
-        startDestination = if (rootStates.isUserLoggedIn) Graph.Main.route else Graph.Authentication.route
+        startDestination = if (rootViewModel.state.value.isUserLoggedIn) Graph.Main.route else Graph.Authentication.route
     ) {
         navigation(
             route = Graph.Authentication.route,
@@ -116,7 +85,9 @@ fun RootNav(navController: NavHostController) {
                 composable(route = BottomNavScreen.Chats.route) {
                     Chats(
                         navController = navController,
-                        chatsViewModelContainer = chatsViewModelContainer
+                        state = chatsViewModel.state.value,
+                        onEvent = chatsViewModel::onEvent,
+                        events = chatsViewModel.events
                     )
                 }
             }
@@ -127,7 +98,9 @@ fun RootNav(navController: NavHostController) {
                 composable(route = BottomNavScreen.Contacts.route) {
                     Contacts(
                         navController = navController,
-                        contactsViewModelContainer = contactsViewModelContainer
+                        state = contactsViewModel.state.value,
+                        onEvent = contactsViewModel::onEvent,
+                        events = contactsViewModel.events
                     )
                 }
             }
@@ -146,7 +119,9 @@ fun RootNav(navController: NavHostController) {
                 composable(route = BottomNavScreen.Settings.route) {
                     Settings(
                         navController = navController,
-                        settingsViewModelContainer = settingsViewModelContainer
+                        state = settingsViewModel.state.value,
+                        onEvent = settingsViewModel::onEvent,
+                        events = settingsViewModel.events
                     )
                 }
             }

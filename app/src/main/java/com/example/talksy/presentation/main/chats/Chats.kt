@@ -19,13 +19,16 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.talksy.presentation.graphs.navigation.GraphIconLabel
+import kotlinx.coroutines.flow.SharedFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Chats(
     modifier: Modifier = Modifier,
     navController: NavController,
-    chatsViewModelContainer: ChatsViewModelContainer
+    state: ChatsState,
+    onEvent: (ChatsEvent) -> Unit,
+    events: SharedFlow<ChatsEvent>
 ) {
 
     val navItems = listOf(

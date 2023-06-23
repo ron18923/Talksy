@@ -59,6 +59,7 @@ import com.example.talksy.presentation.main.settings.SettingsStates
 import com.example.talksy.presentation.main.settings.SettingsViewModelContainer
 import com.example.talksy.ui.theme.TalksyTheme
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -67,11 +68,10 @@ import kotlinx.coroutines.flow.collectLatest
 fun Contacts(
     modifier: Modifier = Modifier,
     navController: NavController,
-    contactsViewModelContainer: ContactsViewModelContainer,
+    state: ContactsStates,
+    onEvent: (ContactsEvent) -> Unit,
+    events: SharedFlow<ContactsEvent>
 ) {
-    val state = contactsViewModelContainer.state
-    val onEvent = contactsViewModelContainer.onEvent
-    val events = contactsViewModelContainer.events
 
     var searchActive by remember { mutableStateOf(false) }
 
@@ -215,15 +215,26 @@ fun Contacts(
     }
 }
 
-    @Preview(showBackground = true)
-    @Composable
-    fun ContactsPrev() {
-        TalksyTheme(darkTheme = true) {
-            Main(
-                navController = rememberNavController(),
-                state = MainStates(1),
-                onEvent = {},
-                events = MutableSharedFlow<MainEvent>().asSharedFlow(),
-            )
-        }
+@Preview(showBackground = true)
+@Composable
+fun ContactsPrev() {
+    TalksyTheme(darkTheme = true) {
+        Contacts(
+            navController = rememberNavController(),
+            state = ContactsStates(
+                contactsList = arrayListOf(
+                    hashMapOf(
+                        "username" to "Ron189",
+                        "profilePicture" to ""
+                    ),
+                    hashMapOf(
+                        "username" to "Gal17",
+                        "profilePicture" to "",
+                    )
+                )
+            ),
+            onEvent = {},
+            events = MutableSharedFlow<ContactsEvent>().asSharedFlow(),
+        )
     }
+}

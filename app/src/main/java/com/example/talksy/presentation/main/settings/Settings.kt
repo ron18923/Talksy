@@ -66,6 +66,7 @@ import com.example.talksy.presentation.main.contacts.ContactsStates
 import com.example.talksy.presentation.main.contacts.ContactsViewModelContainer
 import com.example.talksy.ui.theme.TalksyTheme
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
@@ -74,11 +75,10 @@ import kotlinx.coroutines.flow.collectLatest
 fun Settings(
     modifier: Modifier = Modifier,
     navController: NavController,
-    settingsViewModelContainer: SettingsViewModelContainer
+    state: SettingsStates,
+    onEvent: (SettingsEvent) -> Unit,
+    events: SharedFlow<SettingsEvent>
 ) {
-    val state = settingsViewModelContainer.state
-    val onEvent = settingsViewModelContainer.onEvent
-    val events = settingsViewModelContainer.events
 
     val navItems = listOf(
         GraphIconLabel.Chats,
