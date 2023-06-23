@@ -50,10 +50,8 @@ import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.navigation.GraphIconLabel
 import com.example.talksy.presentation.main.chats.ChatsEvent
 import com.example.talksy.presentation.main.chats.ChatsState
-import com.example.talksy.presentation.main.chats.ChatsViewModelContainer
 import com.example.talksy.presentation.main.settings.SettingsEvent
 import com.example.talksy.presentation.main.settings.SettingsStates
-import com.example.talksy.presentation.main.settings.SettingsViewModelContainer
 import com.example.talksy.ui.theme.TalksyTheme
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow

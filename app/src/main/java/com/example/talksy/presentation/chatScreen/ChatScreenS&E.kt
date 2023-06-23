@@ -1,9 +1,12 @@
 package com.example.talksy.presentation.chatScreen
 
-sealed class ChatScreenEvent(){
+import android.net.Uri
+
+sealed class ChatScreenEvent() {
     object GoBackClicked : ChatScreenEvent()
 }
 
 data class ChatScreenStates(
-    val string: String = ""
+    val otherUsername: String = "",
+    val otherProfile: Uri = Uri.EMPTY
 )

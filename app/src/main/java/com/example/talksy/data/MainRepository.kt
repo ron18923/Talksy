@@ -110,4 +110,10 @@ class MainRepository(
     fun setUserListener(listener: UserStateListener) {
         userRepository.setListener(listener)
     }
+
+    suspend fun getChat(user2: String){
+        userRepository.getUserUid()?.let { user1 ->
+            fireStoreRepository.getChat(user1 = user1, user2 = user2)
+        }
+    }
 }

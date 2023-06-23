@@ -67,9 +67,3 @@ class ContactsViewModel @Inject constructor(
         }
     }
 }
-
-data class ContactsViewModelContainer(
-    var state: ContactsStates,
-    var onEvent: (ContactsEvent) -> Unit,
-    var events: SharedFlow<ContactsEvent>,
-)

@@ -101,7 +101,7 @@ fun EditProfile(
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
             when (event) {
-                is EditProfileEvent.GoBackClicked -> navController?.popBackStack()
+                is EditProfileEvent.GoBackClicked -> navController.popBackStack()
                 is EditProfileEvent.ChangePasswordClicked -> isShowDialog = true
                 is EditProfileEvent.ChangePasswordConfirmed -> scope.launch {
                     snackbarHostState.showSnackbar(

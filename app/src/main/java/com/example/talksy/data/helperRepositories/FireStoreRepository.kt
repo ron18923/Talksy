@@ -1,5 +1,7 @@
 package com.example.talksy.data.helperRepositories
 
+import android.util.Log
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.User
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -8,15 +10,27 @@ class FireStoreRepository {
 
     companion object {
         const val COLLECTION_USERS = "users"
+        const val COLLECTION_CHATS = "chats"
 
+        //user fields
         const val FIELD_CONTACTS = "contacts"
         const val FIELD_USERNAME = "username"
         const val FIELD_EMAIL = "email"
         const val FIELD_PROFILE_PICTURE = "profilePicture"
         const val FIELD_UID = "uid"
+
+        //chat fields
+        const val FIELD_MESSAGES = "messages"
+        const val FIELD_MESSAGE = "message"
+        const val FIELD_SENDER_UID = "senderUid"
+        const val FIELD_UID1 = "uid1"
+        const val FIELD_UID2 = "uid2"
     }
 
-    private val usersCollection = FirebaseFirestore.getInstance().collection(COLLECTION_USERS)
+    private val usersCollection =
+        FirebaseFirestore.getInstance().collection(COLLECTION_USERS)
+    private val chatsCollection =
+        FirebaseFirestore.getInstance().collection(COLLECTION_CHATS)
 
     suspend fun addContactToUser(userUID: String, contactUsername: String) {
 
@@ -89,13 +103,41 @@ class FireStoreRepository {
         return user.profilePicture
     }
 
-    suspend fun checkUsername(username: String, errorMessage: (String) -> Unit): Boolean{
+    suspend fun checkUsername(username: String, errorMessage: (String) -> Unit): Boolean {
         val documents = usersCollection.whereEqualTo(FIELD_USERNAME, username).get().await()
-        return if(documents.isEmpty){
+        return if (documents.isEmpty) {
             true
-        } else{
+        } else {
             errorMessage("Username is already being used.")
             false
         }
+    }
+
+    suspend fun getChat(user1: String, user2: String) {
+        val firstDocument =
+            chatsCollection.whereEqualTo(FIELD_UID1, user1).whereEqualTo(FIELD_UID2, user2).get()
+                .await()
+        val secondDocument =
+            chatsCollection.whereEqualTo(FIELD_UID1, user2).whereEqualTo(FIELD_UID2, user1).get()
+                .await()
+
+        if(firstDocument.isEmpty && secondDocument.isEmpty){
+            createChat(user1, user2)
+
+            val document =
+                chatsCollection.whereEqualTo(FIELD_UID1, user1).whereEqualTo(FIELD_UID2, user2).get()
+                    .await()
+        }
+    }
+
+    private suspend fun createChat(user1: String, user2: String){
+        val docRef = chatsCollection.document()
+        docRef.set(
+            hashMapOf(
+                FIELD_MESSAGES to arrayListOf<Map<String, String>>(),
+                FIELD_UID1 to user1,
+                FIELD_UID2 to user2,
+            )
+        ).await()
     }
 }

@@ -76,9 +76,3 @@ class SettingsViewModel @Inject constructor(
 
     }
 }
-
-data class SettingsViewModelContainer(
-    var state: SettingsStates,
-    var onEvent: (SettingsEvent) -> Unit,
-    var events: SharedFlow<SettingsEvent>,
-)
