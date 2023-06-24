@@ -1,5 +1,7 @@
 package com.example.talksy.data.helperRepositories
 
+import android.util.Log
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.Chat
 import com.example.talksy.data.dataModels.User
 import com.google.firebase.firestore.FirebaseFirestore
@@ -75,7 +77,7 @@ class FireStoreRepository {
         return usernameList
     }
 
-    private suspend fun getUserUidByUsername(username: String): String? {
+    suspend fun getUserUidByUsername(username: String): String? {
         // TODO: if there are two users with the same username(shouldn't happen) then the first one will be added.
         val result = usersCollection.whereEqualTo(FIELD_USERNAME, username).get().await()
         if (result.isEmpty) return null
@@ -113,21 +115,21 @@ class FireStoreRepository {
         }
     }
 
-    suspend fun getChat(user1: String, user2: String): Chat? {
+    suspend fun getChat(userUid1: String, userUid2: String): Chat? {
         val firstQuery =
-            chatsCollection.whereEqualTo(FIELD_UID1, user1).whereEqualTo(FIELD_UID2, user2).get()
+            chatsCollection.whereEqualTo(FIELD_UID1, userUid1).whereEqualTo(FIELD_UID2, userUid2).get()
                 .await()
         val secondQuery =
-            chatsCollection.whereEqualTo(FIELD_UID1, user2).whereEqualTo(FIELD_UID2, user1).get()
+            chatsCollection.whereEqualTo(FIELD_UID1, userUid2).whereEqualTo(FIELD_UID2, userUid1).get()
                 .await()
 
         lateinit var finalQuery: QuerySnapshot
 
         if (firstQuery.isEmpty && secondQuery.isEmpty) {
-            createChat(user1, user2)
+            createChat(userUid1, userUid2)
 
             finalQuery =
-                chatsCollection.whereEqualTo(FIELD_UID1, user1).whereEqualTo(FIELD_UID2, user2)
+                chatsCollection.whereEqualTo(FIELD_UID1, userUid1).whereEqualTo(FIELD_UID2, userUid2)
                     .get()
                     .await()
         } else if (!firstQuery.isEmpty) {
@@ -135,6 +137,7 @@ class FireStoreRepository {
         } else if (!secondQuery.isEmpty) {
             finalQuery = secondQuery
         }
+        Log.d(TAG, "getChat: ${finalQuery.documents[0].id}")
         return finalQuery.documents[0].toObject(Chat::class.java)
     }
 

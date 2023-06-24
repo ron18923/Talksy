@@ -113,10 +113,11 @@ class MainRepository(
         userRepository.setListener(listener)
     }
 
-    suspend fun getChat(user2: String): Chat? {
-        val user1 = userRepository.getUserUid() ?: return null
+    suspend fun getChat(userName2: String): Chat? {
+        val userUid1 = userRepository.getUserUid() ?: return null
+        val userUid2 = fireStoreRepository.getUserUidByUsername(userName2) ?: return null
 
-        return fireStoreRepository.getChat(user1 = user1, user2 = user2)
+        return fireStoreRepository.getChat(userUid1 = userUid1, userUid2 = userUid2)
     }
 
     fun addMessage(message: String, chat: Chat) {
@@ -135,5 +136,11 @@ class MainRepository(
         chat.messages.add(Message(message, senderUid))
 
         fireStoreRepository.updateChat(chat)
+    }
+
+    fun isMessageFromMe(message: Message): Boolean {
+        val senderUid = message.senderUid
+        val userUid = userRepository.getUserUid()
+        return senderUid == userUid
     }
 }
