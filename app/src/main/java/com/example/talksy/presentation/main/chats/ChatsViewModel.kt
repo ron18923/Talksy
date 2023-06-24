@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talksy.data.MainRepository
+import com.example.talksy.data.dataModels.Message
 import com.example.talksy.data.helperRepositories.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,12 +24,6 @@ class ChatsViewModel @Inject constructor(
 
     private val _events = MutableSharedFlow<ChatsEvent>()
     val events = _events.asSharedFlow()
-
-    init {
-        viewModelScope.launch {
-            mainRepository.getChat("6A891zcmqdXZ5XuovML6pefYnOR2")
-        }
-    }
 
     fun onEvent(event: ChatsEvent) {
         when (event) {

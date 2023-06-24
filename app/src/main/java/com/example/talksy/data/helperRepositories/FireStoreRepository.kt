@@ -1,9 +1,9 @@
 package com.example.talksy.data.helperRepositories
 
-import android.util.Log
-import com.example.talksy.TalksyApp.Companion.TAG
+import com.example.talksy.data.dataModels.Chat
 import com.example.talksy.data.dataModels.User
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.tasks.await
 
 class FireStoreRepository {
@@ -113,31 +113,57 @@ class FireStoreRepository {
         }
     }
 
-    suspend fun getChat(user1: String, user2: String) {
-        val firstDocument =
+    suspend fun getChat(user1: String, user2: String): Chat? {
+        val firstQuery =
             chatsCollection.whereEqualTo(FIELD_UID1, user1).whereEqualTo(FIELD_UID2, user2).get()
                 .await()
-        val secondDocument =
+        val secondQuery =
             chatsCollection.whereEqualTo(FIELD_UID1, user2).whereEqualTo(FIELD_UID2, user1).get()
                 .await()
 
-        if(firstDocument.isEmpty && secondDocument.isEmpty){
+        lateinit var finalQuery: QuerySnapshot
+
+        if (firstQuery.isEmpty && secondQuery.isEmpty) {
             createChat(user1, user2)
 
-            val document =
-                chatsCollection.whereEqualTo(FIELD_UID1, user1).whereEqualTo(FIELD_UID2, user2).get()
+            finalQuery =
+                chatsCollection.whereEqualTo(FIELD_UID1, user1).whereEqualTo(FIELD_UID2, user2)
+                    .get()
                     .await()
+        } else if (!firstQuery.isEmpty) {
+            finalQuery = firstQuery
+        } else if (!secondQuery.isEmpty) {
+            finalQuery = secondQuery
         }
+        return finalQuery.documents[0].toObject(Chat::class.java)
     }
 
-    private suspend fun createChat(user1: String, user2: String){
+    private suspend fun createChat(user1: String, user2: String) {
         val docRef = chatsCollection.document()
         docRef.set(
             hashMapOf(
-                FIELD_MESSAGES to arrayListOf<Map<String, String>>(),
+                FIELD_MESSAGES to arrayListOf<HashMap<String, String>>(),
                 FIELD_UID1 to user1,
                 FIELD_UID2 to user2,
             )
         ).await()
+    }
+
+    suspend fun updateChat(chat: Chat) {
+        val firstQuery =
+            chatsCollection.whereEqualTo(FIELD_UID1, chat.uid1).whereEqualTo(FIELD_UID2, chat.uid2)
+                .get()
+                .await()
+        val secondQuery =
+            chatsCollection.whereEqualTo(FIELD_UID1, chat.uid2).whereEqualTo(FIELD_UID2, chat.uid1)
+                .get()
+                .await()
+
+        lateinit var finalQuery: QuerySnapshot
+
+        if (!firstQuery.isEmpty) finalQuery = firstQuery
+        else if (!secondQuery.isEmpty) finalQuery = secondQuery
+
+        chatsCollection.document(finalQuery.documents[0].id).set(chat)
     }
 }

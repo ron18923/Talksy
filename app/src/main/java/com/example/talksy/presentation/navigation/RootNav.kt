@@ -10,6 +10,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.example.talksy.presentation.chatScreen.ChatScreen
+import com.example.talksy.presentation.chatScreen.ChatScreenViewModel
 import com.example.talksy.presentation.editProfile.EditProfile
 import com.example.talksy.presentation.editProfile.EditProfileViewModel
 import com.example.talksy.presentation.login.Login
@@ -35,7 +37,8 @@ fun RootNav(
     chatsViewModel: ChatsViewModel,
     contactsViewModel: ContactsViewModel,
     settingsViewModel: SettingsViewModel,
-    editProfileViewModel: EditProfileViewModel
+    editProfileViewModel: EditProfileViewModel,
+    chatScreenViewModel: ChatScreenViewModel
 ) {
 
     NavHost(
@@ -86,6 +89,15 @@ fun RootNav(
                         state = chatsViewModel.state.value,
                         onEvent = chatsViewModel::onEvent,
                         events = chatsViewModel.events
+                    )
+                }
+                composable(route = "${ChatsNav.ChatScreen.route}/{user2}") { backStackEntry ->
+                    ChatScreen(
+                        navController = navController,
+                        state = chatScreenViewModel.state.value,
+                        onEvent = chatScreenViewModel::onEvent,
+                        events = chatScreenViewModel.events,
+                        user2 = backStackEntry.arguments?.getString("user2")
                     )
                 }
             }
@@ -148,7 +160,7 @@ sealed class BottomNavScreen(val route: String, val label: String, val icon: Ima
 }
 
 // graphs of each bottom nav screen
-sealed class GraphIconLabel(val route: String, val label: String, val icon: ImageVector){
+sealed class GraphIconLabel(val route: String, val label: String, val icon: ImageVector) {
     object Settings : GraphIconLabel("settings_graph", "Settings", Icons.Default.Settings)
     object Contacts : GraphIconLabel("contacts_graph", "Contacts", Icons.Default.Contacts)
     object Chats : GraphIconLabel("chats_graph", "Chats", Icons.Default.Chat)
@@ -157,4 +169,8 @@ sealed class GraphIconLabel(val route: String, val label: String, val icon: Imag
 // objects of bottom nav screens graphs
 sealed class SettingsNav(val route: String) {
     object EditProfile : SettingsNav("edit_profile")
+}
+
+sealed class ChatsNav(val route: String) {
+    object ChatScreen : ChatsNav("chat_screen")
 }

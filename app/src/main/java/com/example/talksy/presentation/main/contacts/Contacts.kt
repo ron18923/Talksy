@@ -47,11 +47,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.TalksyApp.Companion.TAG
+import com.example.talksy.presentation.navigation.ChatsNav
 import com.example.talksy.presentation.navigation.GraphIconLabel
-import com.example.talksy.presentation.main.chats.ChatsEvent
-import com.example.talksy.presentation.main.chats.ChatsState
-import com.example.talksy.presentation.main.settings.SettingsEvent
-import com.example.talksy.presentation.main.settings.SettingsStates
 import com.example.talksy.ui.theme.TalksyTheme
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -84,7 +81,9 @@ fun Contacts(
                 ContactsEvent.SearchClose -> {
                     searchActive = false
                 }
-
+                is ContactsEvent.ExistingContactClicked -> {
+                    navController.navigate("${ChatsNav.ChatScreen.route}/${event.username}")
+                }
                 else -> {}
             }
         }
@@ -162,7 +161,7 @@ fun Contacts(
                             modifier = modifier
                                 .padding(14.dp)
                                 .fillMaxWidth()
-                                .clickable { onEvent(ContactsEvent.AddNewContact(username)) }
+                                .clickable { onEvent(ContactsEvent.NewContactClicked(username)) }
                         ) {
                             Icon(
                                 modifier = modifier.padding(end = 10.dp),
@@ -178,8 +177,12 @@ fun Contacts(
                     state.contactsList.forEach { contact ->
                         item {
                             ListItem(
-                                modifier = modifier.fillMaxWidth(),
                                 headlineContent = { Text(text = contact["username"] ?: "") },
+                                modifier = modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onEvent(ContactsEvent.ExistingContactClicked(contact["username"]))
+                                    },
                                 leadingContent = {
                                     Box(
                                         modifier = modifier

@@ -1,6 +1,8 @@
 package com.example.talksy.data
 
 import android.net.Uri
+import com.example.talksy.data.dataModels.Chat
+import com.example.talksy.data.dataModels.Message
 import com.example.talksy.data.dataModels.User
 import com.example.talksy.data.helperRepositories.FireStoreRepository
 import com.example.talksy.data.helperRepositories.StorageRepository
@@ -22,7 +24,7 @@ class MainRepository(
         userRepository.signInUser(email, password, errorMessage)
     }
 
-    fun signOutUser(){
+    fun signOutUser() {
         userRepository.signOutUser()
     }
 
@@ -44,7 +46,7 @@ class MainRepository(
         password: String,
         errorMessage: (String) -> Unit
     ) {
-        if(!fireStoreRepository.checkUsername(username, errorMessage)) return
+        if (!fireStoreRepository.checkUsername(username, errorMessage)) return
         val userUid =
             userRepository.addNewUser(username = username, email = email, password, errorMessage)
         userUid?.let {
@@ -111,9 +113,27 @@ class MainRepository(
         userRepository.setListener(listener)
     }
 
-    suspend fun getChat(user2: String){
-        userRepository.getUserUid()?.let { user1 ->
-            fireStoreRepository.getChat(user1 = user1, user2 = user2)
+    suspend fun getChat(user2: String): Chat? {
+        val user1 = userRepository.getUserUid() ?: return null
+
+        return fireStoreRepository.getChat(user1 = user1, user2 = user2)
+    }
+
+    fun addMessage(message: String, chat: Chat) {
+        val senderUid = userRepository.getUserUid()
+        senderUid?.let {
+            chat.messages.add(Message(message, senderUid))
         }
+    }
+
+    suspend fun addMessage(message: String, user2: String) {
+
+        val senderUid = userRepository.getUserUid() ?: return
+
+        val chat = getChat(user2) ?: return
+
+        chat.messages.add(Message(message, senderUid))
+
+        fireStoreRepository.updateChat(chat)
     }
 }

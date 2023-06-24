@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.chatScreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -26,10 +27,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.talksy.TalksyApp.Companion.TAG
+import com.example.talksy.presentation.navigation.ChatsNav
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,8 +46,11 @@ fun ChatScreen(
     navController: NavController,
     state: ChatScreenStates,
     onEvent: (ChatScreenEvent) -> Unit,
-    events: SharedFlow<ChatScreenEvent>
+    events: SharedFlow<ChatScreenEvent>,
+    user2: String?
 ) {
+
+    onEvent(ChatScreenEvent.SetUser2(user2))
 
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
@@ -57,32 +67,6 @@ fun ChatScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Box(
-                        modifier = modifier
-                            .fillMaxHeight()
-                            .aspectRatio(1f)
-                    ) {
-                        Image(
-                            modifier = modifier
-                                .fillMaxSize(),
-                            imageVector = Icons.Default.AccountCircle,
-                            colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurface),
-                            contentDescription = "profile picture empty"
-                        )
-                        Image(
-                            modifier = modifier
-                                .fillMaxSize()
-                                .padding(6.dp)
-                                .clip(CircleShape)
-                                .border(
-                                    2.dp,
-                                    MaterialTheme.colorScheme.onBackground,
-                                    CircleShape
-                                ),
-                            painter = rememberAsyncImagePainter(model = state.otherProfile),
-                            contentDescription = "profile picture"
-                        )
-                    }
                     Text(text = state.otherUsername)
                 },
                 navigationIcon = {
@@ -95,4 +79,16 @@ fun ChatScreen(
         }) { contentPadding ->
         contentPadding
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ChatScreenPrev() {
+    ChatScreen(
+        navController = rememberNavController(),
+        state = ChatScreenStates(),
+        onEvent = {},
+        events = MutableSharedFlow<ChatScreenEvent>().asSharedFlow(),
+        user2 = "Ron189"
+    )
 }

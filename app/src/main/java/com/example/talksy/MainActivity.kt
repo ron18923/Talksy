@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.example.talksy.presentation.chatScreen.ChatScreenViewModel
 import com.example.talksy.presentation.main.chats.ChatsViewModel
 import com.example.talksy.presentation.main.contacts.ContactsViewModel
 import com.example.talksy.presentation.main.settings.SettingsViewModel
@@ -39,6 +40,7 @@ class MainActivity : ComponentActivity() {
         lateinit var contactsViewModel: ContactsViewModel
         lateinit var settingsViewModel: SettingsViewModel
         lateinit var editProfileViewModel: EditProfileViewModel
+        lateinit var chatScreenViewModel: ChatScreenViewModel
 
         super.onCreate(savedInstanceState)
         setContent {
@@ -59,6 +61,7 @@ class MainActivity : ComponentActivity() {
                     contactsViewModel = hiltViewModel()
                     settingsViewModel = hiltViewModel()
                     editProfileViewModel = hiltViewModel()
+                    chatScreenViewModel = hiltViewModel()
 
                     //forcing the layout direction of the app to always be ltr
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -73,6 +76,7 @@ class MainActivity : ComponentActivity() {
                             contactsViewModel = contactsViewModel,
                             settingsViewModel = settingsViewModel,
                             editProfileViewModel = editProfileViewModel,
+                            chatScreenViewModel = chatScreenViewModel
                         )
                     }
                 }

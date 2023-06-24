@@ -9,7 +9,6 @@ import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,7 +31,6 @@ class ContactsViewModel @Inject constructor(
     }
 
     fun onEvent(event: ContactsEvent) {
-        Log.d(TAG, "onEvent: ${state.value.searchInput}")
         when (event) {
             ContactsEvent.SearchClose -> {
                 if (state.value.searchInput.isNotEmpty()) {
@@ -59,9 +57,17 @@ class ContactsViewModel @Inject constructor(
                 }
             }
 
-            is ContactsEvent.AddNewContact -> {
+            is ContactsEvent.NewContactClicked -> {
                 viewModelScope.launch {
                     mainRepository.addNewContact(event.username)
+                }
+            }
+
+            is ContactsEvent.ExistingContactClicked -> {
+                viewModelScope.launch {
+                    _events.emit(
+                        ContactsEvent.ExistingContactClicked(event.username)
+                    )
                 }
             }
         }
