@@ -81,10 +81,14 @@ fun Contacts(
                 ContactsEvent.SearchClose -> {
                     searchActive = false
                 }
+
                 is ContactsEvent.ExistingContactClicked -> {
+                    Log.d(TAG, "Contacts: contact clicked event")
                     navController.navigate("${ChatsNav.ChatScreen.route}/${event.username}")
                 }
-                else -> {}
+
+                else -> {
+                }
             }
         }
     }

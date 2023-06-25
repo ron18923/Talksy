@@ -56,11 +56,12 @@ fun ChatScreen(
     events: SharedFlow<ChatScreenEvent>,
     user2: String?
 ) {
-    user2?.let {
-        onEvent(ChatScreenEvent.SetUser2(user2))
-    }
-
     LaunchedEffect(key1 = true) {
+        Log.d(TAG, "ChatScreen: in launched effect")
+        user2?.let {
+            onEvent(ChatScreenEvent.SetUser2(user2))
+        }
+
         events.collectLatest { event ->
             when (event) {
                 ChatScreenEvent.GoBackClicked -> navController.popBackStack()

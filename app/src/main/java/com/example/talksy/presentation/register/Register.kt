@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.register
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.navigation.AuthScreen
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -60,6 +62,7 @@ fun Register(
     onEvent: (RegisterEvent) -> Unit,
     events: SharedFlow<RegisterEvent>
 ) {
+    Log.d(TAG, "Register: ")
     val passwordFieldIcon =
         if (state.isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
     val passwordFieldVisualTransformation =

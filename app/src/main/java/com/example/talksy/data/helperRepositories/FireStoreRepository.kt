@@ -1,11 +1,14 @@
 package com.example.talksy.data.helperRepositories
 
-import android.util.Log
-import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.Chat
 import com.example.talksy.data.dataModels.User
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.tasks.await
 
 class FireStoreRepository {
@@ -115,30 +118,58 @@ class FireStoreRepository {
         }
     }
 
-    suspend fun getChat(userUid1: String, userUid2: String): Chat? {
+    private suspend fun getChatFlow(userUid1: String, userUid2: String) = callbackFlow {
         val firstQuery =
-            chatsCollection.whereEqualTo(FIELD_UID1, userUid1).whereEqualTo(FIELD_UID2, userUid2).get()
+            chatsCollection.whereEqualTo(FIELD_UID1, userUid1).whereEqualTo(FIELD_UID2, userUid2)
+                .get()
                 .await()
         val secondQuery =
-            chatsCollection.whereEqualTo(FIELD_UID1, userUid2).whereEqualTo(FIELD_UID2, userUid1).get()
+            chatsCollection.whereEqualTo(FIELD_UID1, userUid2).whereEqualTo(FIELD_UID2, userUid1)
+                .get()
                 .await()
 
-        lateinit var finalQuery: QuerySnapshot
+        lateinit var finalQuery: Query
 
         if (firstQuery.isEmpty && secondQuery.isEmpty) {
             createChat(userUid1, userUid2)
 
             finalQuery =
-                chatsCollection.whereEqualTo(FIELD_UID1, userUid1).whereEqualTo(FIELD_UID2, userUid2)
-                    .get()
-                    .await()
+                chatsCollection.whereEqualTo(FIELD_UID1, userUid1)
+                    .whereEqualTo(FIELD_UID2, userUid2)
+
         } else if (!firstQuery.isEmpty) {
-            finalQuery = firstQuery
+            finalQuery = chatsCollection.whereEqualTo(FIELD_UID1, userUid1)
+                .whereEqualTo(FIELD_UID2, userUid2)
         } else if (!secondQuery.isEmpty) {
-            finalQuery = secondQuery
+            finalQuery = chatsCollection.whereEqualTo(FIELD_UID1, userUid2)
+                .whereEqualTo(FIELD_UID2, userUid1)
         }
-        Log.d(TAG, "getChat: ${finalQuery.documents[0].id}")
-        return finalQuery.documents[0].toObject(Chat::class.java)
+
+        val snapshotListener = finalQuery.addSnapshotListener { value, error ->
+            val response = if (error == null) {
+                OnSuccess(value)
+            } else {
+                OnError(error)
+            }
+
+            trySend(response)
+        }
+
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
+
+    suspend fun getChat(userUid1: String, userUid2: String, chat: (Chat?) -> Unit) {
+        val c = getChatFlow(userUid1, userUid2)
+        c.collectLatest {
+            when (it) {
+                is OnError -> TODO()
+                is OnSuccess -> {
+                    chat(it.querySnapshot?.documents?.get(0)?.toObject(Chat::class.java))
+                }
+            }
+        }
     }
 
     private suspend fun createChat(user1: String, user2: String) {
@@ -170,3 +201,7 @@ class FireStoreRepository {
         chatsCollection.document(finalQuery.documents[0].id).set(chat)
     }
 }
+
+sealed class BooksResponse
+data class OnSuccess(val querySnapshot: QuerySnapshot?) : BooksResponse()
+data class OnError(val exception: FirebaseFirestoreException?) : BooksResponse()

@@ -27,10 +27,11 @@ class ChatScreenViewModel @Inject constructor(
 
     private fun manualInit(){
         viewModelScope.launch {
-            val chat = mainRepository.getChat(userName2 = state.value.user2) ?: return@launch
-            val updatedMessages = messageConverter(chat.messages)
-            _state.value = _state.value.copy(messages = updatedMessages)
-            Log.d(TAG, "manualInit: ${chat.messages.size} ${updatedMessages.size}")
+            mainRepository.getChat(userName2 = state.value.user2) { chat ->
+                if(chat == null) return@getChat
+                val updatedMessages = messageConverter(chat.messages)
+                _state.value = _state.value.copy(messages = updatedMessages)
+            }
         }
     }
 

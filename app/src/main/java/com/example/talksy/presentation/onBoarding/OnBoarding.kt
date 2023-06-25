@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.onBoarding
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.talksy.R
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.navigation.AuthScreen
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -43,8 +45,9 @@ fun OnBoarding(
 ) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-
+    Log.d(TAG, "OnBoarding: ")
     LaunchedEffect(key1 = true) {
+        Log.d(TAG, "OnBoarding: in launched effect")
         events.collectLatest { event ->
             when (event) {
                 OnBoardingEvent.SkipClicked -> navigateNext(navController)

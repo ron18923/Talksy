@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.main.settings
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.navigation.AuthScreen
 import com.example.talksy.presentation.navigation.GraphIconLabel
 import com.example.talksy.presentation.navigation.SettingsNav
@@ -131,7 +133,7 @@ fun Settings(
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-
+            Log.d(TAG, "Settings: ")
             Column(
                 modifier = modifier.fillMaxWidth(0.9f),
             ) {

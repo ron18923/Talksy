@@ -62,6 +62,7 @@ fun Login(
     onEvent: (LoginEvent) -> Unit,
     events: SharedFlow<LoginEvent>
 ) {
+    Log.d(TAG, "Login: ")
     val passwordFieldIcon =
         if (state.isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
     val passwordFieldVisualTransformation =

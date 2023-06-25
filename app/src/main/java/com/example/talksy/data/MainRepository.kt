@@ -9,6 +9,10 @@ import com.example.talksy.data.helperRepositories.StorageRepository
 import com.example.talksy.data.helperRepositories.UserRepository
 import com.example.talksy.data.helperRepositories.UserStateListener
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainRepository(
     val userRepository: UserRepository,
@@ -16,29 +20,19 @@ class MainRepository(
     val fireStoreRepository: FireStoreRepository
 ) {
 
-    suspend fun updateProfilePicture(profilePicture: Uri) {
+    suspend fun updateProfilePicture(profilePicture: Uri) =
         userRepository.updateProfilePicture(profilePicture)
-    }
 
-    suspend fun signInUser(email: String, password: String, errorMessage: (String) -> Unit) {
+    suspend fun signInUser(email: String, password: String, errorMessage: (String) -> Unit) =
         userRepository.signInUser(email, password, errorMessage)
-    }
 
-    fun signOutUser() {
-        userRepository.signOutUser()
-    }
+    fun signOutUser() = userRepository.signOutUser()
 
-    fun getUser(): FirebaseUser? {
-        return userRepository.getUser()
-    }
+    fun getUser(): FirebaseUser? = userRepository.getUser()
 
-    fun resetPassword() {
-        userRepository.resetPassword()
-    }
+    fun resetPassword() = userRepository.resetPassword()
 
-    fun getUserUid(): String? {
-        return userRepository.getUserUid()
-    }
+    fun getUserUid(): String? = userRepository.getUserUid()
 
     suspend fun addNewUser(
         username: String,
@@ -59,36 +53,30 @@ class MainRepository(
         uid: String,
         profilePicture: Uri,
         profilePictureUri: (Uri) -> Unit
-    ) {
-        storageRepository.putProfilePicture(
-            uid = uid,
-            profilePicture = profilePicture
-        ) { resultUri ->
-            profilePictureUri(resultUri)
-        }
+    ) = storageRepository.putProfilePicture(
+        uid = uid,
+        profilePicture = profilePicture
+    ) { resultUri ->
+        profilePictureUri(resultUri)
     }
 
-    suspend fun deleteProfilePicture(uid: String, profilePictureDeleted: () -> Unit) {
+    suspend fun deleteProfilePicture(uid: String, profilePictureDeleted: () -> Unit) =
         storageRepository.deleteProfilePicture(
             uid = uid,
             profilePictureDeleted = profilePictureDeleted
         )
-    }
 
-    suspend fun searchUsers(searchUsers: String): ArrayList<String> {
-        return fireStoreRepository.searchUsers(searchUsers)
-    }
+    suspend fun searchUsers(searchUsers: String): ArrayList<String> =
+        fireStoreRepository.searchUsers(searchUsers)
 
     suspend fun addNewContact(username: String) {
         val currentUser = userRepository.getUserUid()
         currentUser?.let {
             fireStoreRepository.addContactToUser(userUID = currentUser, contactUsername = username)
         }
-
     }
 
     suspend fun getUserContacts(): ArrayList<HashMap<String, String>> {
-
         val user = userRepository.getUser() ?: return arrayListOf()
 
         val contacts: ArrayList<HashMap<String, String>> = arrayListOf()
@@ -109,15 +97,15 @@ class MainRepository(
         return contacts
     }
 
-    fun setUserListener(listener: UserStateListener) {
-        userRepository.setListener(listener)
-    }
+    fun setUserListener(listener: UserStateListener) = userRepository.setListener(listener)
 
-    suspend fun getChat(userName2: String): Chat? {
-        val userUid1 = userRepository.getUserUid() ?: return null
-        val userUid2 = fireStoreRepository.getUserUidByUsername(userName2) ?: return null
+    suspend fun getChat(userName2: String, chat: (Chat?) -> Unit) {
+        val userUid1 = userRepository.getUserUid() ?: return
+        val userUid2 = fireStoreRepository.getUserUidByUsername(userName2) ?: return
 
-        return fireStoreRepository.getChat(userUid1 = userUid1, userUid2 = userUid2)
+        fireStoreRepository.getChat(userUid1 = userUid1, userUid2 = userUid2) { chatResult ->
+            chat(chatResult)
+        }
     }
 
     fun addMessage(message: String, chat: Chat) {
@@ -131,11 +119,15 @@ class MainRepository(
 
         val senderUid = userRepository.getUserUid() ?: return
 
-        val chat = getChat(user2) ?: return
+        getChat(user2) { chat ->
+            if (chat == null) return@getChat
 
-        chat.messages.add(Message(message, senderUid))
+            chat.messages.add(Message(message, senderUid))
+            CoroutineScope(Dispatchers.IO).launch {
+                fireStoreRepository.updateChat(chat)
+            }
 
-        fireStoreRepository.updateChat(chat)
+        }
     }
 
     fun isMessageFromMe(message: Message): Boolean {

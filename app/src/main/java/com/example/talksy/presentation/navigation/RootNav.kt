@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.navigation
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Contacts
@@ -10,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.chatScreen.ChatScreen
 import com.example.talksy.presentation.chatScreen.ChatScreenViewModel
 import com.example.talksy.presentation.editProfile.EditProfile
