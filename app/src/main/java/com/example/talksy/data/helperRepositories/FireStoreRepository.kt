@@ -1,7 +1,10 @@
 package com.example.talksy.data.helperRepositories
 
+import android.util.Log
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.Chat
 import com.example.talksy.data.dataModels.User
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
@@ -12,24 +15,23 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.tasks.await
 
 class FireStoreRepository {
-
     companion object {
-        const val COLLECTION_USERS = "users"
-        const val COLLECTION_CHATS = "chats"
+        private const val COLLECTION_USERS = "users"
+        private const val COLLECTION_CHATS = "chats"
 
         //user fields
-        const val FIELD_CONTACTS = "contacts"
-        const val FIELD_USERNAME = "username"
-        const val FIELD_EMAIL = "email"
-        const val FIELD_PROFILE_PICTURE = "profilePicture"
-        const val FIELD_UID = "uid"
+        private const val FIELD_CONTACTS = "contacts"
+        private const val FIELD_USERNAME = "username"
+        private const val FIELD_EMAIL = "email"
+        private const val FIELD_PROFILE_PICTURE = "profilePicture"
+        private const val FIELD_UID = "uid"
 
         //chat fields
-        const val FIELD_MESSAGES = "messages"
-        const val FIELD_MESSAGE = "message"
-        const val FIELD_SENDER_UID = "senderUid"
-        const val FIELD_UID1 = "uid1"
-        const val FIELD_UID2 = "uid2"
+        private const val FIELD_MESSAGES = "messages"
+        private const val FIELD_MESSAGE = "message"
+        private const val FIELD_SENDER_UID = "senderUid"
+        private const val FIELD_UID1 = "uid1"
+        private const val FIELD_UID2 = "uid2"
     }
 
     private val usersCollection =
@@ -92,11 +94,34 @@ class FireStoreRepository {
         return user?.username
     }
 
-    suspend fun getUser(userUid: String): User? {
-        val docRef = usersCollection.document(userUid)
+    private suspend fun getUserFlow(userUid: String) = callbackFlow {
+        val snapshotListener = usersCollection.document(userUid).addSnapshotListener { value, error ->
+            val response = if (error == null) {
+                UserResponse.OnSuccess(value)
+            } else {
+                UserResponse.OnError(error)
+            }
+            Log.d(TAG, "getUserFlow: sent")
+            trySend(response)
+        }
 
-        val user = docRef.get().await().toObject(User::class.java)
-        return user
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
+
+    suspend fun getUser(userUid: String, user: (User?) -> Unit) {
+        getUserFlow(userUid).collectLatest {
+            when (it) {
+                is UserResponse.OnError -> TODO()
+                is UserResponse.OnSuccess -> {
+                    Log.d(TAG, "getUserFlow: sent to 2")
+                    val u = it.documentSnapshot?.reference?.get()?.await()?.toObject(User::class.java)
+                    user(u)
+                    Log.d(TAG, "getUser: ${u}")
+                }
+            }
+        }
     }
 
     suspend fun getProfilePicture(uid: String): String {
@@ -147,11 +172,11 @@ class FireStoreRepository {
 
         val snapshotListener = finalQuery.addSnapshotListener { value, error ->
             val response = if (error == null) {
-                OnSuccess(value)
+                ChatResponse.OnSuccess(value)
             } else {
-                OnError(error)
+                ChatResponse.OnError(error)
             }
-
+            Log.d(TAG, "getChatFlow: sent")
             trySend(response)
         }
 
@@ -163,8 +188,9 @@ class FireStoreRepository {
     suspend fun getChat(userUid1: String, userUid2: String, chat: (Chat?) -> Unit) {
         getChatFlow(userUid1, userUid2).collectLatest {
             when (it) {
-                is OnError -> TODO()
-                is OnSuccess -> {
+                is ChatResponse.OnError -> TODO()
+                is ChatResponse.OnSuccess -> {
+                    Log.d(TAG, "getChatFlow: sent to getChat")
                     chat(it.querySnapshot?.documents?.get(0)?.toObject(Chat::class.java))
                 }
             }
@@ -201,6 +227,13 @@ class FireStoreRepository {
     }
 }
 
-sealed class BooksResponse
-data class OnSuccess(val querySnapshot: QuerySnapshot?) : BooksResponse()
-data class OnError(val exception: FirebaseFirestoreException?) : BooksResponse()
+sealed class ChatResponse {
+    data class OnSuccess(val querySnapshot: QuerySnapshot?) : ChatResponse()
+    data class OnError(val exception: FirebaseFirestoreException?) : ChatResponse()
+}
+
+sealed class UserResponse {
+    data class OnSuccess(val documentSnapshot: DocumentSnapshot?) : UserResponse()
+    data class OnError(val exception: FirebaseFirestoreException?) : UserResponse()
+}
+

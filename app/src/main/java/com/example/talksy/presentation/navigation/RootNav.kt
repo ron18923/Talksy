@@ -7,6 +7,8 @@ import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -42,7 +44,6 @@ fun RootNav(
     editProfileViewModel: EditProfileViewModel,
     chatScreenViewModel: ChatScreenViewModel
 ) {
-
     NavHost(
         navController = navController,
         route = Graph.Root.route,
@@ -108,11 +109,13 @@ fun RootNav(
                 startDestination = BottomNavScreen.Contacts.route
             ) {
                 composable(route = BottomNavScreen.Contacts.route) {
+                    val c = hiltViewModel<ContactsViewModel>()
+                    Log.d(TAG, "RootNav: new viewmodel.")
                     Contacts(
                         navController = navController,
-                        state = contactsViewModel.state.value,
-                        onEvent = contactsViewModel::onEvent,
-                        events = contactsViewModel.events
+                        state = c.state.value,
+                        onEvent = c::onEvent,
+                        events = c.events
                     )
                 }
             }

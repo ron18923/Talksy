@@ -1,6 +1,8 @@
 package com.example.talksy.data
 
 import android.net.Uri
+import android.util.Log
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.Chat
 import com.example.talksy.data.dataModels.Message
 import com.example.talksy.data.dataModels.User
@@ -76,25 +78,34 @@ class MainRepository(
         }
     }
 
-    suspend fun getUserContacts(): ArrayList<HashMap<String, String>> {
-        val user = userRepository.getUser() ?: return arrayListOf()
+    suspend fun getUserContacts(contactsResult: (ArrayList<HashMap<String, String>>) -> Unit) {
 
-        val contacts: ArrayList<HashMap<String, String>> = arrayListOf()
-        val currentUserUid = user.uid
-        val userFireStore =
-            fireStoreRepository.getUser(userUid = currentUserUid) ?: return arrayListOf()
-        val currentUserContacts = userFireStore.contacts
-        currentUserContacts.forEach { uid ->
-            val profilePicture = storageRepository.getProfilePicture(uid)
-            val username = fireStoreRepository.getUsernameByUid(uid) ?: return@forEach
-            contacts.add(
-                hashMapOf(
-                    "username" to username,
-                    "profilePicture" to profilePicture.toString()
-                )
-            )
+        val user = userRepository.getUser() ?: return
+
+        fireStoreRepository.getUser(user.uid) { firebaseUser ->
+            Log.d(TAG, "getUserContacts: contacts change.")
+            val contacts: ArrayList<HashMap<String, String>> = arrayListOf()
+            CoroutineScope(Dispatchers.IO).launch {
+                if (firebaseUser == null) return@launch
+                val currentUserContacts = firebaseUser.contacts
+                Log.d(TAG, "getUserContacts: ${currentUserContacts.size}")
+                currentUserContacts.forEach { uid ->
+                    val profilePicture = storageRepository.getProfilePicture(uid)
+                    Log.d(TAG, "getUserContacts: beforeusername")
+                    val username = fireStoreRepository.getUsernameByUid(uid)
+                    if (username != null) {
+                        Log.d(TAG, "getUserContacts: afterusername")
+                        contacts.add(
+                            hashMapOf(
+                                "username" to username,
+                                "profilePicture" to profilePicture.toString()
+                            )
+                        )
+                    }
+                }
+                contactsResult(contacts)
+            }
         }
-        return contacts
     }
 
     fun setUserListener(listener: UserStateListener) = userRepository.setListener(listener)

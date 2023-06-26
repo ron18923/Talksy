@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.main.contacts
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -7,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.MainRepository
+import com.example.talksy.data.helperRepositories.UserStateListener
+import com.example.talksy.presentation.main.settings.SettingsEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -24,10 +27,19 @@ class ContactsViewModel @Inject constructor(
     private val _events = MutableSharedFlow<ContactsEvent>()
     val events = _events.asSharedFlow()
 
+    private val _userStateListener = UserStateListenerImpl()
+
     init {
+        init()
+        mainRepository.setUserListener(_userStateListener)
+    }
+
+    private fun init(){
+        Log.d(TAG, "contacts viewmodel init: ")
         viewModelScope.launch {
-            Log.d(TAG, "contactsViewModel: ${mainRepository.getUserContacts()}")
-            _state.value = _state.value.copy(contactsList = mainRepository.getUserContacts())
+            mainRepository.getUserContacts { contacts ->
+                _state.value = _state.value.copy(contactsList = contacts)
+            }
         }
     }
 
@@ -71,6 +83,12 @@ class ContactsViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    inner class UserStateListenerImpl : UserStateListener {
+        override fun onUserStateChanged() {
+            init()
         }
     }
 }

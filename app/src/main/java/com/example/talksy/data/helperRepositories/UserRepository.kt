@@ -10,16 +10,18 @@ import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.cancellation.CancellationException
 
 class UserRepository(private val auth: FirebaseAuth) {
-    private var listener: UserStateListener? = null
+    private var listeners: ArrayList<UserStateListener?> = arrayListOf()
 
     init {
         auth.addAuthStateListener{
-            listener?.onUserStateChanged()
+            listeners.forEach { listener ->
+                listener?.onUserStateChanged()
+            }
         }
     }
 
     fun setListener(listener: UserStateListener) {
-        this.listener = listener
+        listeners.add(listener)
     }
 
     suspend fun addNewUser(
