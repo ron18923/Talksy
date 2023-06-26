@@ -88,7 +88,11 @@ fun Login(
                 is LoginEvent.GoBackClicked -> navController.popBackStack()
                 is LoginEvent.GoToApp -> {
                     Log.d(TAG, "Login: GoToApp")
-                    navController.navigate(Graph.Main.route)
+                    navController.navigate(Graph.Main.route) {
+                        popUpTo(navController.backQueue.first().destination.id) {
+                            inclusive = true
+                        }
+                    }
                 }
 
                 else -> {} //not all events require implementation here.

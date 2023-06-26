@@ -48,6 +48,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.navigation.AuthScreen
@@ -82,7 +83,11 @@ fun Settings(
             when (event) {
                 // TODO: temporary solution
                 SettingsEvent.SignOut -> {
-                    navController.navigate(AuthScreen.Login.route)
+                    navController.navigate(AuthScreen.Login.route) {
+                        popUpTo(navController.backQueue.first().id) {
+                            inclusive = true
+                        }
+                    }
                 }
 
                 SettingsEvent.GoToEditProfile -> {
@@ -133,12 +138,12 @@ fun Settings(
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            Log.d(TAG, "Settings: ")
             Column(
                 modifier = modifier.fillMaxWidth(0.9f),
             ) {
                 Spacer(modifier = modifier.height(20.dp))
-
+                Log.d(TAG, "Settings: ${state.profilePicture}")
+                Log.d(TAG, "Settings: ${state.email}")
                 Card(
                     modifier = modifier
                         .fillMaxWidth()
@@ -157,7 +162,7 @@ fun Settings(
                                 colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurface),
                                 contentDescription = "profile picture empty"
                             )
-                            Image(
+                            AsyncImage(
                                 modifier = modifier
                                     .fillMaxSize()
                                     .padding(6.dp)
@@ -167,10 +172,9 @@ fun Settings(
                                         MaterialTheme.colorScheme.onBackground,
                                         CircleShape
                                     ),
-                                painter = rememberAsyncImagePainter(model = state.profilePicture),
+                                model = state.profilePicture,
                                 contentDescription = "profile picture"
                             )
-
                         }
                         Column(
                             modifier = modifier.fillMaxHeight(),

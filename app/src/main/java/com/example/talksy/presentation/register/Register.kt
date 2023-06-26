@@ -46,6 +46,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.navigation.AuthScreen
+import com.example.talksy.presentation.navigation.Graph
 import com.example.talksy.presentation.reusableComposables.AutoScalingText
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -79,14 +80,20 @@ fun Register(
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
             when (event) {
-                is RegisterEvent.GoToLoginClicked -> navController.navigate(AuthScreen.Login.route){
-                    popUpTo(AuthScreen.Register.route){
+                is RegisterEvent.GoToLoginClicked -> navController.navigate(AuthScreen.Login.route) {
+                    popUpTo(AuthScreen.Register.route) {
                         inclusive = true
                     }
                 }
+
                 is RegisterEvent.ShowMessage -> scope.launch { snackbarHostState.showSnackbar(event.message) }
                 is RegisterEvent.GoBackClicked -> navController.popBackStack()
-//                is RegisterEvent.GoToApp -> navController.navigate(Screen.ChatFrame.route)
+                is RegisterEvent.GoToApp -> navController.navigate(Graph.Main.route) {
+                    popUpTo(navController.backQueue.first().destination.id) {
+                        inclusive = true
+                    }
+                }
+
                 else -> {} //not all events require implementation here.
             }
         }
@@ -95,16 +102,17 @@ fun Register(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            LargeTopAppBar(title = {
-                Column {
-                    Text(text = "Register")
-                    Spacer(modifier = modifier.height(4.dp))
-                    Text(
-                        text = "Fill up your details to register.",
-                        style = MaterialTheme.typography.titleSmall.copy(fontSize = 16.sp)
-                    )
-                }
-            },
+            LargeTopAppBar(
+                title = {
+                    Column {
+                        Text(text = "Register")
+                        Spacer(modifier = modifier.height(4.dp))
+                        Text(
+                            text = "Fill up your details to register.",
+                            style = MaterialTheme.typography.titleSmall.copy(fontSize = 16.sp)
+                        )
+                    }
+                },
 //                navigationIcon = {
 //                    IconButton(onClick = {
 //                        onEvent(RegisterEvent.GoBackClicked)

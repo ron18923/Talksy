@@ -63,7 +63,8 @@ class SettingsViewModel @Inject constructor(
             val updatedUser = mainRepository.getUser()
             if (updatedUser != null) _state.value = _state.value.copy(
                 username = updatedUser.displayName ?: "",
-                email = updatedUser.email ?: ""
+                email = updatedUser.email ?: "",
+                profilePicture = updatedUser.photoUrl ?: Uri.EMPTY
             )
             if (updatedUser == null) {
                 viewModelScope.launch {

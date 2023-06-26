@@ -26,6 +26,7 @@ class ContactsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            Log.d(TAG, "contactsViewModel: ${mainRepository.getUserContacts()}")
             _state.value = _state.value.copy(contactsList = mainRepository.getUserContacts())
         }
     }

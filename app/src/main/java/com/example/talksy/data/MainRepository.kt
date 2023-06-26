@@ -116,7 +116,6 @@ class MainRepository(
     }
 
     suspend fun addMessage(message: String, user2: String) {
-
         val senderUid = userRepository.getUserUid() ?: return
 
         getChat(user2) { chat ->
@@ -126,7 +125,6 @@ class MainRepository(
             CoroutineScope(Dispatchers.IO).launch {
                 fireStoreRepository.updateChat(chat)
             }
-
         }
     }
 

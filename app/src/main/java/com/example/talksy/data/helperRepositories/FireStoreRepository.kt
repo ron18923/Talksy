@@ -161,8 +161,7 @@ class FireStoreRepository {
     }
 
     suspend fun getChat(userUid1: String, userUid2: String, chat: (Chat?) -> Unit) {
-        val c = getChatFlow(userUid1, userUid2)
-        c.collectLatest {
+        getChatFlow(userUid1, userUid2).collectLatest {
             when (it) {
                 is OnError -> TODO()
                 is OnSuccess -> {
