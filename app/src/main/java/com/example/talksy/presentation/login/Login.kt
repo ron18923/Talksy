@@ -113,14 +113,7 @@ fun Login(
                             style = MaterialTheme.typography.titleSmall.copy(fontSize = 16.sp)
                         )
                     }
-                },
-//                navigationIcon = {
-//                    IconButton(onClick = {
-//                        onEvent(LoginEvent.GoBackClicked)
-//                    }) {
-//                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go Back")
-//                    }
-//                }
+                }
             )
         }) { innerPadding ->
         Box(

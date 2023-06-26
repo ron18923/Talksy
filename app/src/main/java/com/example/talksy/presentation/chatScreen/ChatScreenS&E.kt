@@ -19,5 +19,5 @@ data class ChatScreenStates(
 
 data class MessageChatScreen(
     val message: String,
-    val isItMe: Boolean
+    val isItMe: Boolean,
 )

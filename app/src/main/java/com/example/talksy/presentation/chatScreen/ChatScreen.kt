@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -87,29 +88,32 @@ fun ChatScreen(
                     }
                 })
         }) { innerPadding ->
-        Box(
+        Column(
             modifier = modifier
                 .padding(innerPadding)
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
-            Log.d(TAG, "ChatScreen: ${state.messages.size}")
-            LazyColumn {
-                state.messages.forEach { message ->
-                    item {
-                        Text(
-                            text = message.message,
-                            color = if (message.isItMe) Color.Green else Color.Blue
-                        )
+            Box(modifier = modifier
+                .fillMaxWidth(0.88f)
+                .fillMaxHeight()) {
+                LazyColumn {
+                    state.messages.forEach { message ->
+                        item {
+                            Text(
+                                text = message.message,
+                                color = if (message.isItMe) Color.Green else Color.Blue
+                            )
+                        }
                     }
                 }
-            }
 
-            TextField(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
-                value = state.inputText,
-                onValueChange = {})
+                TextField(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter),
+                    value = state.inputText,
+                    onValueChange = { onEvent(ChatScreenEvent.InputChange(it)) })
+            }
         }
     }
 }
@@ -119,7 +123,13 @@ fun ChatScreen(
 fun ChatScreenPrev() {
     ChatScreen(
         navController = rememberNavController(),
-        state = ChatScreenStates(),
+        state = ChatScreenStates(
+            messages = arrayListOf(
+                MessageChatScreen("Hey!", true),
+                MessageChatScreen("Hey, hdyd?", false),
+                MessageChatScreen("Great, thanks for asking :)", true)
+            )
+        ),
         onEvent = {},
         events = MutableSharedFlow<ChatScreenEvent>().asSharedFlow(),
         user2 = "Ron189"
