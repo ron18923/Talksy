@@ -1,27 +1,20 @@
 package com.example.talksy.presentation.chatScreen
 
+import android.app.Activity
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import android.view.WindowManager
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -32,16 +25,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.TalksyApp.Companion.TAG
-import com.example.talksy.presentation.navigation.ChatsNav
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -55,8 +45,12 @@ fun ChatScreen(
     state: ChatScreenStates,
     onEvent: (ChatScreenEvent) -> Unit,
     events: SharedFlow<ChatScreenEvent>,
-    user2: String?
+    user2: String?,
+    activity: Activity = LocalContext.current as Activity //added as a parameter so preview works.
 ) {
+//    this code is for the keyboard to overlap the screen.
+    activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
     LaunchedEffect(key1 = true) {
         Log.d(TAG, "ChatScreen: in launched effect")
         user2?.let {
@@ -88,15 +82,19 @@ fun ChatScreen(
                     }
                 })
         }) { innerPadding ->
-        Column(
-            modifier = modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-        ) {
-            Box(modifier = modifier
-                .fillMaxWidth(0.88f)
-                .fillMaxHeight()) {
-                LazyColumn {
+        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            ConstraintLayout(
+                modifier = modifier
+                    .padding(innerPadding)
+                    .fillMaxWidth(0.88f)
+                    .fillMaxHeight(),
+            ) {
+                val (messages, input) = createRefs()
+                LazyColumn(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .constrainAs(messages) {}
+                ) {
                     state.messages.forEach { message ->
                         item {
                             Text(
@@ -106,11 +104,14 @@ fun ChatScreen(
                         }
                     }
                 }
-
                 TextField(
                     modifier = modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter),
+                        .constrainAs(input) {
+                            bottom.linkTo(parent.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .fillMaxWidth(),
                     value = state.inputText,
                     onValueChange = { onEvent(ChatScreenEvent.InputChange(it)) })
             }
@@ -132,6 +133,9 @@ fun ChatScreenPrev() {
         ),
         onEvent = {},
         events = MutableSharedFlow<ChatScreenEvent>().asSharedFlow(),
-        user2 = "Ron189"
+        user2 = "Ron189",
+        activity = ActivityPreview
     )
 }
+
+object ActivityPreview : Activity()
