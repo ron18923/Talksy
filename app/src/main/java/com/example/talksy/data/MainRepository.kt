@@ -14,7 +14,6 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainRepository(
     val userRepository: UserRepository,
@@ -110,11 +109,11 @@ class MainRepository(
 
     fun setUserListener(listener: UserStateListener) = userRepository.setListener(listener)
 
-    suspend fun getChat(userName2: String, chat: (Chat?) -> Unit) {
+    suspend fun getChatFlow(userName2: String, chat: (Chat?) -> Unit) {
         val userUid1 = userRepository.getUserUid() ?: return
         val userUid2 = fireStoreRepository.getUserUidByUsername(userName2) ?: return
 
-        fireStoreRepository.getChat(userUid1 = userUid1, userUid2 = userUid2) { chatResult ->
+        fireStoreRepository.getChatFlow(userUid1 = userUid1, userUid2 = userUid2) { chatResult ->
             chat(chatResult)
         }
     }
@@ -126,17 +125,12 @@ class MainRepository(
         }
     }
 
-    suspend fun addMessage(message: String, user2: String) {
+    suspend fun addMessage(message: String, username2: String) {
         val senderUid = userRepository.getUserUid() ?: return
-
-        getChat(user2) { chat ->
-            if (chat == null) return@getChat
-
-            chat.messages.add(Message(message, senderUid))
-            CoroutineScope(Dispatchers.IO).launch {
-                fireStoreRepository.updateChat(chat)
-            }
-        }
+        val user2Uid = fireStoreRepository.getUserUidByUsername(username2) ?: return
+        val chat = fireStoreRepository.getChat(senderUid, user2Uid) ?: return
+        chat.messages.add(Message(message, senderUid))
+        fireStoreRepository.updateChat(chat)
     }
 
     fun isMessageFromMe(message: Message): Boolean {

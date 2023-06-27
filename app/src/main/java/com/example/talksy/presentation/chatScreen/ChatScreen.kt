@@ -1,33 +1,54 @@
 package com.example.talksy.presentation.chatScreen
 
 import android.app.Activity
+import android.graphics.Paint.Align
 import android.util.Log
 import android.view.WindowManager
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -46,7 +67,7 @@ fun ChatScreen(
     onEvent: (ChatScreenEvent) -> Unit,
     events: SharedFlow<ChatScreenEvent>,
     user2: String?,
-    activity: Activity = LocalContext.current as Activity //added as a parameter so preview works.
+    activity: Activity = LocalContext.current as Activity //added as a parameter so preview works.+
 ) {
 //    this code is for the keyboard to overlap the screen.
     activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
@@ -82,38 +103,48 @@ fun ChatScreen(
                     }
                 })
         }) { innerPadding ->
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            ConstraintLayout(
-                modifier = modifier
-                    .padding(innerPadding)
-                    .fillMaxWidth(0.88f)
-                    .fillMaxHeight(),
+        Column(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(horizontal = LocalConfiguration.current.screenWidthDp.times(0.06).dp),
+        ) {
+            val listState = rememberLazyListState(
+                when (state.messages.size) {
+                    0 -> 0
+                    else -> state.messages.size - 1
+                }
+            )
+
+            LazyColumn(
+                state = listState,
+                modifier = modifier.weight(1f)
             ) {
-                val (messages, input) = createRefs()
-                LazyColumn(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .constrainAs(messages) {}
-                ) {
-                    state.messages.forEach { message ->
-                        item {
-                            Text(
-                                text = message.message,
-                                color = if (message.isItMe) Color.Green else Color.Blue
-                            )
-                        }
+                state.messages.forEach { message ->
+                    item {
+                        MessageCard(messageItem = message)
                     }
                 }
+            }
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(bottom = 10.dp, top = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
                 TextField(
-                    modifier = modifier
-                        .constrainAs(input) {
-                            bottom.linkTo(parent.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-                        .fillMaxWidth(),
+                    modifier = modifier,
                     value = state.inputText,
-                    onValueChange = { onEvent(ChatScreenEvent.InputChange(it)) })
+                    onValueChange = { onEvent(ChatScreenEvent.InputChange(it)) },
+                )
+                IconButton(
+                    onClick = { onEvent(ChatScreenEvent.SendClicked) },
+                    colors = IconButtonDefaults.filledIconButtonColors()
+                ) {
+                    Icon(imageVector = Icons.Default.Send, contentDescription = "send icon")
+                }
             }
         }
     }
@@ -139,3 +170,46 @@ fun ChatScreenPrev() {
 }
 
 object ActivityPreview : Activity()
+
+@Composable
+fun MessageCard(messageItem: MessageChatScreen) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalAlignment = when {
+            messageItem.isItMe -> Alignment.End
+            else -> Alignment.Start
+        },
+    ) {
+        Card(
+            modifier = Modifier.widthIn(max = 340.dp),
+            shape = messageShape(messageItem),
+            colors = CardDefaults.cardColors(
+                containerColor = when {
+                    messageItem.isItMe -> MaterialTheme.colorScheme.primary
+                    else -> MaterialTheme.colorScheme.secondary
+                }
+            ),
+        ) {
+            Text(
+                modifier = Modifier.padding(8.dp),
+                text = messageItem.message,
+                color = when {
+                    messageItem.isItMe -> MaterialTheme.colorScheme.onPrimary
+                    else -> MaterialTheme.colorScheme.onSecondary
+                },
+            )
+        }
+    }
+}
+
+
+@Composable
+fun messageShape(message: MessageChatScreen): Shape {
+    val roundedCorners = RoundedCornerShape(16.dp)
+    return when {
+        message.isItMe -> roundedCorners.copy(bottomEnd = CornerSize(0))
+        else -> roundedCorners.copy(bottomStart = CornerSize(0))
+    }
+}

@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -54,7 +55,7 @@ class FireStoreRepository {
                 val contactsArray = user.contacts
                 if (contactsArray.contains(contactUid)) return@addOnSuccessListener
                 contactsArray.add(contactUid)
-                docRef.set(hashMapOf(FIELD_CONTACTS to contactsArray))
+                docRef.set(hashMapOf(FIELD_CONTACTS to contactsArray), SetOptions.merge())
             }
         }
     }
@@ -143,7 +144,7 @@ class FireStoreRepository {
         }
     }
 
-    private suspend fun getChatFlow(userUid1: String, userUid2: String) = callbackFlow {
+    private suspend fun getChatFlowSetup(userUid1: String, userUid2: String) = callbackFlow {
         val firstQuery =
             chatsCollection.whereEqualTo(FIELD_UID1, userUid1).whereEqualTo(FIELD_UID2, userUid2)
                 .get()
@@ -169,8 +170,9 @@ class FireStoreRepository {
             finalQuery = chatsCollection.whereEqualTo(FIELD_UID1, userUid2)
                 .whereEqualTo(FIELD_UID2, userUid1)
         }
-
+        Log.d(TAG, "getChatFlow: 333333333333333")
         val snapshotListener = finalQuery.addSnapshotListener { value, error ->
+            Log.d(TAG, "getChatFlow: 444444444444444")
             val response = if (error == null) {
                 ChatResponse.OnSuccess(value)
             } else {
@@ -185,8 +187,8 @@ class FireStoreRepository {
         }
     }
 
-    suspend fun getChat(userUid1: String, userUid2: String, chat: (Chat?) -> Unit) {
-        getChatFlow(userUid1, userUid2).collectLatest {
+    suspend fun getChatFlow(userUid1: String, userUid2: String, chat: (Chat?) -> Unit) {
+        getChatFlowSetup(userUid1, userUid2).collectLatest {
             when (it) {
                 is ChatResponse.OnError -> TODO()
                 is ChatResponse.OnSuccess -> {
@@ -195,6 +197,31 @@ class FireStoreRepository {
                 }
             }
         }
+    }
+
+    suspend fun getChat(user1: String, user2: String): Chat? {
+        val firstQuery =
+            chatsCollection.whereEqualTo(FIELD_UID1, user1).whereEqualTo(FIELD_UID2, user2).get()
+                .await()
+        val secondQuery =
+            chatsCollection.whereEqualTo(FIELD_UID1, user2).whereEqualTo(FIELD_UID2, user1).get()
+                .await()
+
+        lateinit var finalQuery: QuerySnapshot
+
+        if (firstQuery.isEmpty && secondQuery.isEmpty) {
+            createChat(user1, user2)
+
+            finalQuery =
+                chatsCollection.whereEqualTo(FIELD_UID1, user1).whereEqualTo(FIELD_UID2, user2)
+                    .get()
+                    .await()
+        } else if (!firstQuery.isEmpty) {
+            finalQuery = firstQuery
+        } else if (!secondQuery.isEmpty) {
+            finalQuery = secondQuery
+        }
+        return finalQuery.documents[0].toObject(Chat::class.java)
     }
 
     private suspend fun createChat(user1: String, user2: String) {
@@ -224,6 +251,7 @@ class FireStoreRepository {
         else if (!secondQuery.isEmpty) finalQuery = secondQuery
 
         chatsCollection.document(finalQuery.documents[0].id).set(chat)
+        Log.d(TAG, "updateChat: message should be added.")
     }
 }
 

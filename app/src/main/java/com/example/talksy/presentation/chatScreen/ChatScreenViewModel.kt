@@ -1,11 +1,9 @@
 package com.example.talksy.presentation.chatScreen
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.MainRepository
 import com.example.talksy.data.dataModels.Message
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,17 +23,17 @@ class ChatScreenViewModel @Inject constructor(
     private val _events = MutableSharedFlow<ChatScreenEvent>()
     val events = _events.asSharedFlow()
 
-    private fun manualInit(){
+    private fun manualInit() {
         viewModelScope.launch {
-            mainRepository.getChat(userName2 = state.value.user2) { chat ->
-                if(chat == null) return@getChat
+            mainRepository.getChatFlow(userName2 = state.value.user2) { chat ->
+                if (chat == null) return@getChatFlow
                 val updatedMessages = messageConverter(chat.messages)
                 _state.value = _state.value.copy(messages = updatedMessages)
             }
         }
     }
 
-    fun onEvent(event: ChatScreenEvent){
+    fun onEvent(event: ChatScreenEvent) {
         when (event) {
             ChatScreenEvent.GoBackClicked -> {
                 viewModelScope.launch {
@@ -53,10 +51,21 @@ class ChatScreenViewModel @Inject constructor(
             is ChatScreenEvent.InputChange -> {
                 _state.value = _state.value.copy(inputText = event.input)
             }
-        }
-        }
 
-    private fun messageConverter(messages: ArrayList<Message>): ArrayList<MessageChatScreen>{
+            ChatScreenEvent.SendClicked -> {
+                val message = _state.value.inputText
+                _state.value = _state.value.copy(inputText = "")
+                viewModelScope.launch {
+                    mainRepository.addMessage(
+                        message = message,
+                        username2 = _state.value.user2
+                    )
+                }
+            }
+        }
+    }
+
+    private fun messageConverter(messages: ArrayList<Message>): ArrayList<MessageChatScreen> {
         val newMessages = arrayListOf<MessageChatScreen>()
 
         messages.forEach { message ->

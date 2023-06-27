@@ -1,13 +1,13 @@
 package com.example.talksy.presentation.chatScreen
 
 import android.net.Uri
-import com.example.talksy.data.dataModels.Message
 
 sealed class ChatScreenEvent() {
     data class InputChange(val input: String) : ChatScreenEvent()
     data class SetUser2(val user2: String) : ChatScreenEvent()
 
     object GoBackClicked : ChatScreenEvent()
+    object SendClicked : ChatScreenEvent()
 }
 
 data class ChatScreenStates(
