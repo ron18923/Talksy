@@ -40,6 +40,7 @@ class FireStoreRepository {
     private val chatsCollection =
         FirebaseFirestore.getInstance().collection(COLLECTION_CHATS)
 
+
     suspend fun addContactToUser(userUID: String, contactUsername: String) {
 
         val contactUid = getUserUidByUsername(contactUsername) ?: return
@@ -96,15 +97,16 @@ class FireStoreRepository {
     }
 
     private suspend fun getUserFlow(userUid: String) = callbackFlow {
-        val snapshotListener = usersCollection.document(userUid).addSnapshotListener { value, error ->
-            val response = if (error == null) {
-                UserResponse.OnSuccess(value)
-            } else {
-                UserResponse.OnError(error)
+        val snapshotListener =
+            usersCollection.document(userUid).addSnapshotListener { value, error ->
+                val response = if (error == null) {
+                    UserResponse.OnSuccess(value)
+                } else {
+                    UserResponse.OnError(error)
+                }
+                Log.d(TAG, "getUserFlow: sent")
+                trySend(response)
             }
-            Log.d(TAG, "getUserFlow: sent")
-            trySend(response)
-        }
 
         awaitClose {
             snapshotListener.remove()
@@ -117,7 +119,8 @@ class FireStoreRepository {
                 is UserResponse.OnError -> TODO()
                 is UserResponse.OnSuccess -> {
                     Log.d(TAG, "getUserFlow: sent to 2")
-                    val u = it.documentSnapshot?.reference?.get()?.await()?.toObject(User::class.java)
+                    val u =
+                        it.documentSnapshot?.reference?.get()?.await()?.toObject(User::class.java)
                     user(u)
                     Log.d(TAG, "getUser: ${u}")
                 }
@@ -253,6 +256,24 @@ class FireStoreRepository {
         chatsCollection.document(finalQuery.documents[0].id).set(chat)
         Log.d(TAG, "updateChat: message should be added.")
     }
+
+    suspend fun getUserChats(userUid: String): ArrayList<Chat> {
+        val list1 = chatsCollection.whereEqualTo(FIELD_UID1, userUid).get().await().documents
+        val list2 = chatsCollection.whereEqualTo(FIELD_UID2, userUid).get().await().documents
+
+        val chatsList = arrayListOf<Chat>()
+
+        list1.forEach { document ->
+            val chat = document.toObject(Chat::class.java)
+            if(chat != null) chatsList.add(chat)
+        }
+        list2.forEach { document ->
+            val chat = document.toObject(Chat::class.java)
+            if(chat != null) chatsList.add(chat)
+        }
+
+        return chatsList
+    }
 }
 
 sealed class ChatResponse {
@@ -264,4 +285,5 @@ sealed class UserResponse {
     data class OnSuccess(val documentSnapshot: DocumentSnapshot?) : UserResponse()
     data class OnError(val exception: FirebaseFirestoreException?) : UserResponse()
 }
+
 

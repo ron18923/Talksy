@@ -138,4 +138,23 @@ class MainRepository(
         val userUid = userRepository.getUserUid()
         return senderUid == userUid
     }
+
+    suspend fun getUserChats(): ArrayList<HashMap<String, String>> {
+        val userUid = userRepository.getUserUid() ?: return arrayListOf()
+        val chats = fireStoreRepository.getUserChats(userUid)
+
+        val customChats = arrayListOf<HashMap<String, String>>()
+
+        chats.forEach { chat ->
+            val otherUid = if (chat.uid1 == userRepository.getUserUid()) chat.uid2 else chat.uid1
+            customChats.add(
+                hashMapOf(
+                    "profilePicture" to storageRepository.getProfilePicture(otherUid).toString(),
+                    "username" to (fireStoreRepository.getUsernameByUid(otherUid) ?: ""),
+                    "lastMessage" to chat.messages.last().message
+                    )
+            )
+        }
+        return customChats
+    }
 }
