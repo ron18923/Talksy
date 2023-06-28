@@ -8,13 +8,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +46,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalConfiguration
@@ -53,10 +59,15 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.talksy.TalksyApp.Companion.TAG
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,13 +120,10 @@ fun ChatScreen(
                 .fillMaxSize()
                 .padding(horizontal = LocalConfiguration.current.screenWidthDp.times(0.06).dp),
         ) {
-            val listState = rememberLazyListState(
-                when (state.messages.size) {
-                    0 -> 0
-                    else -> state.messages.size - 1
-                }
-            )
-
+            val listState = rememberLazyListState()
+            LaunchedEffect(key1 = state.messages.size) {
+                listState.animateScrollToItem(state.messages.size)
+            }
             LazyColumn(
                 state = listState,
                 modifier = modifier.weight(1f)
@@ -128,18 +136,23 @@ fun ChatScreen(
             }
             Row(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(bottom = 10.dp, top = 8.dp),
+                    .padding(bottom = 10.dp, top = 8.dp)
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 TextField(
-                    modifier = modifier,
+                    modifier = modifier
+                        .fillMaxWidth(0.8f),
                     value = state.inputText,
                     onValueChange = { onEvent(ChatScreenEvent.InputChange(it)) },
-                )
+                    maxLines = 3,
+
+                    )
                 IconButton(
+                    modifier = modifier
+                        .padding(8.dp)
+                        .aspectRatio(1f),
                     onClick = { onEvent(ChatScreenEvent.SendClicked) },
                     colors = IconButtonDefaults.filledIconButtonColors()
                 ) {
@@ -159,8 +172,26 @@ fun ChatScreenPrev() {
             messages = arrayListOf(
                 MessageChatScreen("Hey!", true),
                 MessageChatScreen("Hey, hdyd?", false),
-                MessageChatScreen("Great, thanks for asking :)", true)
-            )
+                MessageChatScreen("Great, thanks for asking :)", true),
+                MessageChatScreen("Hey, hdyd?", false),
+                MessageChatScreen("Hey!", true),
+                MessageChatScreen("Hey, hdyd?", false),
+                MessageChatScreen("Great, thanks for asking :)", true),
+                MessageChatScreen("Hey, hdyd?", false),
+                MessageChatScreen("Hey!", true),
+                MessageChatScreen("Hey, hdyd?", false),
+                MessageChatScreen("Great, thanks for asking :)", true),
+                MessageChatScreen("Hey, hdyd?", false),
+                MessageChatScreen("Hey!", true),
+                MessageChatScreen("Hey, hdyd?", false),
+                MessageChatScreen("Great, thanks for asking :)", true),
+                MessageChatScreen("Hey, hdyd?", false),
+                MessageChatScreen("Hey!", true),
+                MessageChatScreen("Hey, hdyd?", false),
+                MessageChatScreen("Great, thanks for asking :)", true),
+                MessageChatScreen("Hey...?", false),
+
+                )
         ),
         onEvent = {},
         events = MutableSharedFlow<ChatScreenEvent>().asSharedFlow(),
@@ -176,10 +207,10 @@ fun MessageCard(messageItem: MessageChatScreen) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+            .padding(vertical = 4.dp),
         horizontalAlignment = when {
-            messageItem.isItMe -> Alignment.End
-            else -> Alignment.Start
+            messageItem.isItMe -> Alignment.Start
+            else -> Alignment.End
         },
     ) {
         Card(
@@ -209,7 +240,7 @@ fun MessageCard(messageItem: MessageChatScreen) {
 fun messageShape(message: MessageChatScreen): Shape {
     val roundedCorners = RoundedCornerShape(16.dp)
     return when {
-        message.isItMe -> roundedCorners.copy(bottomEnd = CornerSize(0))
-        else -> roundedCorners.copy(bottomStart = CornerSize(0))
+        message.isItMe -> roundedCorners.copy(bottomStart = CornerSize(0))
+        else -> roundedCorners.copy(bottomEnd = CornerSize(0))
     }
 }
