@@ -36,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,6 +78,12 @@ fun Settings(
     )
     val item = GraphIconLabel.Settings
 
+//    DisposableEffect(Unit) {
+//        onDispose {
+//            onEvent(SettingsEvent.Dispose)
+//        }
+//    }
+
     //Handling events
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
@@ -93,6 +100,8 @@ fun Settings(
                 SettingsEvent.GoToEditProfile -> {
                     navController.navigate(SettingsNav.EditProfile.route)
                 }
+
+                else -> {}
             }
         }
     }

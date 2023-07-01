@@ -5,7 +5,8 @@ import coil.Coil
 
 sealed class SettingsEvent {
     object SignOut : SettingsEvent()
-    object GoToEditProfile :SettingsEvent()
+    object GoToEditProfile : SettingsEvent()
+    object Dispose : SettingsEvent()
 }
 
 data class SettingsStates(

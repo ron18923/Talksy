@@ -139,22 +139,26 @@ class MainRepository(
         return senderUid == userUid
     }
 
-    suspend fun getUserChats(): ArrayList<HashMap<String, String>> {
-        val userUid = userRepository.getUserUid() ?: return arrayListOf()
-        val chats = fireStoreRepository.getUserChats(userUid)
+    suspend fun getUserChats(chats: (ArrayList<HashMap<String, String>>) -> Unit){
+        val userUid = userRepository.getUserUid() ?: return
+        Log.d(TAG, "getUserChats: getUserChats!!")
+        fireStoreRepository.getUserChatsFlow(userUid){ returnedChats ->
+            Log.d(TAG, "getUserChats: returned chats ${returnedChats.size}")
+            CoroutineScope(Dispatchers.IO).launch {
+                val customChats = arrayListOf<HashMap<String, String>>()
 
-        val customChats = arrayListOf<HashMap<String, String>>()
-
-        chats.forEach { chat ->
-            val otherUid = if (chat.uid1 == userRepository.getUserUid()) chat.uid2 else chat.uid1
-            customChats.add(
-                hashMapOf(
-                    "profilePicture" to storageRepository.getProfilePicture(otherUid).toString(),
-                    "username" to (fireStoreRepository.getUsernameByUid(otherUid) ?: ""),
-                    "lastMessage" to chat.messages.last().message
+                returnedChats.forEach { chat ->
+                    val otherUid = if (chat.uid1 == userRepository.getUserUid()) chat.uid2 else chat.uid1
+                    customChats.add(
+                        hashMapOf(
+                            "profilePicture" to storageRepository.getProfilePicture(otherUid).toString(),
+                            "username" to (fireStoreRepository.getUsernameByUid(otherUid) ?: ""),
+                            "lastMessage" to if(chat.messages.isNotEmpty()) chat.messages.last().message else ""
+                        )
                     )
-            )
+                }
+                chats(customChats)
+            }
         }
-        return customChats
     }
 }

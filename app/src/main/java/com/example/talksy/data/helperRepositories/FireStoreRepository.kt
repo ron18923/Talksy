@@ -5,6 +5,7 @@ import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.Chat
 import com.example.talksy.data.dataModels.User
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Query
@@ -35,10 +36,11 @@ class FireStoreRepository {
         private const val FIELD_UID2 = "uid2"
     }
 
+    private val fireStore = FirebaseFirestore.getInstance()
     private val usersCollection =
-        FirebaseFirestore.getInstance().collection(COLLECTION_USERS)
+        fireStore.collection(COLLECTION_USERS)
     private val chatsCollection =
-        FirebaseFirestore.getInstance().collection(COLLECTION_CHATS)
+        fireStore.collection(COLLECTION_CHATS)
 
 
     suspend fun addContactToUser(userUID: String, contactUsername: String) {
@@ -257,22 +259,40 @@ class FireStoreRepository {
         Log.d(TAG, "updateChat: message should be added.")
     }
 
-    suspend fun getUserChats(userUid: String): ArrayList<Chat> {
-        val list1 = chatsCollection.whereEqualTo(FIELD_UID1, userUid).get().await().documents
-        val list2 = chatsCollection.whereEqualTo(FIELD_UID2, userUid).get().await().documents
+    private suspend fun getUserChatsFlowSetup(userUid: String) = callbackFlow {
+        val query = chatsCollection.where(
+            Filter.or(
+                Filter.equalTo(FIELD_UID1, userUid),
+                Filter.equalTo(FIELD_UID2, userUid)
+            )
+        )
 
-        val chatsList = arrayListOf<Chat>()
-
-        list1.forEach { document ->
-            val chat = document.toObject(Chat::class.java)
-            if(chat != null) chatsList.add(chat)
+        val snapshotListener = query.addSnapshotListener { value, error ->
+            val response = if (error == null) {
+                ChatResponse.OnSuccess(value)
+            } else {
+                ChatResponse.OnError(error)
+            }
+            trySend(response)
         }
-        list2.forEach { document ->
-            val chat = document.toObject(Chat::class.java)
-            if(chat != null) chatsList.add(chat)
+        awaitClose {
+            snapshotListener.remove()
         }
+    }
 
-        return chatsList
+    suspend fun getUserChatsFlow(userUid: String, chat: (ArrayList<Chat>) -> Unit) {
+        getUserChatsFlowSetup(userUid).collectLatest {
+            val chatsList: ArrayList<Chat> = arrayListOf()
+            when (it) {
+                is ChatResponse.OnError -> TODO()
+                is ChatResponse.OnSuccess -> {
+                    it.querySnapshot?.documents?.forEach { document ->
+                        chatsList.add(document.toObject(Chat::class.java)!!)
+                    }
+                    chat(chatsList)
+                }
+            }
+        }
     }
 }
 
@@ -285,5 +305,3 @@ sealed class UserResponse {
     data class OnSuccess(val documentSnapshot: DocumentSnapshot?) : UserResponse()
     data class OnError(val exception: FirebaseFirestoreException?) : UserResponse()
 }
-
-

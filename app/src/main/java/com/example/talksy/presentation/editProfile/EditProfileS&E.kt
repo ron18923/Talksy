@@ -12,6 +12,7 @@ sealed class EditProfileEvent {
     object ChangePasswordConfirmed: EditProfileEvent()
     object ProfileImageClicked: EditProfileEvent()
     object DeleteImageClicked: EditProfileEvent()
+    object Dispose : EditProfileEvent()
 }
 
 data class EditProfileStates(

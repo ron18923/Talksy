@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talksy.data.MainRepository
+import com.example.talksy.data.helperRepositories.UserStateListener
 import com.example.talksy.presentation.main.settings.SettingsEvent
 import com.example.talksy.presentation.main.settings.SettingsStates
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,8 +30,11 @@ class EditProfileViewModel @Inject constructor(
 
     private val _user = mainRepository.getUser()
 
+    private val _userStateListener = UserStateListenerImpl()
+
     init {
         updateScreenValues()
+        mainRepository.setUserListener(_userStateListener)
     }
 
     private fun updateScreenValues() {
@@ -41,6 +45,7 @@ class EditProfileViewModel @Inject constructor(
                 profileImage = _user.photoUrl ?: Uri.EMPTY
             )
         }
+
     }
 
     fun onEvent(event: EditProfileEvent) {
@@ -109,12 +114,23 @@ class EditProfileViewModel @Inject constructor(
                     }
                 }
             }
+
+            EditProfileEvent.Dispose -> _state.value =
+                _state.value.copy(email = "", username = "", profileImage = Uri.EMPTY)
+        }
+    }
+
+    inner class UserStateListenerImpl : UserStateListener {
+        override fun onUserStateChanged() {
+            _state.value = _state.value.copy(email = "", username = "", profileImage = Uri.EMPTY)
+            val updatedUser = mainRepository.getUser()
+            updatedUser?.let { user ->
+                _state.value = _state.value.copy(
+                    email = user.email ?: "",
+                    username = user.displayName ?: "",
+                    profileImage = user.photoUrl ?: Uri.EMPTY
+                )
+            }
         }
     }
 }
-
-data class EditProfileViewModelContainer(
-    var state: SettingsStates,
-    var onEvent: (SettingsEvent) -> Unit,
-    var events: SharedFlow<SettingsEvent>,
-)

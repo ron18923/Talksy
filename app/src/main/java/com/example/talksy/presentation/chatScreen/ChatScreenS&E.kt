@@ -8,6 +8,7 @@ sealed class ChatScreenEvent() {
 
     object GoBackClicked : ChatScreenEvent()
     object SendClicked : ChatScreenEvent()
+    object Dispose : ChatScreenEvent()
 }
 
 data class ChatScreenStates(

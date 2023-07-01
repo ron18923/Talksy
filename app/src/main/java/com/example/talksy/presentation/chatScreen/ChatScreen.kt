@@ -42,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -82,6 +83,12 @@ fun ChatScreen(
 ) {
 //    this code is for the keyboard to overlap the screen.
     activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
+    DisposableEffect(Unit){
+        onDispose {
+            onEvent(ChatScreenEvent.Dispose)
+        }
+    }
 
     LaunchedEffect(key1 = true) {
         Log.d(TAG, "ChatScreen: in launched effect")

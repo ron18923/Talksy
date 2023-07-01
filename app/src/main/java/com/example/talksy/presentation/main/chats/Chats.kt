@@ -23,11 +23,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -59,12 +61,20 @@ fun Chats(
 
     val item = GraphIconLabel.Chats
 
+//    DisposableEffect(Unit){
+//        onDispose {
+//            onEvent(ChatsEvent.Dispose)
+//        }
+//    }
+
     //Handling events
     LaunchedEffect(key1 = true) {
         events.collectLatest { event ->
             when (event) {
                 is ChatsEvent.ChatClicked ->
                     navController.navigate("${ChatsNav.ChatScreen.route}/${event.username}")
+
+                else -> {}
             }
         }
     }
@@ -112,44 +122,54 @@ fun Chats(
         ) {
 
             Column(modifier = modifier.fillMaxWidth(0.9f)) {
-                LazyColumn {
-                    state.chats.forEach { chat ->
-                        item {
-                            ListItem(
-                                headlineContent = {
-                                    Text(
-                                        text = chat["username"] ?: "",
-                                        style = MaterialTheme.typography.titleLarge
-                                    )
-                                },
-                                supportingContent = { Text(text = chat["lastMessage"] ?: "") },
-                                modifier = modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        onEvent(ChatsEvent.ChatClicked(chat["username"] ?: ""))
+                if (state.chats.isEmpty()) {
+                    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        Text(
+                            text = "You don't have chats right now. Let's change that!",
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                } else {
+                    LazyColumn {
+                        state.chats.forEach { chat ->
+                            item {
+                                ListItem(
+                                    headlineContent = {
+                                        Text(
+                                            text = chat["username"] ?: "",
+                                            style = MaterialTheme.typography.titleLarge
+                                        )
                                     },
-                                leadingContent = {
-                                    Box(
-                                        modifier = modifier
-                                            .size(60.dp)
-                                            .aspectRatio(1f)
-                                    ) {
-                                        Image(
+                                    supportingContent = { Text(text = chat["lastMessage"] ?: "") },
+                                    modifier = modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            onEvent(ChatsEvent.ChatClicked(chat["username"] ?: ""))
+                                        },
+                                    leadingContent = {
+                                        Box(
                                             modifier = modifier
-                                                .fillMaxSize(),
-                                            imageVector = Icons.Default.AccountCircle,
-                                            colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurface),
-                                            contentDescription = "profile picture empty"
-                                        )
-                                        Image(
-                                            modifier = modifier
-                                                .fillMaxSize()
-                                                .clip(CircleShape),
-                                            painter = rememberAsyncImagePainter(model = chat["profilePicture"]),
-                                            contentDescription = "profile picture"
-                                        )
-                                    }
-                                })
+                                                .size(60.dp)
+                                                .aspectRatio(1f)
+                                        ) {
+                                            Image(
+                                                modifier = modifier
+                                                    .fillMaxSize(),
+                                                imageVector = Icons.Default.AccountCircle,
+                                                colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurface),
+                                                contentDescription = "profile picture empty"
+                                            )
+                                            Image(
+                                                modifier = modifier
+                                                    .fillMaxSize()
+                                                    .clip(CircleShape),
+                                                painter = rememberAsyncImagePainter(model = chat["profilePicture"]),
+                                                contentDescription = "profile picture"
+                                            )
+                                        }
+                                    })
+                            }
                         }
                     }
                 }
@@ -165,16 +185,16 @@ fun ChatsPrev() {
         navController = rememberNavController(),
         state = ChatsState(
             arrayListOf(
-                hashMapOf(
-                    "username" to "Ron189",
-                    "profilePicture" to "",
-                    "lastMessage" to "I am fine. And you?"
-                ),
-                hashMapOf(
-                    "username" to "Gal17",
-                    "profilePicture" to "",
-                    "lastMessage" to "Wow this is amazing"
-                )
+//                hashMapOf(
+//                    "username" to "Ron189",
+//                    "profilePicture" to "",
+//                    "lastMessage" to "I am fine. And you?"
+//                ),
+//                hashMapOf(
+//                    "username" to "Gal17",
+//                    "profilePicture" to "",
+//                    "lastMessage" to "Wow this is amazing"
+//                )
             )
         ),
         onEvent = {},

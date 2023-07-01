@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.chatScreen
 
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -62,6 +63,13 @@ class ChatScreenViewModel @Inject constructor(
                     )
                 }
             }
+
+            ChatScreenEvent.Dispose -> _state.value = _state.value.copy(
+                otherProfile = Uri.EMPTY,
+                user2 = "",
+                inputText = "",
+                messages = arrayListOf()
+            )
         }
     }
 

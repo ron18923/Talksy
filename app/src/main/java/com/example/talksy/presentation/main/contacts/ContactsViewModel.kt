@@ -34,8 +34,7 @@ class ContactsViewModel @Inject constructor(
         mainRepository.setUserListener(_userStateListener)
     }
 
-    private fun init(){
-        Log.d(TAG, "contacts viewmodel init: ")
+    private fun init() {
         viewModelScope.launch {
             mainRepository.getUserContacts { contacts ->
                 _state.value = _state.value.copy(contactsList = contacts)
@@ -83,11 +82,22 @@ class ContactsViewModel @Inject constructor(
                     )
                 }
             }
+
+            ContactsEvent.Dispose -> _state.value = _state.value.copy(
+                searchInput = "",
+                searchList = arrayListOf(),
+                contactsList = arrayListOf()
+            )
         }
     }
 
     inner class UserStateListenerImpl : UserStateListener {
         override fun onUserStateChanged() {
+            _state.value = _state.value.copy(
+                searchInput = "",
+                searchList = arrayListOf(),
+                contactsList = arrayListOf()
+            )
             init()
         }
     }

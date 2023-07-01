@@ -32,7 +32,6 @@ class SettingsViewModel @Inject constructor(
     private val _userStateListener = UserStateListenerImpl()
 
     init {
-        if (_user != null) Log.d(TAG, "user: ${_user.displayName}")
         if (_user != null) _state.value = _state.value.copy(
             username = _user.displayName ?: "",
             email = _user.email ?: "",
@@ -55,11 +54,15 @@ class SettingsViewModel @Inject constructor(
                     )
                 }
             }
+
+            SettingsEvent.Dispose -> _state.value =
+                _state.value.copy(username = "", email = "", profilePicture = Uri.EMPTY)
         }
     }
 
     inner class UserStateListenerImpl : UserStateListener {
         override fun onUserStateChanged() {
+            _state.value = _state.value.copy(username = "", email = "", profilePicture = Uri.EMPTY)
             val updatedUser = mainRepository.getUser()
             if (updatedUser != null) _state.value = _state.value.copy(
                 username = updatedUser.displayName ?: "",
@@ -74,6 +77,5 @@ class SettingsViewModel @Inject constructor(
                 }
             }
         }
-
     }
 }

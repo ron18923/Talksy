@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -96,6 +97,12 @@ fun EditProfile(
         isChangeProfile = false
         cameraPickerLauncher.launch("image/*")
     }
+
+//    DisposableEffect(Unit) {
+//        onDispose {
+//            onEvent(EditProfileEvent.Dispose)
+//        }
+//    }
 
     //Handling events
     LaunchedEffect(key1 = true) {

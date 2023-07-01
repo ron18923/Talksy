@@ -31,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,6 +74,12 @@ fun Contacts(
         GraphIconLabel.Settings
     )
     val item = GraphIconLabel.Contacts
+
+//    DisposableEffect(Unit) {
+//        onDispose {
+//            onEvent(ContactsEvent.Dispose)
+//        }
+//    }
 
     //Handling events
     LaunchedEffect(key1 = true) {
@@ -165,7 +172,11 @@ fun Contacts(
                             modifier = modifier
                                 .padding(14.dp)
                                 .fillMaxWidth()
-                                .clickable { onEvent(ContactsEvent.NewContactClicked(username)) }
+                                .clickable {
+                                    onEvent(ContactsEvent.NewContactClicked(username))
+                                    searchActive = false
+                                    onEvent(ContactsEvent.SearchEntered(""))
+                                }
                         ) {
                             Icon(
                                 modifier = modifier.padding(end = 10.dp),
