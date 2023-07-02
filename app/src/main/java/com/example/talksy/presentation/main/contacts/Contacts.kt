@@ -90,7 +90,6 @@ fun Contacts(
                 }
 
                 is ContactsEvent.ExistingContactClicked -> {
-                    Log.d(TAG, "Contacts: contact clicked event")
                     navController.navigate("${ChatsNav.ChatScreen.route}/${event.username}")
                 }
 

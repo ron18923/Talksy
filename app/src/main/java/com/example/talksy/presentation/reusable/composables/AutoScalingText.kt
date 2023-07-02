@@ -1,4 +1,4 @@
-package com.example.talksy.presentation.reusableComposables
+package com.example.talksy.presentation.reusable.composables
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable

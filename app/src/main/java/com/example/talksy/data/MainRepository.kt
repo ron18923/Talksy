@@ -82,18 +82,14 @@ class MainRepository(
         val user = userRepository.getUser() ?: return
 
         fireStoreRepository.getUser(user.uid) { firebaseUser ->
-            Log.d(TAG, "getUserContacts: contacts change.")
             val contacts: ArrayList<HashMap<String, String>> = arrayListOf()
             CoroutineScope(Dispatchers.IO).launch {
                 if (firebaseUser == null) return@launch
                 val currentUserContacts = firebaseUser.contacts
-                Log.d(TAG, "getUserContacts: ${currentUserContacts.size}")
                 currentUserContacts.forEach { uid ->
                     val profilePicture = storageRepository.getProfilePicture(uid)
-                    Log.d(TAG, "getUserContacts: beforeusername")
                     val username = fireStoreRepository.getUsernameByUid(uid)
                     if (username != null) {
-                        Log.d(TAG, "getUserContacts: afterusername")
                         contacts.add(
                             hashMapOf(
                                 "username" to username,
@@ -121,16 +117,14 @@ class MainRepository(
     fun addMessage(message: String, chat: Chat) {
         val senderUid = userRepository.getUserUid()
         senderUid?.let {
-            chat.messages.add(Message(message, senderUid))
+            chat.messages.add(Message(message = message, senderUid = senderUid))
         }
     }
 
     suspend fun addMessage(message: String, username2: String) {
         val senderUid = userRepository.getUserUid() ?: return
         val user2Uid = fireStoreRepository.getUserUidByUsername(username2) ?: return
-        val chat = fireStoreRepository.getChat(senderUid, user2Uid) ?: return
-        chat.messages.add(Message(message, senderUid))
-        fireStoreRepository.updateChat(chat)
+        fireStoreRepository.addOneMessage(message, senderUid, user2Uid)
     }
 
     fun isMessageFromMe(message: Message): Boolean {
@@ -139,26 +133,31 @@ class MainRepository(
         return senderUid == userUid
     }
 
-    suspend fun getUserChats(chats: (ArrayList<HashMap<String, String>>) -> Unit){
+    suspend fun getUserChats(chats: (ArrayList<HashMap<String, String>>) -> Unit) {
         val userUid = userRepository.getUserUid() ?: return
-        Log.d(TAG, "getUserChats: getUserChats!!")
-        fireStoreRepository.getUserChatsFlow(userUid){ returnedChats ->
-            Log.d(TAG, "getUserChats: returned chats ${returnedChats.size}")
+        fireStoreRepository.getUserChatsFlow(userUid) { returnedChats ->
             CoroutineScope(Dispatchers.IO).launch {
                 val customChats = arrayListOf<HashMap<String, String>>()
 
                 returnedChats.forEach { chat ->
-                    val otherUid = if (chat.uid1 == userRepository.getUserUid()) chat.uid2 else chat.uid1
+                    val otherUid =
+                        if (chat.uid1 == userRepository.getUserUid()) chat.uid2 else chat.uid1
                     customChats.add(
                         hashMapOf(
-                            "profilePicture" to storageRepository.getProfilePicture(otherUid).toString(),
+                            "profilePicture" to storageRepository.getProfilePicture(otherUid)
+                                .toString(),
                             "username" to (fireStoreRepository.getUsernameByUid(otherUid) ?: ""),
-                            "lastMessage" to if(chat.messages.isNotEmpty()) chat.messages.last().message else ""
+                            "lastMessage" to if (chat.messages.isNotEmpty()) chat.messages.last().message else ""
                         )
                     )
                 }
                 chats(customChats)
             }
         }
+    }
+
+    suspend fun getUserProfilePicture(username: String): Uri {
+        val uid = fireStoreRepository.getUserUidByUsername(username) ?: return Uri.EMPTY
+        return storageRepository.getProfilePicture(uid)
     }
 }

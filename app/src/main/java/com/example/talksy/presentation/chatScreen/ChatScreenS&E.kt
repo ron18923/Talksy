@@ -20,5 +20,6 @@ data class ChatScreenStates(
 
 data class MessageChatScreen(
     val message: String,
+    val timestamp: String,
     val isItMe: Boolean,
 )

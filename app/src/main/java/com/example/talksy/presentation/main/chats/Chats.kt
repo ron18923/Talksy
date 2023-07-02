@@ -73,7 +73,6 @@ fun Chats(
             when (event) {
                 is ChatsEvent.ChatClicked ->
                     navController.navigate("${ChatsNav.ChatScreen.route}/${event.username}")
-
                 else -> {}
             }
         }
@@ -141,7 +140,7 @@ fun Chats(
                                             style = MaterialTheme.typography.titleLarge
                                         )
                                     },
-                                    supportingContent = { Text(text = chat["lastMessage"] ?: "") },
+                                    supportingContent = { Text(text = chat["lastMessage"] ?: "", maxLines = 1) },
                                     modifier = modifier
                                         .fillMaxWidth()
                                         .clickable {

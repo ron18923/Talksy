@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -41,24 +43,33 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.TalksyApp.Companion.TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -84,14 +95,13 @@ fun ChatScreen(
 //    this code is for the keyboard to overlap the screen.
     activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
-    DisposableEffect(Unit){
+    DisposableEffect(Unit) {
         onDispose {
             onEvent(ChatScreenEvent.Dispose)
         }
     }
 
     LaunchedEffect(key1 = true) {
-        Log.d(TAG, "ChatScreen: in launched effect")
         user2?.let {
             onEvent(ChatScreenEvent.SetUser2(user2))
         }
@@ -109,9 +119,19 @@ fun ChatScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = {
-                    Text(text = state.user2)
+                    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            modifier = modifier
+                                .clip(CircleShape)
+                                .height(40.dp),
+                            painter = rememberAsyncImagePainter(model = state.otherProfile),
+                            contentDescription = "profile picture",
+                            tint = Color.Unspecified
+                        )
+                        Text(modifier = modifier.padding(start = 8.dp), text = state.user2, style = MaterialTheme.typography.titleMedium)
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = {
@@ -127,6 +147,7 @@ fun ChatScreen(
                 .fillMaxSize()
                 .padding(horizontal = LocalConfiguration.current.screenWidthDp.times(0.06).dp),
         ) {
+            Spacer(modifier = modifier.height(4.dp))
             val listState = rememberLazyListState()
             LaunchedEffect(key1 = state.messages.size) {
                 listState.animateScrollToItem(state.messages.size)
@@ -170,43 +191,6 @@ fun ChatScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ChatScreenPrev() {
-    ChatScreen(
-        navController = rememberNavController(),
-        state = ChatScreenStates(
-            messages = arrayListOf(
-                MessageChatScreen("Hey!", true),
-                MessageChatScreen("Hey, hdyd?", false),
-                MessageChatScreen("Great, thanks for asking :)", true),
-                MessageChatScreen("Hey, hdyd?", false),
-                MessageChatScreen("Hey!", true),
-                MessageChatScreen("Hey, hdyd?", false),
-                MessageChatScreen("Great, thanks for asking :)", true),
-                MessageChatScreen("Hey, hdyd?", false),
-                MessageChatScreen("Hey!", true),
-                MessageChatScreen("Hey, hdyd?", false),
-                MessageChatScreen("Great, thanks for asking :)", true),
-                MessageChatScreen("Hey, hdyd?", false),
-                MessageChatScreen("Hey!", true),
-                MessageChatScreen("Hey, hdyd?", false),
-                MessageChatScreen("Great, thanks for asking :)", true),
-                MessageChatScreen("Hey, hdyd?", false),
-                MessageChatScreen("Hey!", true),
-                MessageChatScreen("Hey, hdyd?", false),
-                MessageChatScreen("Great, thanks for asking :)", true),
-                MessageChatScreen("Hey...?", false),
-
-                )
-        ),
-        onEvent = {},
-        events = MutableSharedFlow<ChatScreenEvent>().asSharedFlow(),
-        user2 = "Ron189",
-        activity = ActivityPreview
-    )
-}
-
 object ActivityPreview : Activity()
 
 @Composable
@@ -220,8 +204,14 @@ fun MessageCard(messageItem: MessageChatScreen) {
             else -> Alignment.End
         },
     ) {
+        var cardWidth by remember { mutableStateOf(0.dp) }
+        val localDensity = LocalDensity.current
         Card(
-            modifier = Modifier.widthIn(max = 340.dp),
+            modifier = Modifier
+                .widthIn(max = 340.dp)
+                .onGloballyPositioned {
+                    cardWidth = with(localDensity) { it.size.width.toDp() }
+                },
             shape = messageShape(messageItem),
             colors = CardDefaults.cardColors(
                 containerColor = when {
@@ -230,14 +220,39 @@ fun MessageCard(messageItem: MessageChatScreen) {
                 }
             ),
         ) {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = messageItem.message,
-                color = when {
-                    messageItem.isItMe -> MaterialTheme.colorScheme.onPrimary
-                    else -> MaterialTheme.colorScheme.onSecondary
-                },
-            )
+            if (cardWidth < 300.dp) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        modifier = Modifier.padding(8.dp),
+                        text = messageItem.message,
+                        color = when {
+                            messageItem.isItMe -> MaterialTheme.colorScheme.onPrimary
+                            else -> MaterialTheme.colorScheme.onSecondary
+                        },
+                    )
+                    Text(
+                        modifier = Modifier.padding(bottom = 3.dp, end = 8.dp),
+                        text = messageItem.timestamp,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            } else {
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        modifier = Modifier.padding(8.dp),
+                        text = messageItem.message,
+                        color = when {
+                            messageItem.isItMe -> MaterialTheme.colorScheme.onPrimary
+                            else -> MaterialTheme.colorScheme.onSecondary
+                        },
+                    )
+                    Text(
+                        modifier = Modifier.padding(bottom = 3.dp, end = 8.dp),
+                        text = messageItem.timestamp,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
         }
     }
 }
@@ -250,4 +265,34 @@ fun messageShape(message: MessageChatScreen): Shape {
         message.isItMe -> roundedCorners.copy(bottomStart = CornerSize(0))
         else -> roundedCorners.copy(bottomEnd = CornerSize(0))
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ChatScreenPrev() {
+    ChatScreen(
+        navController = rememberNavController(),
+        state = ChatScreenStates(
+            messages = arrayListOf(
+                MessageChatScreen("Hey, how are you? I am fine.", "16:08", true),
+                MessageChatScreen("Good. How you doing?", "16:09", false),
+                MessageChatScreen("Hey, how are you? I am fine.", "16:10", true),
+                MessageChatScreen("Good. How you doing?", "16:11", false),
+                MessageChatScreen("Hey, how are you? I am fine.", "16:11", true),
+                MessageChatScreen("Good. How you doing?", "16:11", false),
+                MessageChatScreen("Hey, how are you? I am fine.", "16:18", true),
+                MessageChatScreen("Good. How you doing?", "16:32", false),
+                MessageChatScreen("Hey, how are you? I am fine.", "16:44", true),
+                MessageChatScreen(
+                    "Good. How you doing? Good. How you doing? Good. How you doing? Good. How you doing? ",
+                    "16:46",
+                    false
+                ),
+            )
+        ),
+        onEvent = {},
+        events = MutableSharedFlow<ChatScreenEvent>().asSharedFlow(),
+        user2 = "Ron189",
+        activity = ActivityPreview
+    )
 }

@@ -1,8 +1,10 @@
 package com.example.talksy.data.helperRepositories
 
+import android.net.Uri
 import android.util.Log
 import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.Chat
+import com.example.talksy.data.dataModels.Message
 import com.example.talksy.data.dataModels.User
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Filter
@@ -32,6 +34,7 @@ class FireStoreRepository {
         private const val FIELD_MESSAGES = "messages"
         private const val FIELD_MESSAGE = "message"
         private const val FIELD_SENDER_UID = "senderUid"
+        private const val FIELD_TIMESTAMP = "timestamp"
         private const val FIELD_UID1 = "uid1"
         private const val FIELD_UID2 = "uid2"
     }
@@ -130,13 +133,13 @@ class FireStoreRepository {
         }
     }
 
-    suspend fun getProfilePicture(uid: String): String {
+    suspend fun getProfilePicture(uid: String): Uri {
 
         val docRef = usersCollection.document(uid)
 
-        val user = docRef.get().await().toObject(User::class.java) ?: return ""
-
-        return user.profilePicture
+        val user = docRef.get().await().toObject(User::class.java) ?: return Uri.EMPTY
+        Log.d(TAG, "getProfilePicture: ${user}")
+        return Uri.parse(user.profilePicture)
     }
 
     suspend fun checkUsername(username: String, errorMessage: (String) -> Unit): Boolean {
@@ -175,15 +178,12 @@ class FireStoreRepository {
             finalQuery = chatsCollection.whereEqualTo(FIELD_UID1, userUid2)
                 .whereEqualTo(FIELD_UID2, userUid1)
         }
-        Log.d(TAG, "getChatFlow: 333333333333333")
         val snapshotListener = finalQuery.addSnapshotListener { value, error ->
-            Log.d(TAG, "getChatFlow: 444444444444444")
             val response = if (error == null) {
                 ChatResponse.OnSuccess(value)
             } else {
                 ChatResponse.OnError(error)
             }
-            Log.d(TAG, "getChatFlow: sent")
             trySend(response)
         }
 
@@ -197,7 +197,6 @@ class FireStoreRepository {
             when (it) {
                 is ChatResponse.OnError -> TODO()
                 is ChatResponse.OnSuccess -> {
-                    Log.d(TAG, "getChatFlow: sent to getChat")
                     chat(it.querySnapshot?.documents?.get(0)?.toObject(Chat::class.java))
                 }
             }
@@ -240,7 +239,11 @@ class FireStoreRepository {
         ).await()
     }
 
-    suspend fun updateChat(chat: Chat) {
+    suspend fun addOneMessage(message: String, senderUid: String, user2Uid: String) {
+
+        val chat = getChat(senderUid, user2Uid) ?: return
+        chat.messages.add(Message(message = message, timestamp = System.currentTimeMillis(), senderUid = senderUid))
+
         val firstQuery =
             chatsCollection.whereEqualTo(FIELD_UID1, chat.uid1).whereEqualTo(FIELD_UID2, chat.uid2)
                 .get()
@@ -256,7 +259,6 @@ class FireStoreRepository {
         else if (!secondQuery.isEmpty) finalQuery = secondQuery
 
         chatsCollection.document(finalQuery.documents[0].id).set(chat)
-        Log.d(TAG, "updateChat: message should be added.")
     }
 
     private suspend fun getUserChatsFlowSetup(userUid: String) = callbackFlow {

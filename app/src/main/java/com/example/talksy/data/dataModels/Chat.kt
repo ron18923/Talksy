@@ -1,7 +1,5 @@
 package com.example.talksy.data.dataModels
 
-import java.sql.Timestamp
-
 data class Chat(
     val messages: ArrayList<Message> = arrayListOf(),
     val uid1: String = "",
@@ -10,5 +8,6 @@ data class Chat(
 
 data class Message(
     val message: String = "",
+    val timestamp: Long = -1,
     val senderUid: String = "",
 )

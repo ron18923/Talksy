@@ -46,7 +46,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.navigation.AuthScreen
 import com.example.talksy.presentation.navigation.Graph
-import com.example.talksy.presentation.reusableComposables.AutoScalingText
+import com.example.talksy.presentation.reusable.composables.AutoScalingText
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
