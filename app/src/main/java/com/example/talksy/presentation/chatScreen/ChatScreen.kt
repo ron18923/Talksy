@@ -4,17 +4,20 @@ import android.app.Activity
 import android.graphics.Paint.Align
 import android.util.Log
 import android.view.WindowManager
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,8 +28,14 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.EmojiEmotions
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.EmojiEmotions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,6 +51,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -71,6 +81,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.TalksyApp.Companion.TAG
+import com.example.talksy.data.dataModels.MessageView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -121,16 +132,36 @@ fun ChatScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
+                    Row(
+                        modifier = modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
                             modifier = modifier
-                                .clip(CircleShape)
-                                .height(40.dp),
-                            painter = rememberAsyncImagePainter(model = state.otherProfile),
-                            contentDescription = "profile picture",
-                            tint = Color.Unspecified
+                                .size(40.dp)
+                                .aspectRatio(1f)
+                        ) {
+                            Icon(
+                                modifier = modifier
+                                    .fillMaxSize(),
+                                imageVector = Icons.Default.AccountCircle,
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                contentDescription = "profile picture empty"
+                            )
+                            Icon(
+                                modifier = modifier
+                                    .fillMaxSize()
+                                    .clip(CircleShape),
+                                painter = rememberAsyncImagePainter(model = state.otherProfile),
+                                contentDescription = "profile picture",
+                                tint = Color.Unspecified
+                            )
+                        }
+                        Text(
+                            modifier = modifier.padding(start = 8.dp),
+                            text = state.user2,
+                            style = MaterialTheme.typography.titleMedium
                         )
-                        Text(modifier = modifier.padding(start = 8.dp), text = state.user2, style = MaterialTheme.typography.titleMedium)
                     }
                 },
                 navigationIcon = {
@@ -165,21 +196,45 @@ fun ChatScreen(
             Row(
                 modifier = modifier
                     .padding(bottom = 10.dp, top = 8.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .height(56.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                TextField(
+                Row(
                     modifier = modifier
                         .fillMaxWidth(0.8f),
-                    value = state.inputText,
-                    onValueChange = { onEvent(ChatScreenEvent.InputChange(it)) },
-                    maxLines = 3,
-
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = modifier
+                            .fillMaxHeight(0.6f)
+                            .aspectRatio(1f),
+                        imageVector = Icons.Outlined.EmojiEmotions,
+                        contentDescription = "Emojis"
                     )
+                    BasicTextField (
+                        modifier = modifier.defaultMinSize(0.dp).weight(1f),
+                        value = state.inputText,
+                        onValueChange = { onEvent(ChatScreenEvent.InputChange(it)) },
+                        maxLines = 3,
+                    )
+                    Icon(
+                        modifier = modifier
+                            .fillMaxHeight(0.6f)
+                            .aspectRatio(1f), contentDescription = "clip",
+                        imageVector = Icons.Default.AttachFile
+                    )
+                    Icon(
+                        modifier = modifier
+                            .fillMaxHeight(0.6f)
+                            .aspectRatio(1f), contentDescription = "clip",
+                        imageVector = Icons.Outlined.CameraAlt
+                    )
+
+                }
                 IconButton(
                     modifier = modifier
-                        .padding(8.dp)
                         .aspectRatio(1f),
                     onClick = { onEvent(ChatScreenEvent.SendClicked) },
                     colors = IconButtonDefaults.filledIconButtonColors()
@@ -194,7 +249,7 @@ fun ChatScreen(
 object ActivityPreview : Activity()
 
 @Composable
-fun MessageCard(messageItem: MessageChatScreen) {
+fun MessageCard(messageItem: MessageView) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -259,7 +314,7 @@ fun MessageCard(messageItem: MessageChatScreen) {
 
 
 @Composable
-fun messageShape(message: MessageChatScreen): Shape {
+fun messageShape(message: MessageView): Shape {
     val roundedCorners = RoundedCornerShape(16.dp)
     return when {
         message.isItMe -> roundedCorners.copy(bottomStart = CornerSize(0))
@@ -274,16 +329,16 @@ fun ChatScreenPrev() {
         navController = rememberNavController(),
         state = ChatScreenStates(
             messages = arrayListOf(
-                MessageChatScreen("Hey, how are you? I am fine.", "16:08", true),
-                MessageChatScreen("Good. How you doing?", "16:09", false),
-                MessageChatScreen("Hey, how are you? I am fine.", "16:10", true),
-                MessageChatScreen("Good. How you doing?", "16:11", false),
-                MessageChatScreen("Hey, how are you? I am fine.", "16:11", true),
-                MessageChatScreen("Good. How you doing?", "16:11", false),
-                MessageChatScreen("Hey, how are you? I am fine.", "16:18", true),
-                MessageChatScreen("Good. How you doing?", "16:32", false),
-                MessageChatScreen("Hey, how are you? I am fine.", "16:44", true),
-                MessageChatScreen(
+                MessageView("Hey, how are you? I am fine.", "16:08", true),
+                MessageView("Good. How you doing?", "16:09", false),
+                MessageView("Hey, how are you? I am fine.", "16:10", true),
+                MessageView("Good. How you doing?", "16:11", false),
+                MessageView("Hey, how are you? I am fine.", "16:11", true),
+                MessageView("Good. How you doing?", "16:11", false),
+                MessageView("Hey, how are you? I am fine.", "16:18", true),
+                MessageView("Good. How you doing?", "16:32", false),
+                MessageView("Hey, how are you? I am fine.", "16:44", true),
+                MessageView(
                     "Good. How you doing? Good. How you doing? Good. How you doing? Good. How you doing? ",
                     "16:46",
                     false

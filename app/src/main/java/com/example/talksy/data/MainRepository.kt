@@ -1,9 +1,8 @@
 package com.example.talksy.data
 
 import android.net.Uri
-import android.util.Log
-import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.Chat
+import com.example.talksy.data.dataModels.ChatsListItem
 import com.example.talksy.data.dataModels.Message
 import com.example.talksy.data.dataModels.User
 import com.example.talksy.data.helperRepositories.FireStoreRepository
@@ -133,21 +132,20 @@ class MainRepository(
         return senderUid == userUid
     }
 
-    suspend fun getUserChats(chats: (ArrayList<HashMap<String, String>>) -> Unit) {
+    suspend fun getUserChats(chats: (ArrayList<ChatsListItem>) -> Unit) {
         val userUid = userRepository.getUserUid() ?: return
         fireStoreRepository.getUserChatsFlow(userUid) { returnedChats ->
             CoroutineScope(Dispatchers.IO).launch {
-                val customChats = arrayListOf<HashMap<String, String>>()
+                val customChats = arrayListOf<ChatsListItem>()
 
                 returnedChats.forEach { chat ->
                     val otherUid =
                         if (chat.uid1 == userRepository.getUserUid()) chat.uid2 else chat.uid1
                     customChats.add(
-                        hashMapOf(
-                            "profilePicture" to storageRepository.getProfilePicture(otherUid)
-                                .toString(),
-                            "username" to (fireStoreRepository.getUsernameByUid(otherUid) ?: ""),
-                            "lastMessage" to if (chat.messages.isNotEmpty()) chat.messages.last().message else ""
+                        ChatsListItem(
+                            profilePicture = storageRepository.getProfilePicture(otherUid),
+                            username = (fireStoreRepository.getUsernameByUid(otherUid) ?: ""),
+                            lastMessage =  if (chat.messages.isNotEmpty()) chat.messages.last() else Message()
                         )
                     )
                 }

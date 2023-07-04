@@ -1,6 +1,5 @@
 package com.example.talksy.presentation.main.settings
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +25,6 @@ import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.ReadMore
 import androidx.compose.material3.Card
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,8 +33,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,8 +48,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.navigation.AuthScreen
 import com.example.talksy.presentation.navigation.GraphIconLabel
 import com.example.talksy.presentation.navigation.SettingsNav
@@ -77,12 +73,6 @@ fun Settings(
         GraphIconLabel.Settings
     )
     val item = GraphIconLabel.Settings
-
-//    DisposableEffect(Unit) {
-//        onDispose {
-//            onEvent(SettingsEvent.Dispose)
-//        }
-//    }
 
     //Handling events
     LaunchedEffect(key1 = true) {
@@ -134,7 +124,7 @@ fun Settings(
         }
     },
         topBar = {
-            CenterAlignedTopAppBar(title = {
+            TopAppBar(title = {
                 Text(
                     text = item.label
                 )
@@ -151,8 +141,6 @@ fun Settings(
                 modifier = modifier.fillMaxWidth(0.9f),
             ) {
                 Spacer(modifier = modifier.height(20.dp))
-                Log.d(TAG, "Settings: ${state.profilePicture}")
-                Log.d(TAG, "Settings: ${state.email}")
                 Card(
                     modifier = modifier
                         .fillMaxWidth()

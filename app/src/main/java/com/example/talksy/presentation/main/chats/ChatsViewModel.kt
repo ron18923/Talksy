@@ -1,15 +1,15 @@
 package com.example.talksy.presentation.main.chats
 
-import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.MainRepository
+import com.example.talksy.data.dataModels.ChatsListItem
+import com.example.talksy.data.dataModels.ChatsListItemView
+import com.example.talksy.data.dataModels.MessageView
 import com.example.talksy.data.helperRepositories.UserStateListener
-import com.example.talksy.presentation.main.settings.SettingsEvent
+import com.example.talksy.presentation.reusable.nonComposables.convertLongToTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -30,14 +30,21 @@ class ChatsViewModel @Inject constructor(
     private val _userStateListener = UserStateListenerImpl()
 
     init {
+        init()
+        mainRepository.setUserListener(_userStateListener)
+    }
+
+    private fun init() {
+        _state.value =
+            _state.value.copy(chats = arrayListOf()) //emptying chats list before assigning
         viewModelScope.launch {
             mainRepository.getUserChats { chats ->
+                val sortedChats = chats.sortedWith(compareByDescending { it.lastMessage.timestamp })
                 _state.value = _state.value.copy(
-                    chats = chats
+                    chats = chatListItemConverter(ArrayList(sortedChats))
                 )
             }
         }
-        mainRepository.setUserListener(_userStateListener)
     }
 
     fun onEvent(event: ChatsEvent) {
@@ -53,15 +60,28 @@ class ChatsViewModel @Inject constructor(
 
     inner class UserStateListenerImpl : UserStateListener {
         override fun onUserStateChanged() {
-            _state.value = _state.value.copy(chats = arrayListOf())
-            viewModelScope.launch {
-                mainRepository.getUserChats { chats ->
-                    _state.value = _state.value.copy(
-                        chats = chats
-                    )
-                }
-            }
+            init()
         }
 
+    }
+
+    private fun chatListItemConverter(chatListItems: ArrayList<ChatsListItem>): ArrayList<ChatsListItemView> {
+        val newChatListItems = arrayListOf<ChatsListItemView>()
+
+        chatListItems.forEach { chatListItem ->
+            val isItMe = mainRepository.isMessageFromMe(chatListItem.lastMessage)
+            newChatListItems.add(
+                ChatsListItemView(
+                    profilePicture = chatListItem.profilePicture,
+                    username = chatListItem.username,
+                    lastMessage = MessageView(
+                        message = chatListItem.lastMessage.message,
+                        timestamp = convertLongToTime(chatListItem.lastMessage.timestamp),
+                        isItMe = isItMe
+                    )
+                )
+            )
+        }
+        return newChatListItems
     }
 }

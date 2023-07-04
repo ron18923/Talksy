@@ -2,8 +2,10 @@ package com.example.talksy.presentation.main.chats
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,20 +16,25 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +43,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.talksy.data.dataModels.ChatsListItemView
+import com.example.talksy.data.dataModels.MessageView
 import com.example.talksy.presentation.navigation.ChatsNav
 import com.example.talksy.presentation.navigation.GraphIconLabel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -73,6 +82,7 @@ fun Chats(
             when (event) {
                 is ChatsEvent.ChatClicked ->
                     navController.navigate("${ChatsNav.ChatScreen.route}/${event.username}")
+
                 else -> {}
             }
         }
@@ -106,7 +116,7 @@ fun Chats(
         }
     },
         topBar = {
-            CenterAlignedTopAppBar(title = {
+            TopAppBar(title = {
                 Text(
                     text = item.label
                 )
@@ -122,7 +132,7 @@ fun Chats(
 
             Column(modifier = modifier.fillMaxWidth(0.9f)) {
                 if (state.chats.isEmpty()) {
-                    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             text = "You don't have chats right now. Let's change that!",
                             style = MaterialTheme.typography.titleMedium,
@@ -136,38 +146,59 @@ fun Chats(
                                 ListItem(
                                     headlineContent = {
                                         Text(
-                                            text = chat["username"] ?: "",
-                                            style = MaterialTheme.typography.titleLarge
+                                            text = chat.username ?: "",
+                                            style = MaterialTheme.typography.titleMedium
                                         )
                                     },
-                                    supportingContent = { Text(text = chat["lastMessage"] ?: "", maxLines = 1) },
+                                    supportingContent = {
+                                        Row(
+                                            modifier = modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text =
+                                                if (chat.lastMessage.isItMe) "You: "
+                                                else {
+                                                    ""
+                                                } + chat.lastMessage.message,
+                                                maxLines = 1
+                                            )
+                                            Text(
+                                                text = chat.lastMessage.timestamp,
+                                                style = MaterialTheme.typography.bodySmall
+                                            )
+                                        }
+                                    },
                                     modifier = modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            onEvent(ChatsEvent.ChatClicked(chat["username"] ?: ""))
+                                            onEvent(ChatsEvent.ChatClicked(chat.username))
                                         },
                                     leadingContent = {
                                         Box(
                                             modifier = modifier
-                                                .size(60.dp)
+                                                .size(52.dp)
                                                 .aspectRatio(1f)
                                         ) {
-                                            Image(
+                                            Icon(
                                                 modifier = modifier
                                                     .fillMaxSize(),
                                                 imageVector = Icons.Default.AccountCircle,
-                                                colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurface),
+                                                tint = MaterialTheme.colorScheme.onSurface,
                                                 contentDescription = "profile picture empty"
                                             )
-                                            Image(
+                                            Icon(
                                                 modifier = modifier
                                                     .fillMaxSize()
                                                     .clip(CircleShape),
-                                                painter = rememberAsyncImagePainter(model = chat["profilePicture"]),
-                                                contentDescription = "profile picture"
+                                                painter = rememberAsyncImagePainter(model = chat.profilePicture),
+                                                contentDescription = "profile picture",
+                                                tint = Color.Unspecified
                                             )
                                         }
                                     })
+                                Divider()
                             }
                         }
                     }
@@ -184,16 +215,22 @@ fun ChatsPrev() {
         navController = rememberNavController(),
         state = ChatsState(
             arrayListOf(
-//                hashMapOf(
-//                    "username" to "Ron189",
-//                    "profilePicture" to "",
-//                    "lastMessage" to "I am fine. And you?"
-//                ),
-//                hashMapOf(
-//                    "username" to "Gal17",
-//                    "profilePicture" to "",
-//                    "lastMessage" to "Wow this is amazing"
-//                )
+                ChatsListItemView(
+                    username = "Ron189",
+                    lastMessage = MessageView(
+                        message = "Thank you :)",
+                        timestamp = "17:52",
+                        isItMe = false
+                    )
+                ),
+                ChatsListItemView(
+                    username = "Gal17",
+                    lastMessage = MessageView(
+                        message = "Great! Okay.",
+                        timestamp = "08:13",
+                        isItMe = true
+                    )
+                )
             )
         ),
         onEvent = {},

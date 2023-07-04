@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -30,6 +31,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -127,7 +129,7 @@ fun Contacts(
         }
     },
         topBar = {
-            CenterAlignedTopAppBar(title = {
+            TopAppBar(title = {
                 Text(
                     text = item.label
                 )
@@ -184,6 +186,7 @@ fun Contacts(
                             )
                             Text(text = username)
                         }
+                        Divider()
                     }
                 }
                 Spacer(modifier = modifier.height(20.dp))
@@ -219,6 +222,7 @@ fun Contacts(
                                         )
                                     }
                                 })
+                            Divider()
                         }
                     }
                 }

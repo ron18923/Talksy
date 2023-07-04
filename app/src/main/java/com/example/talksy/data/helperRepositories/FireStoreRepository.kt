@@ -138,7 +138,6 @@ class FireStoreRepository {
         val docRef = usersCollection.document(uid)
 
         val user = docRef.get().await().toObject(User::class.java) ?: return Uri.EMPTY
-        Log.d(TAG, "getProfilePicture: ${user}")
         return Uri.parse(user.profilePicture)
     }
 
@@ -242,7 +241,13 @@ class FireStoreRepository {
     suspend fun addOneMessage(message: String, senderUid: String, user2Uid: String) {
 
         val chat = getChat(senderUid, user2Uid) ?: return
-        chat.messages.add(Message(message = message, timestamp = System.currentTimeMillis(), senderUid = senderUid))
+        chat.messages.add(
+            Message(
+                message = message,
+                timestamp = System.currentTimeMillis(),
+                senderUid = senderUid
+            )
+        )
 
         val firstQuery =
             chatsCollection.whereEqualTo(FIELD_UID1, chat.uid1).whereEqualTo(FIELD_UID2, chat.uid2)
