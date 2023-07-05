@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.EditAttributes
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.outlined.ReadMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -96,40 +98,47 @@ fun Settings(
         }
     }
 
-    Scaffold(bottomBar = {
-        NavigationBar() {
-            navItems.forEach { screen ->
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            imageVector = screen.icon,
-                            contentDescription = "navigation item icon"
-                        )
-                    },
-                    label = { Text(text = screen.label) },
-                    selected = screen.route == item.route,
-                    onClick = {
-                        navController.navigate(screen.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+    Scaffold(
+        bottomBar = {
+            NavigationBar() {
+                navItems.forEach { screen ->
+                    NavigationBarItem(
+                        icon = {
+                            Icon(
+                                imageVector = screen.icon,
+                                contentDescription = "navigation item icon"
+                            )
+                        },
+                        label = { Text(text = screen.label) },
+                        selected = screen.route == item.route,
+                        onClick = {
+                            navController.navigate(screen.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                // Avoid multiple copies of the same destination when
+                                // reselecting the same item
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                                restoreState = true
                             }
-                            // Avoid multiple copies of the same destination when
-                            // reselecting the same item
-                            launchSingleTop = true
-                            // Restore state when reselecting a previously selected item
-                            restoreState = true
-                        }
-                    })
+                        })
+                }
             }
-        }
-    },
+        },
         topBar = {
-            TopAppBar(title = {
-                Text(
-                    text = item.label
-                )
-            })
-        }
+            TopAppBar(
+                title = {
+                    Text(
+                        text = item.label
+                    )
+                },
+                actions = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
+                    }
+                })
+        },
     ) {
         Box(
             modifier = modifier
@@ -144,29 +153,29 @@ fun Settings(
                 Card(
                     modifier = modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.1f)
+                        .height(80.dp)
                 ) {
                     Row(modifier = modifier.fillMaxSize()) {
                         Box(
                             modifier = modifier
                                 .fillMaxHeight()
+                                .padding(10.dp)
                                 .aspectRatio(1f)
                         ) {
-                            Image(
+                            Icon(
                                 modifier = modifier
                                     .fillMaxSize(),
                                 imageVector = Icons.Default.AccountCircle,
-                                colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurface),
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 contentDescription = "profile picture empty"
                             )
                             AsyncImage(
                                 modifier = modifier
                                     .fillMaxSize()
-                                    .padding(6.dp)
                                     .clip(CircleShape)
                                     .border(
                                         2.dp,
-                                        MaterialTheme.colorScheme.onBackground,
+                                        MaterialTheme.colorScheme.onSurfaceVariant,
                                         CircleShape
                                     ),
                                 model = state.profilePicture,
@@ -175,12 +184,20 @@ fun Settings(
                         }
                         Column(
                             modifier = modifier.fillMaxHeight(),
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.spacedBy(
+                                space = 4.dp,
+                                alignment = Alignment.CenterVertically
+                            )
                         ) {
-                            Text(text = state.username, color = MaterialTheme.colorScheme.onSurface)
+                            Text(
+                                text = state.username,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
                             Text(
                                 text = state.email,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }

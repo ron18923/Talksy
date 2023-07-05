@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -147,7 +148,7 @@ fun EditProfile(
                     .fillMaxWidth(0.88f)
                     .fillMaxHeight(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly
+                verticalArrangement = Arrangement.Center
             ) {
                 Column(
                     modifier = modifier.wrapContentHeight(),
@@ -158,12 +159,12 @@ fun EditProfile(
                             .fillMaxWidth(0.5f)
                             .aspectRatio(1f)
                     ) {
-                        Image(
+                        Icon(
                             imageVector = Icons.Default.AccountCircle,
                             modifier = modifier
                                 .fillMaxSize()
-                                .border(4.dp, MaterialTheme.colorScheme.onBackground, CircleShape),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
+                                .border(4.dp, MaterialTheme.colorScheme.onSurfaceVariant, CircleShape),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             contentDescription = "profile picture empty",
                         )
                         Image(
@@ -171,7 +172,7 @@ fun EditProfile(
                             modifier = modifier
                                 .fillMaxSize()
                                 .clip(CircleShape)
-                                .border(4.dp, MaterialTheme.colorScheme.onBackground, CircleShape)
+                                .border(4.dp, MaterialTheme.colorScheme.onSurfaceVariant, CircleShape)
                                 .clickable { onEvent(EditProfileEvent.ProfileImageClicked) },
                             contentDescription = "profile picture",
                         )
@@ -193,8 +194,9 @@ fun EditProfile(
                         }
                     }
                 }
+                Spacer(modifier = modifier.height(70.dp))
                 Button(
-                    modifier = modifier.height(60.dp),
+                    modifier = modifier.fillMaxWidth(0.8f),
                     onClick = {
                         onEvent(EditProfileEvent.ChangePasswordClicked)
                     }) {
@@ -202,7 +204,6 @@ fun EditProfile(
                         modifier = modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.titleMedium,
-                        fontSize = 18.sp,
                         text = "Change password"
                     )
                 }

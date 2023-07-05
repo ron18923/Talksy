@@ -59,6 +59,7 @@ class ChatScreenViewModel @Inject constructor(
 
             ChatScreenEvent.SendClicked -> {
                 val message = _state.value.inputText
+                if(message.isEmpty()) return
                 _state.value = _state.value.copy(inputText = "")
                 viewModelScope.launch {
                     mainRepository.addMessage(

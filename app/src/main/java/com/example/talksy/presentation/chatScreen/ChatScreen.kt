@@ -1,13 +1,16 @@
 package com.example.talksy.presentation.chatScreen
 
 import android.app.Activity
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.graphics.Paint.Align
 import android.util.Log
 import android.view.WindowManager
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -18,25 +21,32 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.EmojiEmotions
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.EmojiEmotions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -45,15 +55,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -65,21 +83,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.example.talksy.R
 import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.MessageView
 import kotlinx.coroutines.CoroutineScope
@@ -170,13 +199,18 @@ fun ChatScreen(
                     }) {
                         Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go Back")
                     }
-                })
+                },
+                actions = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
+                    }
+                }
+            )
         }) { innerPadding ->
         Column(
             modifier = modifier
-                .padding(innerPadding)
                 .fillMaxSize()
-                .padding(horizontal = LocalConfiguration.current.screenWidthDp.times(0.06).dp),
+                .padding(innerPadding)
         ) {
             Spacer(modifier = modifier.height(4.dp))
             val listState = rememberLazyListState()
@@ -185,7 +219,9 @@ fun ChatScreen(
             }
             LazyColumn(
                 state = listState,
-                modifier = modifier.weight(1f)
+                modifier = modifier
+                    .weight(1f)
+                    .padding(horizontal = LocalConfiguration.current.screenWidthDp.times(0.06).dp),
             ) {
                 state.messages.forEach { message ->
                     item {
@@ -197,45 +233,79 @@ fun ChatScreen(
                 modifier = modifier
                     .padding(bottom = 10.dp, top = 8.dp)
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .padding(horizontal = LocalConfiguration.current.screenWidthDp.times(0.03).dp)
+                    .height(50.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(
                     modifier = modifier
-                        .fillMaxWidth(0.8f),
-                    verticalAlignment = Alignment.CenterVertically
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(
+                            horizontal = LocalConfiguration.current.screenWidthDp.times(
+                                0.02
+                            ).dp
+                        )
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = RoundedCornerShape(40.dp)
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    val spacingValue = 10.dp
+                    Spacer(modifier = modifier.width(spacingValue))
                     Icon(
                         modifier = modifier
-                            .fillMaxHeight(0.6f)
+                            .fillMaxHeight(0.5f)
                             .aspectRatio(1f),
-                        imageVector = Icons.Outlined.EmojiEmotions,
-                        contentDescription = "Emojis"
+                        imageVector = Icons.Default.EmojiEmotions,
+                        contentDescription = "Emojis",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    BasicTextField (
-                        modifier = modifier.defaultMinSize(0.dp).weight(1f),
+                    Spacer(modifier = modifier.width(spacingValue))
+                    BasicTextField(
+                        modifier = modifier
+                            .defaultMinSize(0.dp)
+                            .weight(1f),
                         value = state.inputText,
                         onValueChange = { onEvent(ChatScreenEvent.InputChange(it)) },
                         maxLines = 3,
+                        decorationBox = { innerTextField ->
+                            Box(
+                                modifier = modifier.padding(start = 6.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                if (state.inputText.isEmpty()) Text(
+                                    text = "Message",
+                                    style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                )
+                                innerTextField()
+                            }
+                        },
+                        textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant)
                     )
+                    Spacer(modifier = modifier.width(spacingValue))
                     Icon(
                         modifier = modifier
-                            .fillMaxHeight(0.6f)
+                            .fillMaxHeight(0.5f)
                             .aspectRatio(1f), contentDescription = "clip",
-                        imageVector = Icons.Default.AttachFile
+                        imageVector = Icons.Default.AttachFile,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    Spacer(modifier = modifier.width(spacingValue))
                     Icon(
                         modifier = modifier
-                            .fillMaxHeight(0.6f)
+                            .fillMaxHeight(0.5f)
                             .aspectRatio(1f), contentDescription = "clip",
-                        imageVector = Icons.Outlined.CameraAlt
+                        imageVector = Icons.Default.CameraAlt,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-
+                    Spacer(modifier = modifier.width(spacingValue))
                 }
                 IconButton(
-                    modifier = modifier
-                        .aspectRatio(1f),
+                    modifier = modifier.aspectRatio(1f),
                     onClick = { onEvent(ChatScreenEvent.SendClicked) },
                     colors = IconButtonDefaults.filledIconButtonColors()
                 ) {
@@ -302,7 +372,7 @@ fun MessageCard(messageItem: MessageView) {
                         },
                     )
                     Text(
-                        modifier = Modifier.padding(bottom = 3.dp, end = 8.dp),
+                        modifier = Modifier.padding(bottom = 3.dp, end = 9.dp),
                         text = messageItem.timestamp,
                         style = MaterialTheme.typography.bodySmall
                     )
