@@ -1,9 +1,13 @@
 package com.example.talksy.presentation.main.chats
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.MainRepository
 import com.example.talksy.data.dataModels.ChatsListItem
 import com.example.talksy.data.dataModels.ChatsListItemView
@@ -38,23 +42,29 @@ class ChatsViewModel @Inject constructor(
         _state.value =
             _state.value.copy(chats = arrayListOf()) //emptying chats list before assigning
         viewModelScope.launch {
-            mainRepository.getUserChats { chats ->
+            mainRepository.getUserChats(chats = { chats ->
                 val sortedChats = chats.sortedWith(compareByDescending { it.lastMessage.timestamp })
                 _state.value = _state.value.copy(
-                    chats = chatListItemConverter(ArrayList(sortedChats))
+                    chats = chatListItemConverter(ArrayList(sortedChats)),
+                    showProgressBar = false //indicating to the progress bar that data has been loaded.
                 )
-            }
+            },
+                error = { onEvent(ChatsEvent.ShowError(it)) }
+            )
         }
     }
 
     fun onEvent(event: ChatsEvent) {
         when (event) {
-            is ChatsEvent.ChatClicked ->
-                viewModelScope.launch {
-                    _events.emit(ChatsEvent.ChatClicked(event.username))
-                }
+            is ChatsEvent.ChatClicked -> viewModelScope.launch {
+                _events.emit(ChatsEvent.ChatClicked(event.username))
+            }
 
             ChatsEvent.Dispose -> _state.value = _state.value.copy(chats = arrayListOf())
+
+            is ChatsEvent.ShowError -> viewModelScope.launch {
+                _events.emit(ChatsEvent.ShowError(event.error))
+            }
         }
     }
 

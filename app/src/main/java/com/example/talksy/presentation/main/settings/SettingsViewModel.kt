@@ -35,7 +35,7 @@ class SettingsViewModel @Inject constructor(
         if (_user != null) _state.value = _state.value.copy(
             username = _user.displayName ?: "",
             email = _user.email ?: "",
-            profilePicture = _user.photoUrl ?: Uri.EMPTY
+            profilePicture = _user.photoUrl ?: Uri.EMPTY,
         )
         mainRepository.setUserListener(_userStateListener)
     }
@@ -43,7 +43,6 @@ class SettingsViewModel @Inject constructor(
     fun onEvent(event: SettingsEvent) {
         when (event) {
             SettingsEvent.SignOut -> {
-                Log.d(TAG, "onEvent: event")
                 mainRepository.signOutUser()
             }
 

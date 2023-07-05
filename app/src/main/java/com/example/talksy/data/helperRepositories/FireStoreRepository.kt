@@ -287,11 +287,11 @@ class FireStoreRepository {
         }
     }
 
-    suspend fun getUserChatsFlow(userUid: String, chat: (ArrayList<Chat>) -> Unit) {
+    suspend fun getUserChatsFlow(userUid: String, chat: (ArrayList<Chat>) -> Unit, error: (String) -> Unit) {
         getUserChatsFlowSetup(userUid).collectLatest {
             val chatsList: ArrayList<Chat> = arrayListOf()
             when (it) {
-                is ChatResponse.OnError -> TODO()
+                is ChatResponse.OnError -> error(it.exception?.message ?: "Error getting chats.")
                 is ChatResponse.OnSuccess -> {
                     it.querySnapshot?.documents?.forEach { document ->
                         chatsList.add(document.toObject(Chat::class.java)!!)

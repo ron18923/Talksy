@@ -16,5 +16,6 @@ data class ChatScreenStates(
     val otherProfile: Uri = Uri.EMPTY,
     val user2: String = "",
     val inputText: String = "",
-    val messages: ArrayList<MessageView> = arrayListOf()
+    val messages: ArrayList<MessageView> = arrayListOf(),
+    val showProgressBar: Boolean = true
 )

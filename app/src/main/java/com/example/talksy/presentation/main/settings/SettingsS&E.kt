@@ -12,5 +12,5 @@ sealed class SettingsEvent {
 data class SettingsStates(
     var username: String = "",
     var email: String = "",
-    var profilePicture: Uri = Uri.EMPTY
+    var profilePicture: Uri = Uri.EMPTY,
 )

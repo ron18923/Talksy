@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -80,14 +84,15 @@ fun OnBoarding(
                 Text(text = "Skip", fontSize = 14.sp)
             }
 
-            Spacer(modifier = modifier.height(screenHeight.times(0.05.toFloat())))
+            Spacer(modifier = modifier.height(screenHeight.times(0.1.toFloat())))
 
             Image(
                 modifier = modifier
                     .fillMaxWidth(0.6f)
                     .aspectRatio(1f)
                     .align(Alignment.CenterHorizontally),
-                painter = painterResource(id = R.drawable.on_boarding_screen_illustration),
+                imageVector = Icons.Outlined.Forum,
+                colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.primary),
                 contentDescription = "on-boarding screen illustration"
             )
 
@@ -97,7 +102,7 @@ fun OnBoarding(
                 text = state.textState,
                 modifier = modifier
                     .align(Alignment.CenterHorizontally)
-                    .fillMaxWidth(0.6f),
+                    .fillMaxWidth(0.7f),
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium

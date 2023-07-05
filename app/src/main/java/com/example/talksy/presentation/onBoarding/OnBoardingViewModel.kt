@@ -30,9 +30,9 @@ class OnBoardingViewModel @Inject constructor(
 
     private val texts: Queue<String> = LinkedList(
         listOf(
-            "Welcome to Talksy, a great friend to chat with you",
-            "If you are confused about what to do just open Talksy app",
-            "Talksy will be ready to chat & make you happy"
+            "Welcome to Talksy! chat and create memorable moments together.",
+            "Discover new conversations. Dive into the world of Talksy!",
+            "Talksy, your joyful companion for delightful chats."
         )
     )
 

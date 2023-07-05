@@ -37,7 +37,10 @@ class ContactsViewModel @Inject constructor(
     private fun init() {
         viewModelScope.launch {
             mainRepository.getUserContacts { contacts ->
-                _state.value = _state.value.copy(contactsList = contacts)
+                _state.value = _state.value.copy(
+                    contactsList = contacts,
+                    showProgressBar = false //indicating to the progress bar that data has been loaded.
+                )
             }
         }
     }

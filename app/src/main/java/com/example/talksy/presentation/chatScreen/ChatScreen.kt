@@ -3,7 +3,6 @@ package com.example.talksy.presentation.chatScreen
 import android.app.Activity
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.graphics.Paint.Align
-import android.util.Log
 import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,6 +49,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -207,25 +207,37 @@ fun ChatScreen(
                 }
             )
         }) { innerPadding ->
-        Column(
+        Box(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            Spacer(modifier = modifier.height(4.dp))
-            val listState = rememberLazyListState()
-            LaunchedEffect(key1 = state.messages.size) {
-                listState.animateScrollToItem(state.messages.size)
-            }
-            LazyColumn(
-                state = listState,
-                modifier = modifier
-                    .weight(1f)
-                    .padding(horizontal = LocalConfiguration.current.screenWidthDp.times(0.06).dp),
-            ) {
-                state.messages.forEach { message ->
-                    item {
-                        MessageCard(messageItem = message)
+            if (state.showProgressBar) CircularProgressIndicator(modifier = modifier.align(Alignment.Center))
+            else {
+                Column(
+                    modifier = modifier
+                        .fillMaxSize()
+                ) {
+                    Spacer(modifier = modifier.height(4.dp))
+                    val listState = rememberLazyListState()
+                    LaunchedEffect(key1 = state.messages.size) {
+                        listState.animateScrollToItem(state.messages.size)
+                    }
+                    LazyColumn(
+                        state = listState,
+                        modifier = modifier
+                            .weight(1f)
+                            .padding(
+                                horizontal = LocalConfiguration.current.screenWidthDp.times(
+                                    0.06
+                                ).dp
+                            ),
+                    ) {
+                        state.messages.forEach { message ->
+                            item {
+                                MessageCard(messageItem = message)
+                            }
+                        }
                     }
                 }
             }
@@ -233,8 +245,13 @@ fun ChatScreen(
                 modifier = modifier
                     .padding(bottom = 10.dp, top = 8.dp)
                     .fillMaxWidth()
-                    .padding(horizontal = LocalConfiguration.current.screenWidthDp.times(0.03).dp)
-                    .height(50.dp),
+                    .padding(
+                        horizontal = LocalConfiguration.current.screenWidthDp.times(
+                            0.03
+                        ).dp
+                    )
+                    .height(50.dp)
+                    .align(Alignment.BottomCenter),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -413,7 +430,8 @@ fun ChatScreenPrev() {
                     "16:46",
                     false
                 ),
-            )
+            ),
+            showProgressBar = false
         ),
         onEvent = {},
         events = MutableSharedFlow<ChatScreenEvent>().asSharedFlow(),

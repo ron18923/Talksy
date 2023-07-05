@@ -1,6 +1,5 @@
 package com.example.talksy.presentation.main.contacts
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,6 +21,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -150,9 +150,7 @@ fun Contacts(
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-
             Column(modifier = modifier.fillMaxWidth(0.9f)) {
-                Log.d(TAG, "Contacts: ${state.searchInput}")
                 SearchBar(
                     modifier = modifier.fillMaxWidth(),
                     query = state.searchInput,
@@ -163,7 +161,8 @@ fun Contacts(
                     placeholder = { Text(text = "Search by username") },
                     leadingIcon = {
                         Icon(
-                            imageVector = Icons.Default.Search, contentDescription = "Search icon"
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search icon"
                         )
                     },
                     trailingIcon = {
@@ -198,39 +197,52 @@ fun Contacts(
                     }
                 }
                 Spacer(modifier = modifier.height(20.dp))
-                LazyColumn {
-                    state.contactsList.forEach { contact ->
-                        item {
-                            ListItem(
-                                headlineContent = { Text(text = contact["username"] ?: "") },
-                                modifier = modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        onEvent(ContactsEvent.ExistingContactClicked(contact["username"]))
-                                    },
-                                leadingContent = {
-                                    Box(
+                Box(modifier = modifier.fillMaxSize()) {
+                    if (state.showProgressBar) CircularProgressIndicator(
+                        modifier = modifier.align(
+                            Alignment.Center
+                        )
+                    )
+                    else {
+                        LazyColumn {
+                            state.contactsList.forEach { contact ->
+                                item {
+                                    ListItem(
+                                        headlineContent = {
+                                            Text(
+                                                text = contact["username"] ?: ""
+                                            )
+                                        },
                                         modifier = modifier
-                                            .size(40.dp)
-                                            .aspectRatio(1f)
-                                    ) {
-                                        Image(
-                                            modifier = modifier
-                                                .fillMaxSize(),
-                                            imageVector = Icons.Default.AccountCircle,
-                                            colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurface),
-                                            contentDescription = "profile picture empty"
-                                        )
-                                        Image(
-                                            modifier = modifier
-                                                .fillMaxSize()
-                                                .clip(CircleShape),
-                                            painter = rememberAsyncImagePainter(model = contact["profilePicture"]),
-                                            contentDescription = "profile picture"
-                                        )
-                                    }
-                                })
-                            Divider()
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                onEvent(ContactsEvent.ExistingContactClicked(contact["username"]))
+                                            },
+                                        leadingContent = {
+                                            Box(
+                                                modifier = modifier
+                                                    .size(40.dp)
+                                                    .aspectRatio(1f)
+                                            ) {
+                                                Image(
+                                                    modifier = modifier
+                                                        .fillMaxSize(),
+                                                    imageVector = Icons.Default.AccountCircle,
+                                                    colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.onSurface),
+                                                    contentDescription = "profile picture empty"
+                                                )
+                                                Image(
+                                                    modifier = modifier
+                                                        .fillMaxSize()
+                                                        .clip(CircleShape),
+                                                    painter = rememberAsyncImagePainter(model = contact["profilePicture"]),
+                                                    contentDescription = "profile picture"
+                                                )
+                                            }
+                                        })
+                                    Divider()
+                                }
+                            }
                         }
                     }
                 }
@@ -255,7 +267,8 @@ fun ContactsPrev() {
                         "username" to "Gal17",
                         "profilePicture" to "",
                     )
-                )
+                ),
+                showProgressBar = false
             ),
             onEvent = {},
             events = MutableSharedFlow<ContactsEvent>().asSharedFlow(),

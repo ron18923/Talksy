@@ -33,7 +33,11 @@ class ChatScreenViewModel @Inject constructor(
             mainRepository.getChatFlow(userName2 = username) { chat ->
                 if (chat == null) return@getChatFlow
                 val updatedMessages = messagesConverter(chat.messages)
-                _state.value = _state.value.copy(messages = updatedMessages, otherProfile = profilePicture)
+                _state.value = _state.value.copy(
+                    messages = updatedMessages,
+                    otherProfile = profilePicture,
+                    showProgressBar = false //indicating to the progress bar that data has been loaded.
+                )
             }
         }
     }
@@ -59,7 +63,7 @@ class ChatScreenViewModel @Inject constructor(
 
             ChatScreenEvent.SendClicked -> {
                 val message = _state.value.inputText
-                if(message.isEmpty()) return
+                if (message.isEmpty()) return
                 _state.value = _state.value.copy(inputText = "")
                 viewModelScope.launch {
                     mainRepository.addMessage(
@@ -73,7 +77,8 @@ class ChatScreenViewModel @Inject constructor(
                 otherProfile = Uri.EMPTY,
                 user2 = "",
                 inputText = "",
-                messages = arrayListOf()
+                messages = arrayListOf(),
+                showProgressBar = true
             )
         }
     }

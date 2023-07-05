@@ -1,5 +1,6 @@
 package com.example.talksy.presentation.main.settings
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.ReadMore
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,6 +52,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.presentation.navigation.AuthScreen
 import com.example.talksy.presentation.navigation.GraphIconLabel
 import com.example.talksy.presentation.navigation.SettingsNav
@@ -160,7 +164,8 @@ fun Settings(
                             modifier = modifier
                                 .fillMaxHeight()
                                 .padding(10.dp)
-                                .aspectRatio(1f)
+                                .aspectRatio(1f),
+                            contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 modifier = modifier
@@ -169,18 +174,20 @@ fun Settings(
                                 tint = MaterialTheme.colorScheme.onSurface,
                                 contentDescription = "profile picture empty"
                             )
-                            AsyncImage(
-                                modifier = modifier
-                                    .fillMaxSize()
-                                    .clip(CircleShape)
-                                    .border(
-                                        2.dp,
-                                        MaterialTheme.colorScheme.onSurfaceVariant,
-                                        CircleShape
-                                    ),
-                                model = state.profilePicture,
-                                contentDescription = "profile picture"
-                            )
+                            if(state.profilePicture != Uri.EMPTY) {
+                                AsyncImage(
+                                    modifier = modifier
+                                        .fillMaxSize()
+                                        .clip(CircleShape)
+                                        .border(
+                                            2.dp,
+                                            MaterialTheme.colorScheme.primary,
+                                            CircleShape
+                                        ),
+                                    model = state.profilePicture,
+                                    contentDescription = "profile picture",
+                                )
+                            }
                         }
                         Column(
                             modifier = modifier.fillMaxHeight(),

@@ -163,19 +163,25 @@ fun EditProfile(
                             imageVector = Icons.Default.AccountCircle,
                             modifier = modifier
                                 .fillMaxSize()
-                                .border(4.dp, MaterialTheme.colorScheme.onSurfaceVariant, CircleShape),
+                                .border(
+                                    4.dp,
+                                    MaterialTheme.colorScheme.onSurfaceVariant,
+                                    CircleShape
+                                ),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             contentDescription = "profile picture empty",
                         )
-                        Image(
-                            painter = rememberAsyncImagePainter(model = state.profileImage),
-                            modifier = modifier
-                                .fillMaxSize()
-                                .clip(CircleShape)
-                                .border(4.dp, MaterialTheme.colorScheme.onSurfaceVariant, CircleShape)
-                                .clickable { onEvent(EditProfileEvent.ProfileImageClicked) },
-                            contentDescription = "profile picture",
-                        )
+                        if (state.profileImage != Uri.EMPTY) {
+                            Image(
+                                painter = rememberAsyncImagePainter(model = state.profileImage),
+                                modifier = modifier
+                                    .fillMaxSize()
+                                    .clip(CircleShape)
+                                    .border(4.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                                    .clickable { onEvent(EditProfileEvent.ProfileImageClicked) },
+                                contentDescription = "profile picture",
+                            )
+                        }
                     }
                     CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
                         TextButton(

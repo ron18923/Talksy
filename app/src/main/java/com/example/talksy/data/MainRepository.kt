@@ -132,9 +132,9 @@ class MainRepository(
         return senderUid == userUid
     }
 
-    suspend fun getUserChats(chats: (ArrayList<ChatsListItem>) -> Unit) {
+    suspend fun getUserChats(chats: (ArrayList<ChatsListItem>) -> Unit, error: (String) -> Unit) {
         val userUid = userRepository.getUserUid() ?: return
-        fireStoreRepository.getUserChatsFlow(userUid) { returnedChats ->
+        fireStoreRepository.getUserChatsFlow(userUid = userUid, chat = { returnedChats ->
             CoroutineScope(Dispatchers.IO).launch {
                 val customChats = arrayListOf<ChatsListItem>()
 
@@ -145,13 +145,15 @@ class MainRepository(
                         ChatsListItem(
                             profilePicture = storageRepository.getProfilePicture(otherUid),
                             username = (fireStoreRepository.getUsernameByUid(otherUid) ?: ""),
-                            lastMessage =  if (chat.messages.isNotEmpty()) chat.messages.last() else Message()
+                            lastMessage = if (chat.messages.isNotEmpty()) chat.messages.last() else Message()
                         )
                     )
                 }
                 chats(customChats)
             }
-        }
+        },
+            error = { error(it) }
+        )
     }
 
     suspend fun getUserProfilePicture(username: String): Uri {

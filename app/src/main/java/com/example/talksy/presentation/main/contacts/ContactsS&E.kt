@@ -12,5 +12,6 @@ sealed class ContactsEvent {
 data class ContactsStates(
     var searchInput: String = "",
     var searchList: ArrayList<String> = arrayListOf(),
-    var contactsList: ArrayList<HashMap<String, String>> = arrayListOf()
+    var contactsList: ArrayList<HashMap<String, String>> = arrayListOf(),
+    var showProgressBar: Boolean = true
 )
