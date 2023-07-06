@@ -1,17 +1,14 @@
 package com.example.talksy.presentation.main.settings
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.MainRepository
 import com.example.talksy.data.helperRepositories.UserStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,16 +24,10 @@ class SettingsViewModel @Inject constructor(
     private val _events = MutableSharedFlow<SettingsEvent>()
     val events = _events.asSharedFlow()
 
-    private val _user = mainRepository.getUser()
-
     private val _userStateListener = UserStateListenerImpl()
 
     init {
-        if (_user != null) _state.value = _state.value.copy(
-            username = _user.displayName ?: "",
-            email = _user.email ?: "",
-            profilePicture = _user.photoUrl ?: Uri.EMPTY,
-        )
+        init()
         mainRepository.setUserListener(_userStateListener)
     }
 
@@ -59,16 +50,24 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    private fun init() {
+        viewModelScope.launch {
+            mainRepository.getUser { user ->
+                if (user == null) return@getUser
+                _state.value = _state.value.copy(
+                    username = user.username,
+                    email = user.email,
+                    profilePicture = Uri.parse(user.profilePicture)
+                )
+            }
+        }
+    }
+
     inner class UserStateListenerImpl : UserStateListener {
         override fun onUserStateChanged() {
             _state.value = _state.value.copy(username = "", email = "", profilePicture = Uri.EMPTY)
-            val updatedUser = mainRepository.getUser()
-            if (updatedUser != null) _state.value = _state.value.copy(
-                username = updatedUser.displayName ?: "",
-                email = updatedUser.email ?: "",
-                profilePicture = updatedUser.photoUrl ?: Uri.EMPTY
-            )
-            if (updatedUser == null) {
+            init()
+            if (!mainRepository.isUserLoggedIn()) {
                 viewModelScope.launch {
                     _events.emit(
                         SettingsEvent.SignOut

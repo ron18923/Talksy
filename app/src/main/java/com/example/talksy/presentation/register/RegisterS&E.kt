@@ -18,5 +18,6 @@ data class RegisterStates(
     var usernameInput: String = "",
     var emailInput: String = "",
     var passwordInput: String = "",
-    var isPasswordVisible: Boolean = false
+    var isPasswordVisible: Boolean = false,
+    var showProgressDialog: Boolean = false,
 )

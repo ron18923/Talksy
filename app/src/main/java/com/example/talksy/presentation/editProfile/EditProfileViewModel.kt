@@ -7,11 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talksy.data.MainRepository
 import com.example.talksy.data.helperRepositories.UserStateListener
-import com.example.talksy.presentation.main.settings.SettingsEvent
-import com.example.talksy.presentation.main.settings.SettingsStates
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,24 +25,24 @@ class EditProfileViewModel @Inject constructor(
     private val _events = MutableSharedFlow<EditProfileEvent>()
     val events = _events.asSharedFlow()
 
-    private val _user = mainRepository.getUser()
-
     private val _userStateListener = UserStateListenerImpl()
 
     init {
-        updateScreenValues()
+        init()
         mainRepository.setUserListener(_userStateListener)
     }
 
-    private fun updateScreenValues() {
-        _user?.let {
-            _state.value = _state.value.copy(
-                email = _user.email ?: "",
-                username = _user.displayName ?: "",
-                profileImage = _user.photoUrl ?: Uri.EMPTY
-            )
+    private fun init() {
+        viewModelScope.launch {
+            mainRepository.getUser { user ->
+                if(user == null) return@getUser
+                _state.value = _state.value.copy(
+                    email = user.email,
+                    username = user.username,
+                    profileImage = Uri.parse(user.profilePicture)
+                )
+            }
         }
-
     }
 
     fun onEvent(event: EditProfileEvent) {
@@ -123,14 +120,7 @@ class EditProfileViewModel @Inject constructor(
     inner class UserStateListenerImpl : UserStateListener {
         override fun onUserStateChanged() {
             _state.value = _state.value.copy(email = "", username = "", profileImage = Uri.EMPTY)
-            val updatedUser = mainRepository.getUser()
-            updatedUser?.let { user ->
-                _state.value = _state.value.copy(
-                    email = user.email ?: "",
-                    username = user.displayName ?: "",
-                    profileImage = user.photoUrl ?: Uri.EMPTY
-                )
-            }
+            init()
         }
     }
 }

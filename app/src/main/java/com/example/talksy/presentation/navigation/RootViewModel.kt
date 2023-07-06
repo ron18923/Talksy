@@ -26,7 +26,7 @@ class RootViewModel @Inject constructor(
     val events = _events.asSharedFlow()
 
     init {
-        _state.value = _state.value.copy(isUserLoggedIn = (mainRepository.getUser() != null))
+        _state.value = _state.value.copy(isUserLoggedIn = mainRepository.isUserLoggedIn())
     }
 }
 

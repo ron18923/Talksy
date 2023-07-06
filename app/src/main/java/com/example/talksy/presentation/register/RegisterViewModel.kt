@@ -28,28 +28,39 @@ class RegisterViewModel @Inject constructor(
     val events = _events.asSharedFlow()
 
     private fun registerUser() {
-        viewModelScope.launch{
-            mainRepository.addNewUser(username = _state.value.usernameInput, email = _state.value.emailInput,
+        showProgressDialog(true)
+        viewModelScope.launch {
+            mainRepository.addNewUser(username = _state.value.usernameInput,
+                email = _state.value.emailInput,
                 _state.value.passwordInput,
-            ) { errorMessage ->
-                onEvent(RegisterEvent.ShowMessage(errorMessage))
-                return@addNewUser
-            }
-            if(mainRepository.getUser() != null) onEvent(RegisterEvent.GoToApp)
+                errorMessage = { errorMessage ->
+                    onEvent(RegisterEvent.ShowMessage(errorMessage))
+                    showProgressDialog(false)
+                    return@addNewUser
+                },
+                onFinish = {
+                    if (mainRepository.isUserLoggedIn()) {
+                        showProgressDialog(false)
+                        onEvent(RegisterEvent.GoToApp)
+                    }
+                })
         }
     }
 
-    fun onEvent(event: RegisterEvent){
-        when(event){
+    fun onEvent(event: RegisterEvent) {
+        when (event) {
             is RegisterEvent.UsernameEntered -> {
                 _state.value = _state.value.copy(usernameInput = event.value)
             }
+
             is RegisterEvent.EmailEntered -> {
                 _state.value = _state.value.copy(emailInput = event.value)
             }
+
             is RegisterEvent.PasswordEntered -> {
                 _state.value = _state.value.copy(passwordInput = event.value)
             }
+
             is RegisterEvent.GoToLoginClicked -> {
                 viewModelScope.launch {
                     _events.emit(
@@ -57,6 +68,7 @@ class RegisterViewModel @Inject constructor(
                     )
                 }
             }
+
             is RegisterEvent.GoBackClicked -> {
                 viewModelScope.launch {
                     _events.emit(
@@ -64,12 +76,16 @@ class RegisterViewModel @Inject constructor(
                     )
                 }
             }
+
             is RegisterEvent.PasswordVisibilityClicked -> {
-                _state.value = _state.value.copy(isPasswordVisible = !_state.value.isPasswordVisible)
+                _state.value =
+                    _state.value.copy(isPasswordVisible = !_state.value.isPasswordVisible)
             }
+
             is RegisterEvent.RegisterClicked -> {
                 registerUser()
             }
+
             is RegisterEvent.ShowMessage -> {
                 viewModelScope.launch {
                     _events.emit(
@@ -77,6 +93,7 @@ class RegisterViewModel @Inject constructor(
                     )
                 }
             }
+
             is RegisterEvent.GoToApp -> {
                 viewModelScope.launch {
                     _events.emit(
@@ -85,5 +102,9 @@ class RegisterViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun showProgressDialog(state: Boolean) {
+        _state.value = _state.value.copy(showProgressDialog = state)
     }
 }

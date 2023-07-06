@@ -16,5 +16,6 @@ sealed class LoginEvent {
 data class LoginStates(
     var emailInput: String = "",
     var passwordInput: String = "",
-    var isPasswordVisible: Boolean = false
+    var isPasswordVisible: Boolean = false,
+    var showProgressDialog: Boolean = false
 )

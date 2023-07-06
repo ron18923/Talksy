@@ -47,6 +47,7 @@ import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.presentation.navigation.AuthScreen
 import com.example.talksy.presentation.navigation.Graph
 import com.example.talksy.presentation.reusable.composables.AutoScalingText
+import com.example.talksy.presentation.reusable.composables.ProgressDialog
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -122,6 +123,9 @@ fun Login(
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
+            if(state.showProgressDialog){
+                ProgressDialog()
+            }
             Column(
                 modifier = modifier
                     .fillMaxWidth(0.88f),
@@ -199,7 +203,7 @@ fun Login(
 fun LoginPrev() {
     Login(
         navController = rememberNavController(),
-        state = LoginStates("", "", false),
+        state = LoginStates("", "", false, true),
         onEvent = {},
         events = MutableSharedFlow<LoginEvent>().asSharedFlow()
     )

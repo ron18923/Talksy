@@ -38,18 +38,20 @@ class LoginViewModel @Inject constructor(
             onEvent(LoginEvent.ShowMessage(errorMessage))
             return@checkIfFieldsValid
         }
-
+        showProgressDialog(true)
         viewModelScope.launch {
-            Log.d(TAG, "Login: 1")
             mainRepository.signInUser(
                 _state.value.emailInput,
                 _state.value.passwordInput
             ) { errorMessage ->
                 onEvent(LoginEvent.ShowMessage(errorMessage))
+                showProgressDialog(false)
                 return@signInUser
             }
-            Log.d(TAG, "Login: 2 ${mainRepository.getUser() != null}")
-            if (mainRepository.getUser() != null) onEvent(LoginEvent.GoToApp)
+            if (mainRepository.isUserLoggedIn()){
+                showProgressDialog(false)
+                onEvent(LoginEvent.GoToApp)
+            }
         }
     }
 
@@ -92,7 +94,8 @@ class LoginViewModel @Inject constructor(
             }
 
             is LoginEvent.PasswordVisibilityClicked -> {
-                _state.value = _state.value.copy(isPasswordVisible = !_state.value.isPasswordVisible)
+                _state.value =
+                    _state.value.copy(isPasswordVisible = !_state.value.isPasswordVisible)
             }
 
             is LoginEvent.LoginClicked -> {
@@ -108,7 +111,6 @@ class LoginViewModel @Inject constructor(
             }
 
             is LoginEvent.GoToApp -> {
-                Log.d(TAG, "Login: GoToAppViewModel")
                 viewModelScope.launch {
                     _events.emit(
                         LoginEvent.GoToApp
@@ -116,5 +118,9 @@ class LoginViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun showProgressDialog(state: Boolean) {
+        _state.value = _state.value.copy(showProgressDialog = state)
     }
 }

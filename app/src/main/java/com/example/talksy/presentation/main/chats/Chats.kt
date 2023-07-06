@@ -139,13 +139,12 @@ fun Chats(
                 .padding(innerPadding)
                 .fillMaxHeight()
                 .fillMaxWidth(),
-            contentAlignment = Alignment.Center
         ) {
             if (state.showProgressBar)
-                CircularProgressIndicator()
+                CircularProgressIndicator(modifier = modifier.align(Alignment.Center))
             else {
                 Column(
-                    modifier = modifier.fillMaxWidth(0.9f),
+                    modifier = modifier.fillMaxWidth(0.9f).align(Alignment.TopCenter),
                     verticalArrangement = Arrangement.Top
                 ) {
                     if (state.chats.isEmpty()) {

@@ -109,7 +109,6 @@ class FireStoreRepository {
                 } else {
                     UserResponse.OnError(error)
                 }
-                Log.d(TAG, "getUserFlow: sent")
                 trySend(response)
             }
 
@@ -123,11 +122,9 @@ class FireStoreRepository {
             when (it) {
                 is UserResponse.OnError -> TODO()
                 is UserResponse.OnSuccess -> {
-                    Log.d(TAG, "getUserFlow: sent to 2")
                     val u =
                         it.documentSnapshot?.reference?.get()?.await()?.toObject(User::class.java)
                     user(u)
-                    Log.d(TAG, "getUser: ${u}")
                 }
             }
         }
@@ -202,7 +199,7 @@ class FireStoreRepository {
         }
     }
 
-    suspend fun getChat(user1: String, user2: String): Chat? {
+    private suspend fun getChat(user1: String, user2: String): Chat? {
         val firstQuery =
             chatsCollection.whereEqualTo(FIELD_UID1, user1).whereEqualTo(FIELD_UID2, user2).get()
                 .await()

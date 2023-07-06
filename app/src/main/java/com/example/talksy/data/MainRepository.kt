@@ -9,7 +9,6 @@ import com.example.talksy.data.helperRepositories.FireStoreRepository
 import com.example.talksy.data.helperRepositories.StorageRepository
 import com.example.talksy.data.helperRepositories.UserRepository
 import com.example.talksy.data.helperRepositories.UserStateListener
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +27,15 @@ class MainRepository(
 
     fun signOutUser() = userRepository.signOutUser()
 
-    fun getUser(): FirebaseUser? = userRepository.getUser()
+    suspend fun getUser(user: (User?) -> Unit) {
+        getUserUid()?.let { uid ->
+            fireStoreRepository.getUser(uid) { user ->
+                user(user)
+            }
+        }
+    }
+
+    fun isUserLoggedIn(): Boolean = userRepository.getUser() != null
 
     fun resetPassword() = userRepository.resetPassword()
 
@@ -38,7 +45,8 @@ class MainRepository(
         username: String,
         email: String,
         password: String,
-        errorMessage: (String) -> Unit
+        errorMessage: (String) -> Unit,
+        onFinish: () -> Unit
     ) {
         if (!fireStoreRepository.checkUsername(username, errorMessage)) return
         val userUid =
@@ -47,6 +55,7 @@ class MainRepository(
             val user = User(username = username, email = email)
             fireStoreRepository.addNewUser(user = user, uid = userUid)
         }
+        onFinish()
     }
 
     suspend fun putProfilePicture(
