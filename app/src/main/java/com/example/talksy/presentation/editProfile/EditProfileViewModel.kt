@@ -35,7 +35,7 @@ class EditProfileViewModel @Inject constructor(
     private fun init() {
         viewModelScope.launch {
             mainRepository.getUser { user ->
-                if(user == null) return@getUser
+                if (user == null) return@getUser
                 _state.value = _state.value.copy(
                     email = user.email,
                     username = user.username,
@@ -89,12 +89,11 @@ class EditProfileViewModel @Inject constructor(
             is EditProfileEvent.ImagePicked -> {
                 viewModelScope.launch {
                     val userUid = mainRepository.getUserUid() ?: return@launch
-                    mainRepository.putProfilePicture(userUid, event.value) {
-                        viewModelScope.launch {
-                            mainRepository.updateProfilePicture(it)
-                            _state.value =
-                                _state.value.copy(profileImage = it)
-                        }
+                    val profilePictureUri = mainRepository.putProfilePicture(
+                        userUid,
+                        event.value
+                    ) { profilePictureUri ->
+                        _state.value = _state.value.copy(profileImage = profilePictureUri)
                     }
                 }
             }
@@ -104,9 +103,10 @@ class EditProfileViewModel @Inject constructor(
                     val userUid = mainRepository.getUserUid() ?: return@launch
                     mainRepository.deleteProfilePicture(userUid) {
                         viewModelScope.launch {
-                            mainRepository.updateProfilePicture(Uri.EMPTY)
-                            _state.value =
-                                _state.value.copy(profileImage = Uri.EMPTY)
+                            mainRepository.deleteProfilePicture(userUid) {
+                                _state.value =
+                                    _state.value.copy(profileImage = Uri.EMPTY)
+                            }
                         }
                     }
                 }

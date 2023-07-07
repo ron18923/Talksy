@@ -1,8 +1,6 @@
 package com.example.talksy.data.helperRepositories
 
 import android.net.Uri
-import android.util.Log
-import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.Chat
 import com.example.talksy.data.dataModels.Message
 import com.example.talksy.data.dataModels.User
@@ -130,12 +128,24 @@ class FireStoreRepository {
         }
     }
 
-    suspend fun getProfilePicture(uid: String): Uri {
+    suspend fun getProfilePicture(userUid: String): Uri {
 
-        val docRef = usersCollection.document(uid)
+        val docRef = usersCollection.document(userUid)
 
         val user = docRef.get().await().toObject(User::class.java) ?: return Uri.EMPTY
         return Uri.parse(user.profilePicture)
+    }
+
+    fun setProfilePicture(userUid: String, imageUri: Uri, pictureAdded: () -> Unit) {
+        val docRef = usersCollection.document(userUid)
+        docRef.get().addOnSuccessListener { document ->
+            val user = document.toObject(User::class.java)
+            user?.let {
+                docRef.set(hashMapOf(FIELD_PROFILE_PICTURE to imageUri), SetOptions.merge()).addOnSuccessListener {
+                    pictureAdded()
+                }
+            }
+        }
     }
 
     suspend fun checkUsername(username: String, errorMessage: (String) -> Unit): Boolean {
@@ -284,7 +294,11 @@ class FireStoreRepository {
         }
     }
 
-    suspend fun getUserChatsFlow(userUid: String, chat: (ArrayList<Chat>) -> Unit, error: (String) -> Unit) {
+    suspend fun getUserChatsFlow(
+        userUid: String,
+        chat: (ArrayList<Chat>) -> Unit,
+        error: (String) -> Unit
+    ) {
         getUserChatsFlowSetup(userUid).collectLatest {
             val chatsList: ArrayList<Chat> = arrayListOf()
             when (it) {

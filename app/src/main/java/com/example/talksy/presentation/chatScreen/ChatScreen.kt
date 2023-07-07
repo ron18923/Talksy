@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.graphics.Paint.Align
 import android.view.WindowManager
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -91,6 +92,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -177,13 +179,13 @@ fun ChatScreen(
                                 tint = MaterialTheme.colorScheme.onSurface,
                                 contentDescription = "profile picture empty"
                             )
-                            Icon(
+                            Image(
                                 modifier = modifier
                                     .fillMaxSize()
                                     .clip(CircleShape),
                                 painter = rememberAsyncImagePainter(model = state.otherProfile),
                                 contentDescription = "profile picture",
-                                tint = Color.Unspecified
+                                contentScale = ContentScale.Crop,
                             )
                         }
                         Text(

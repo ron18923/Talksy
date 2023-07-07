@@ -11,12 +11,10 @@ class StorageRepository {
     suspend fun putProfilePicture(
         uid: String,
         profilePicture: Uri,
-        profilePictureUri: (Uri) -> Unit
-    ) {
+    ): Uri {
         val task = storageRef.child(uid).putFile(profilePicture).await()
-        task.storage.downloadUrl.await()?.let {
-            profilePictureUri(it)
-        }
+        val uri = task.storage.downloadUrl.await()
+        return uri
     }
 
     suspend fun deleteProfilePicture(uid: String, profilePictureDeleted: () -> Unit) {
@@ -28,7 +26,7 @@ class StorageRepository {
         }
     }
 
-    suspend fun getProfilePicture(uid: String): Uri {
+    suspend fun getProfilePicture(uid: String): Uri{
         return try {
             storageRef.child(uid).downloadUrl.await() ?: Uri.EMPTY
         } catch (e: Exception){

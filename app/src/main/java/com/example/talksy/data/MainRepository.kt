@@ -1,6 +1,7 @@
 package com.example.talksy.data
 
 import android.net.Uri
+import androidx.lifecycle.viewModelScope
 import com.example.talksy.data.dataModels.Chat
 import com.example.talksy.data.dataModels.ChatsListItem
 import com.example.talksy.data.dataModels.Message
@@ -18,9 +19,6 @@ class MainRepository(
     val storageRepository: StorageRepository,
     val fireStoreRepository: FireStoreRepository
 ) {
-
-    suspend fun updateProfilePicture(profilePicture: Uri) =
-        userRepository.updateProfilePicture(profilePicture)
 
     suspend fun signInUser(email: String, password: String, errorMessage: (String) -> Unit) =
         userRepository.signInUser(email, password, errorMessage)
@@ -61,12 +59,16 @@ class MainRepository(
     suspend fun putProfilePicture(
         uid: String,
         profilePicture: Uri,
-        profilePictureUri: (Uri) -> Unit
-    ) = storageRepository.putProfilePicture(
-        uid = uid,
-        profilePicture = profilePicture
-    ) { resultUri ->
-        profilePictureUri(resultUri)
+        pictureAdded: (Uri) -> Unit
+    ){
+        val profilePictureUri = storageRepository.putProfilePicture(
+            uid = uid,
+            profilePicture = profilePicture
+        )
+        userRepository.updateProfilePicture(profilePictureUri)
+        fireStoreRepository.setProfilePicture(userUid = uid, imageUri = profilePictureUri) {
+            pictureAdded(profilePictureUri)
+        }
     }
 
     suspend fun deleteProfilePicture(uid: String, profilePictureDeleted: () -> Unit) =
