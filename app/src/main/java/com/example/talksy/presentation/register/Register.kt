@@ -198,7 +198,6 @@ fun Register(
                             )
                         }
                     }
-                    Spacer(modifier = modifier.fillMaxHeight(0.06f))
                 }
             }
         }

@@ -48,7 +48,7 @@ class LoginViewModel @Inject constructor(
                 showProgressDialog(false)
                 return@signInUser
             }
-            if (mainRepository.isUserLoggedIn()){
+            if (mainRepository.isUserLoggedIn()) {
                 showProgressDialog(false)
                 onEvent(LoginEvent.GoToApp)
             }

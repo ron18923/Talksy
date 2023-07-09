@@ -1,6 +1,8 @@
 package com.example.talksy.data.helperRepositories
 
 import android.net.Uri
+import android.util.Log
+import com.example.talksy.TalksyApp
 import com.example.talksy.data.dataModels.Chat
 import com.example.talksy.data.dataModels.Message
 import com.example.talksy.data.dataModels.User
@@ -149,7 +151,9 @@ class FireStoreRepository {
     }
 
     suspend fun checkUsername(username: String, errorMessage: (String) -> Unit): Boolean {
+        Log.d(TalksyApp.TAG, "addNewUser: before checkusername")
         val documents = usersCollection.whereEqualTo(FIELD_USERNAME, username).get().await()
+        Log.d(TalksyApp.TAG, "addNewUser: after checkusername")
         return if (documents.isEmpty) {
             true
         } else {

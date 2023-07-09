@@ -60,6 +60,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalMinimumTouchTargetEnforcement
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -77,6 +78,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -291,59 +293,70 @@ fun ChatScreen(
                 ) {
                     val spacingValue = 10.dp
                     Spacer(modifier = modifier.width(spacingValue))
-                    IconButton(onClick = { /*TODO*/ }, modifier = modifier.fillMaxHeight(0.5f)) {
-                        Icon(
+                    CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                        IconButton(
+                            onClick = { /*TODO*/ },
+                            modifier = modifier.fillMaxHeight(0.5f)
+                        ) {
+                            Icon(
+                                modifier = modifier
+                                    .aspectRatio(1f),
+                                imageVector = Icons.Default.EmojiEmotions,
+                                contentDescription = "Emojis",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Spacer(modifier = modifier.width(spacingValue))
+                        BasicTextField(
                             modifier = modifier
-                                .aspectRatio(1f),
-                            imageVector = Icons.Default.EmojiEmotions,
-                            contentDescription = "Emojis",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                .defaultMinSize(0.dp)
+                                .weight(1f),
+                            value = state.inputText,
+                            onValueChange = { onEvent(ChatScreenEvent.InputChange(it)) },
+                            maxLines = 3,
+                            decorationBox = { innerTextField ->
+                                Box(
+                                    modifier = modifier.padding(start = 6.dp),
+                                    contentAlignment = Alignment.CenterStart
+                                ) {
+                                    if (state.inputText.isEmpty()) Text(
+                                        text = "Message",
+                                        style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    )
+                                    innerTextField()
+                                }
+                            },
+                            textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant)
                         )
-                    }
-                    Spacer(modifier = modifier.width(spacingValue))
-                    BasicTextField(
-                        modifier = modifier
-                            .defaultMinSize(0.dp)
-                            .weight(1f),
-                        value = state.inputText,
-                        onValueChange = { onEvent(ChatScreenEvent.InputChange(it)) },
-                        maxLines = 3,
-                        decorationBox = { innerTextField ->
-                            Box(
-                                modifier = modifier.padding(start = 6.dp),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                if (state.inputText.isEmpty()) Text(
-                                    text = "Message",
-                                    style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                )
-                                innerTextField()
-                            }
-                        },
-                        textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current),
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant)
-                    )
-                    Spacer(modifier = modifier.width(spacingValue))
+                        Spacer(modifier = modifier.width(spacingValue))
 
-                    IconButton(onClick = { onEvent(ChatScreenEvent.ClipClicked) }, modifier = modifier.fillMaxHeight(0.5f)) {
-                        Icon(
-                            modifier = modifier
-                                .aspectRatio(1f),
-                            contentDescription = "clip",
-                            imageVector = Icons.Default.AttachFile,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                        IconButton(
+                            onClick = { onEvent(ChatScreenEvent.ClipClicked) },
+                            modifier = modifier.fillMaxHeight(0.5f)
+                        ) {
+                            Icon(
+                                modifier = modifier
+                                    .aspectRatio(1f),
+                                contentDescription = "clip",
+                                imageVector = Icons.Default.AttachFile,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Spacer(modifier = modifier.width(spacingValue))
+                        IconButton(
+                            onClick = { /*TODO*/ },
+                            modifier = modifier.fillMaxHeight(0.5f)
+                        ) {
+                            Icon(
+                                modifier = modifier
+                                    .aspectRatio(1f), contentDescription = "clip",
+                                imageVector = Icons.Default.CameraAlt,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Spacer(modifier = modifier.width(spacingValue))
                     }
-                    Spacer(modifier = modifier.width(spacingValue))
-                    IconButton(onClick = { /*TODO*/ }, modifier = modifier.fillMaxHeight(0.5f)) {
-                        Icon(
-                            modifier = modifier
-                                .aspectRatio(1f), contentDescription = "clip",
-                            imageVector = Icons.Default.CameraAlt,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Spacer(modifier = modifier.width(spacingValue))
                 }
                 IconButton(
                     modifier = modifier.aspectRatio(1f),

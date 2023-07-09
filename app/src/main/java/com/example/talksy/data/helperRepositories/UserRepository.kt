@@ -13,7 +13,7 @@ class UserRepository(private val auth: FirebaseAuth) {
     private var listeners: ArrayList<UserStateListener?> = arrayListOf()
 
     init {
-        auth.addAuthStateListener {
+        auth.addAuthStateListener{
             listeners.forEach { listener ->
                 listener?.onUserStateChanged()
             }
@@ -34,7 +34,7 @@ class UserRepository(private val auth: FirebaseAuth) {
             val firebaseUser = auth.createUserWithEmailAndPassword(email, password).await().user
             val profileUpdates = UserProfileChangeRequest.Builder().setDisplayName(username).build()
             firebaseUser?.updateProfile(profileUpdates)?.await()
-            if (firebaseUser == null) {
+            if (firebaseUser == null){
                 errorMessage("failed to create new user.")
                 return null
             }
@@ -48,9 +48,10 @@ class UserRepository(private val auth: FirebaseAuth) {
     }
 
     suspend fun signInUser(email: String, password: String, errorMessage: (String) -> Unit) {
-        Log.d(TAG, "signInUser: login")
         try {
+            Log.d(TAG, "signInUser: before")
             val firebaseUser = auth.signInWithEmailAndPassword(email, password).await().user
+            Log.d(TAG, "signInUser: after")
             if (firebaseUser == null) errorMessage("failed to Login.")
         } catch (e: Exception) {
             e.printStackTrace()
@@ -64,21 +65,19 @@ class UserRepository(private val auth: FirebaseAuth) {
         return auth.currentUser
     }
 
-    fun signOutUser() {
+    fun signOutUser(){
         auth.signOut()
     }
 
-    suspend fun updateUsername(username: String) {
+    suspend fun updateUsername(username: String){
         val user = auth.currentUser ?: return
-        val userProfileChangeRequest =
-            UserProfileChangeRequest.Builder().setDisplayName(username).build()
+        val userProfileChangeRequest = UserProfileChangeRequest.Builder().setDisplayName(username).build()
         user.updateProfile(userProfileChangeRequest).await()
     }
 
-    suspend fun updateProfilePicture(profilePicture: Uri) {
+    suspend fun updateProfilePicture(profilePicture: Uri){
         val user = auth.currentUser ?: return
-        val userProfileChangeRequest =
-            UserProfileChangeRequest.Builder().setPhotoUri(profilePicture).build()
+        val userProfileChangeRequest = UserProfileChangeRequest.Builder().setPhotoUri(profilePicture).build()
         user.updateProfile(userProfileChangeRequest).await()
     }
 
@@ -88,7 +87,7 @@ class UserRepository(private val auth: FirebaseAuth) {
         auth.sendPasswordResetEmail(finalEmail)
     }
 
-    fun getUserUid(): String? {
+    fun getUserUid(): String?{
         return auth.currentUser?.uid
     }
 }

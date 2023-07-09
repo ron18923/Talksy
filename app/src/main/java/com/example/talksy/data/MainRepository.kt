@@ -1,7 +1,9 @@
 package com.example.talksy.data
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.Chat
 import com.example.talksy.data.dataModels.ChatsListItem
 import com.example.talksy.data.dataModels.Message

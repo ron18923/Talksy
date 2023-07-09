@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
@@ -24,7 +23,7 @@ fun ProgressDialog(modifier: Modifier = Modifier) {
             contentAlignment= Center,
             modifier = modifier
                 .size(100.dp)
-                .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(8.dp))
+                .background(White, shape = RoundedCornerShape(8.dp))
         ) {
             CircularProgressIndicator()
         }
