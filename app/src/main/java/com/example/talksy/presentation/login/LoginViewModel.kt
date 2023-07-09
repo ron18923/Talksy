@@ -31,13 +31,13 @@ class LoginViewModel @Inject constructor(
     val events = _events.asSharedFlow()
 
     private fun loginUser() {
-        checkIfFieldsValid(
-            _state.value.emailInput,
-            _state.value.passwordInput
-        ) { errorMessage ->
-            onEvent(LoginEvent.ShowMessage(errorMessage))
-            return@checkIfFieldsValid
-        }
+//        checkIfFieldsValid(
+//            _state.value.emailInput,
+//            _state.value.passwordInput
+//        ) { errorMessage ->
+//            onEvent(LoginEvent.ShowMessage(errorMessage))
+//            return@checkIfFieldsValid
+//        }
         showProgressDialog(true)
         viewModelScope.launch {
             mainRepository.signInUser(
@@ -119,7 +119,6 @@ class LoginViewModel @Inject constructor(
             }
 
             LoginEvent.ForgotPasswordClicked -> {
-
                 viewModelScope.launch {
                     _events.emit(
                         LoginEvent.ForgotPasswordClicked

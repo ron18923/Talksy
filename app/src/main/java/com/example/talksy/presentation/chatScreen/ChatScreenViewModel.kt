@@ -45,11 +45,7 @@ class ChatScreenViewModel @Inject constructor(
     fun onEvent(event: ChatScreenEvent) {
         when (event) {
             ChatScreenEvent.GoBackClicked -> {
-                viewModelScope.launch {
-                    _events.emit(
-                        ChatScreenEvent.GoBackClicked
-                    )
-                }
+                viewModelScope.launch { _events.emit(ChatScreenEvent.GoBackClicked) }
             }
 
             is ChatScreenEvent.SetUser2 -> {
@@ -80,6 +76,12 @@ class ChatScreenViewModel @Inject constructor(
                 messages = arrayListOf(),
                 showProgressBar = true
             )
+
+            ChatScreenEvent.ClipClicked -> {
+                viewModelScope.launch { _events.emit(ChatScreenEvent.ClipClicked) }
+            }
+
+            is ChatScreenEvent.ClipImagePicked -> {}// TODO
         }
     }
 

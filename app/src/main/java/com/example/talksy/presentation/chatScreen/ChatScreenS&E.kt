@@ -6,9 +6,12 @@ import com.example.talksy.data.dataModels.MessageView
 sealed class ChatScreenEvent() {
     data class InputChange(val input: String) : ChatScreenEvent()
     data class SetUser2(val user2: String) : ChatScreenEvent()
+    data class ClipImagePicked(val uri: Uri) : ChatScreenEvent()
 
     object GoBackClicked : ChatScreenEvent()
     object SendClicked : ChatScreenEvent()
+    object ClipClicked : ChatScreenEvent()
+
     object Dispose : ChatScreenEvent()
 }
 

@@ -1,4 +1,4 @@
-package com.example.talksy.data.dataModels
+     package com.example.talksy.data.dataModels
 
 import android.net.Uri
 

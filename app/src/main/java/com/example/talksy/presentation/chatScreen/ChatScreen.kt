@@ -3,7 +3,10 @@ package com.example.talksy.presentation.chatScreen
 import android.app.Activity
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.graphics.Paint.Align
+import android.net.Uri
 import android.view.WindowManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -113,6 +116,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.R
 import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.MessageView
+import com.example.talksy.presentation.editProfile.EditProfileEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -137,6 +141,18 @@ fun ChatScreen(
 //    this code is for the keyboard to overlap the screen.
     activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
+    var showImagePicker by remember { mutableStateOf(false) }
+
+    val cameraPickerLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+            if (uri != null) onEvent(ChatScreenEvent.ClipImagePicked(uri))
+        }
+
+    if (showImagePicker) {
+        showImagePicker = false
+        cameraPickerLauncher.launch("image/*")
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             onEvent(ChatScreenEvent.Dispose)
@@ -151,6 +167,7 @@ fun ChatScreen(
         events.collectLatest { event ->
             when (event) {
                 ChatScreenEvent.GoBackClicked -> navController.popBackStack()
+                ChatScreenEvent.ClipClicked -> showImagePicker = true
                 else -> {}
             }
         }
@@ -274,14 +291,15 @@ fun ChatScreen(
                 ) {
                     val spacingValue = 10.dp
                     Spacer(modifier = modifier.width(spacingValue))
-                    Icon(
-                        modifier = modifier
-                            .fillMaxHeight(0.5f)
-                            .aspectRatio(1f),
-                        imageVector = Icons.Default.EmojiEmotions,
-                        contentDescription = "Emojis",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    IconButton(onClick = { /*TODO*/ }, modifier = modifier.fillMaxHeight(0.5f)) {
+                        Icon(
+                            modifier = modifier
+                                .aspectRatio(1f),
+                            imageVector = Icons.Default.EmojiEmotions,
+                            contentDescription = "Emojis",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     Spacer(modifier = modifier.width(spacingValue))
                     BasicTextField(
                         modifier = modifier
@@ -306,21 +324,25 @@ fun ChatScreen(
                         cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant)
                     )
                     Spacer(modifier = modifier.width(spacingValue))
-                    Icon(
-                        modifier = modifier
-                            .fillMaxHeight(0.5f)
-                            .aspectRatio(1f), contentDescription = "clip",
-                        imageVector = Icons.Default.AttachFile,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+
+                    IconButton(onClick = { onEvent(ChatScreenEvent.ClipClicked) }, modifier = modifier.fillMaxHeight(0.5f)) {
+                        Icon(
+                            modifier = modifier
+                                .aspectRatio(1f),
+                            contentDescription = "clip",
+                            imageVector = Icons.Default.AttachFile,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                     Spacer(modifier = modifier.width(spacingValue))
-                    Icon(
-                        modifier = modifier
-                            .fillMaxHeight(0.5f)
-                            .aspectRatio(1f), contentDescription = "clip",
-                        imageVector = Icons.Default.CameraAlt,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    IconButton(onClick = { /*TODO*/ }, modifier = modifier.fillMaxHeight(0.5f)) {
+                        Icon(
+                            modifier = modifier
+                                .aspectRatio(1f), contentDescription = "clip",
+                            imageVector = Icons.Default.CameraAlt,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     Spacer(modifier = modifier.width(spacingValue))
                 }
                 IconButton(
