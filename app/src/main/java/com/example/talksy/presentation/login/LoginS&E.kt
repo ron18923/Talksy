@@ -8,6 +8,8 @@ sealed class LoginEvent {
     object LoginClicked : LoginEvent()
     object GoToRegisterClicked : LoginEvent()
     object GoBackClicked : LoginEvent()
+    object ForgotPasswordClicked : LoginEvent()
+    object ForgotPasswordDialogClicked : LoginEvent()
 
     data class ShowMessage(val message: String) : LoginEvent()
     object GoToApp : LoginEvent()

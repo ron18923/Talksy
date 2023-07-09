@@ -117,6 +117,17 @@ class LoginViewModel @Inject constructor(
                     )
                 }
             }
+
+            LoginEvent.ForgotPasswordClicked -> {
+
+                viewModelScope.launch {
+                    _events.emit(
+                        LoginEvent.ForgotPasswordClicked
+                    )
+                }
+            }
+
+            LoginEvent.ForgotPasswordDialogClicked -> mainRepository.resetPassword(_state.value.emailInput)
         }
     }
 

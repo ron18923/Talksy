@@ -35,7 +35,7 @@ class MainRepository(
 
     fun isUserLoggedIn(): Boolean = userRepository.getUser() != null
 
-    fun resetPassword() = userRepository.resetPassword()
+    fun resetPassword(email: String = "") = userRepository.resetPassword(email)
 
     fun getUserUid(): String? = userRepository.getUserUid()
 

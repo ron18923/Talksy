@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -84,7 +85,6 @@ fun EditProfile(
 
     val cameraPickerLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-            Log.d(TAG, "EditProfile: asd")
             if (uri != null) onEvent(EditProfileEvent.ImagePicked(uri))
         }
 
@@ -192,7 +192,7 @@ fun EditProfile(
                             modifier = Modifier
                                 .defaultMinSize(minWidth = 1.dp, minHeight = 1.dp),
                             contentPadding = PaddingValues(0.dp),
-                            onClick = { /*TODO*/ },
+                            onClick = { /*TODO*/ }
                         ) {
                             TextButton(
                                 onClick = { onEvent(EditProfileEvent.DeleteImageClicked) }) {
@@ -237,7 +237,7 @@ fun EditProfilePrev() {
 fun ChangePasswordDialog(
     onDismissRequest: (Boolean) -> Unit,
 ) {
-    androidx.compose.material3.AlertDialog(
+    AlertDialog(
         onDismissRequest = { onDismissRequest(false) },
         title = { Text(text = "Reset Password") },
         text = { Text(text = "Link to reset your password will be sent to your Email.") },
