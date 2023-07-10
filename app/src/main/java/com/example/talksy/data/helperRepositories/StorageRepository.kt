@@ -8,13 +8,12 @@ import kotlinx.coroutines.tasks.await
 class StorageRepository {
     private val storageRef: StorageReference = FirebaseStorage.getInstance().reference
 
-    suspend fun putProfilePicture(
-        uid: String,
+    suspend fun putPicture(
+        fileName: String,
         profilePicture: Uri,
     ): Uri {
-        val task = storageRef.child(uid).putFile(profilePicture).await()
-        val uri = task.storage.downloadUrl.await()
-        return uri
+        val task = storageRef.child(fileName).putFile(profilePicture).await()
+        return task.storage.downloadUrl.await()
     }
 
     suspend fun deleteProfilePicture(uid: String, profilePictureDeleted: () -> Unit) {

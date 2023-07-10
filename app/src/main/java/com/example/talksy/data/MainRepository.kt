@@ -1,9 +1,6 @@
 package com.example.talksy.data
 
 import android.net.Uri
-import android.util.Log
-import androidx.lifecycle.viewModelScope
-import com.example.talksy.TalksyApp.Companion.TAG
 import com.example.talksy.data.dataModels.Chat
 import com.example.talksy.data.dataModels.ChatsListItem
 import com.example.talksy.data.dataModels.Message
@@ -15,6 +12,7 @@ import com.example.talksy.data.helperRepositories.UserStateListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class MainRepository(
     val userRepository: UserRepository,
@@ -63,8 +61,8 @@ class MainRepository(
         profilePicture: Uri,
         pictureAdded: (Uri) -> Unit
     ){
-        val profilePictureUri = storageRepository.putProfilePicture(
-            uid = uid,
+        val profilePictureUri = storageRepository.putPicture(
+            fileName = uid,
             profilePicture = profilePicture
         )
         userRepository.updateProfilePicture(profilePictureUri)
@@ -126,11 +124,12 @@ class MainRepository(
         }
     }
 
-    fun addMessage(message: String, chat: Chat) {
-        val senderUid = userRepository.getUserUid()
-        senderUid?.let {
-            chat.messages.add(Message(message = message, senderUid = senderUid))
-        }
+    suspend fun addMessageImage(image: Uri, username2: String){
+        val uuid = UUID.randomUUID().toString()
+        val senderUid = userRepository.getUserUid() ?: return
+        val user2Uid = fireStoreRepository.getUserUidByUsername(username2) ?: return
+        val storageUri = storageRepository.putPicture(fileName = uuid, profilePicture = image)
+        fireStoreRepository.addOneMessageImage(storageUri, senderUid, user2Uid, uuid)
     }
 
     suspend fun addMessage(message: String, username2: String) {

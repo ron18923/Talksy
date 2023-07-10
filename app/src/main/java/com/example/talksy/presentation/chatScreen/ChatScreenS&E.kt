@@ -7,10 +7,12 @@ sealed class ChatScreenEvent() {
     data class InputChange(val input: String) : ChatScreenEvent()
     data class SetUser2(val user2: String) : ChatScreenEvent()
     data class ClipImagePicked(val uri: Uri) : ChatScreenEvent()
+    data class EmojiClicked(val emoji: String) : ChatScreenEvent()
 
     object GoBackClicked : ChatScreenEvent()
-    object SendClicked : ChatScreenEvent()
+    object EmojisClicked : ChatScreenEvent()
     object ClipClicked : ChatScreenEvent()
+    object SendClicked : ChatScreenEvent()
 
     object Dispose : ChatScreenEvent()
 }

@@ -81,7 +81,20 @@ class ChatScreenViewModel @Inject constructor(
                 viewModelScope.launch { _events.emit(ChatScreenEvent.ClipClicked) }
             }
 
-            is ChatScreenEvent.ClipImagePicked -> {}// TODO
+            is ChatScreenEvent.ClipImagePicked -> {
+                val image = event.uri
+                _state.value = _state.value.copy(inputText = "")
+                viewModelScope.launch {
+                    mainRepository.addMessageImage(
+                        image = image,
+                        username2 = _state.value.user2
+                    )
+                }
+            }
+
+            ChatScreenEvent.EmojisClicked -> viewModelScope.launch { _events.emit(ChatScreenEvent.EmojisClicked) }
+            is ChatScreenEvent.EmojiClicked -> _state.value =
+                _state.value.copy(inputText = _state.value.inputText + event.emoji)
         }
     }
 
@@ -94,7 +107,8 @@ class ChatScreenViewModel @Inject constructor(
                 MessageView(
                     message = message.message,
                     timestamp = convertLongToTime(message.timestamp),
-                    isItMe = isFromMe
+                    isItMe = isFromMe,
+                    image = Uri.parse(message.image)
                 )
             )
         }

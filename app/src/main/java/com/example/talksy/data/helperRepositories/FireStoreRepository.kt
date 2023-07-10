@@ -143,9 +143,10 @@ class FireStoreRepository {
         docRef.get().addOnSuccessListener { document ->
             val user = document.toObject(User::class.java)
             user?.let {
-                docRef.set(hashMapOf(FIELD_PROFILE_PICTURE to imageUri), SetOptions.merge()).addOnSuccessListener {
-                    pictureAdded()
-                }
+                docRef.set(hashMapOf(FIELD_PROFILE_PICTURE to imageUri), SetOptions.merge())
+                    .addOnSuccessListener {
+                        pictureAdded()
+                    }
             }
         }
     }
@@ -247,6 +248,34 @@ class FireStoreRepository {
                 FIELD_UID2 to user2,
             )
         ).await()
+    }
+
+    suspend fun addOneMessageImage(image: Uri, senderUid: String, user2Uid: String, uuid: String) {
+        val chat = getChat(senderUid, user2Uid) ?: return
+        chat.messages.add(
+            Message(
+                timestamp = System.currentTimeMillis(),
+                senderUid = senderUid,
+                image = image.toString(),
+                id = uuid
+            )
+        )
+
+        val firstQuery =
+            chatsCollection.whereEqualTo(FIELD_UID1, chat.uid1).whereEqualTo(FIELD_UID2, chat.uid2)
+                .get()
+                .await()
+        val secondQuery =
+            chatsCollection.whereEqualTo(FIELD_UID1, chat.uid2).whereEqualTo(FIELD_UID2, chat.uid1)
+                .get()
+                .await()
+
+        lateinit var finalQuery: QuerySnapshot
+
+        if (!firstQuery.isEmpty) finalQuery = firstQuery
+        else if (!secondQuery.isEmpty) finalQuery = secondQuery
+
+        chatsCollection.document(finalQuery.documents[0].id).set(chat)
     }
 
     suspend fun addOneMessage(message: String, senderUid: String, user2Uid: String) {
