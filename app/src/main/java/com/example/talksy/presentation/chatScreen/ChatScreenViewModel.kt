@@ -93,6 +93,7 @@ class ChatScreenViewModel @Inject constructor(
             }
 
             ChatScreenEvent.EmojisClicked -> viewModelScope.launch { _events.emit(ChatScreenEvent.EmojisClicked) }
+
             is ChatScreenEvent.EmojiClicked -> _state.value =
                 _state.value.copy(inputText = _state.value.inputText + event.emoji)
         }

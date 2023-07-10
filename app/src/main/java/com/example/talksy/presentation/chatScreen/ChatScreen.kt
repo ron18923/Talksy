@@ -80,6 +80,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -90,7 +91,6 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.data.dataModels.MessageView
 import com.example.talksy.presentation.reusable.composables.EmojiTable
-import com.example.talksy.presentation.reusable.composables.keyboardAsState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -112,8 +112,6 @@ fun ChatScreen(
 
     var showImagePicker by remember { mutableStateOf(false) }
     var showEmojiPicker by remember { mutableStateOf(false) }
-
-    val keyboard by keyboardAsState() // saving keyboard state
 
     val keyboardController = LocalSoftwareKeyboardController.current // to control the keyboard
 
