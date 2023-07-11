@@ -250,7 +250,13 @@ class FireStoreRepository {
         ).await()
     }
 
-    suspend fun addOneMessageImage(image: Uri, senderUid: String, user2Uid: String, uuid: String) {
+    suspend fun addOneMessageImage(
+        image: Uri,
+        senderUid: String,
+        user2Uid: String,
+        uuid: String,
+        success: () -> Unit
+    ) {
         val chat = getChat(senderUid, user2Uid) ?: return
         chat.messages.add(
             Message(
@@ -275,7 +281,9 @@ class FireStoreRepository {
         if (!firstQuery.isEmpty) finalQuery = firstQuery
         else if (!secondQuery.isEmpty) finalQuery = secondQuery
 
-        chatsCollection.document(finalQuery.documents[0].id).set(chat)
+        chatsCollection.document(finalQuery.documents[0].id).set(chat).addOnCompleteListener {
+            success()
+        }
     }
 
     suspend fun addOneMessage(message: String, senderUid: String, user2Uid: String) {

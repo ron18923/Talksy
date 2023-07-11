@@ -60,7 +60,7 @@ class MainRepository(
         uid: String,
         profilePicture: Uri,
         pictureAdded: (Uri) -> Unit
-    ){
+    ) {
         val profilePictureUri = storageRepository.putPicture(
             fileName = uid,
             profilePicture = profilePicture
@@ -124,12 +124,12 @@ class MainRepository(
         }
     }
 
-    suspend fun addMessageImage(image: Uri, username2: String){
+    suspend fun addMessageImage(image: Uri, username2: String, success: () -> Unit) {
         val uuid = UUID.randomUUID().toString()
         val senderUid = userRepository.getUserUid() ?: return
         val user2Uid = fireStoreRepository.getUserUidByUsername(username2) ?: return
         val storageUri = storageRepository.putPicture(fileName = uuid, profilePicture = image)
-        fireStoreRepository.addOneMessageImage(storageUri, senderUid, user2Uid, uuid)
+        fireStoreRepository.addOneMessageImage(storageUri, senderUid, user2Uid, uuid) { success() }
     }
 
     suspend fun addMessage(message: String, username2: String) {

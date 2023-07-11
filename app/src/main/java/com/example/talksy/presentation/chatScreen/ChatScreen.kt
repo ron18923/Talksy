@@ -91,6 +91,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.talksy.data.dataModels.MessageView
 import com.example.talksy.presentation.reusable.composables.EmojiTable
+import com.example.talksy.presentation.reusable.composables.ProgressDialog
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -110,7 +111,6 @@ fun ChatScreen(
 //    this code is for the keyboard to overlap the screen.
     activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
-    var showImagePicker by remember { mutableStateOf(false) }
     var showEmojiPicker by remember { mutableStateOf(false) }
 
     val keyboardController = LocalSoftwareKeyboardController.current // to control the keyboard
@@ -126,8 +126,7 @@ fun ChatScreen(
             if (uri != null) onEvent(ChatScreenEvent.ClipImagePicked(uri))
         }
 
-    if (showImagePicker) {
-        showImagePicker = false
+    if (state.showImagePicker) {
         cameraPickerLauncher.launch("image/*")
     }
 
@@ -161,7 +160,6 @@ fun ChatScreen(
                     }
                 }
 
-                ChatScreenEvent.ClipClicked -> showImagePicker = true
                 else -> {}
             }
         }
@@ -220,6 +218,9 @@ fun ChatScreen(
                 }
             )
         }) { innerPadding ->
+        if(state.showSendingDialog){
+            ProgressDialog(text = "Sending...")
+        }
         Box(
             modifier = modifier
                 .fillMaxSize()

@@ -78,17 +78,21 @@ class ChatScreenViewModel @Inject constructor(
             )
 
             ChatScreenEvent.ClipClicked -> {
+                _state.value = _state.value.copy(showImagePicker = true)
                 viewModelScope.launch { _events.emit(ChatScreenEvent.ClipClicked) }
             }
 
             is ChatScreenEvent.ClipImagePicked -> {
+                _state.value = _state.value.copy(showImagePicker = false, showSendingDialog = true)
                 val image = event.uri
                 _state.value = _state.value.copy(inputText = "")
                 viewModelScope.launch {
                     mainRepository.addMessageImage(
                         image = image,
                         username2 = _state.value.user2
-                    )
+                    ) {
+                        _state.value = _state.value.copy(showSendingDialog = false)
+                    }
                 }
             }
 
